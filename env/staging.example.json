@@ -1,0 +1,11 @@
+{
+  "FLAVOR": "staging",
+  "APP_NAME": "My App Staging",
+  "API_BASE_URL": "https://staging-api.example.com",
+  "CONNECT_TIMEOUT_MS": "15000",
+  "RECEIVE_TIMEOUT_MS": "15000",
+  "LOG_LEVEL": "info",
+  "ENABLE_CRASH_REPORTING": "true",
+  "ENABLE_ANALYTICS": "false",
+  "CRASH_DSN": ""
+}
