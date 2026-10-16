@@ -14,7 +14,7 @@
 - Repository provider (keepAlive, declared next to the repository): `<feature>RepositoryProvider`. Notifier: `<Thing>Controller` for actions+state, `<thing>(Ref)` functions for pure derived/read-only data.
 
 ## Imports
-- `String.fromEnvironment` only inside `core/config`.
+- `dotenv` / `String.fromEnvironment` only inside `core/config`.
 - Always package imports (`package:riverpod_core/...`) for anything under `lib/`. No relative imports across folders.
 - Order (enforced by `directives_ordering`): dart, package (flutter first), project. One blank line between groups.
 - No `import ... show`/`hide` unless resolving a name clash (comment why).

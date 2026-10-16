@@ -120,3 +120,20 @@ at implementation time and record them in its report.
 - Decision: the template is a mobile app: `android/` and `ios/` are tracked (ios generated with `flutter create --platforms=ios`, org `com.example`, renamed by `tool/rename_app` / C-13). Web, macOS, Windows, Linux are not part of the template.
 - Why: every checklist item (FCM, permissions, biometrics, deep links, store releases) is mobile; fewer native folders to maintain.
 - Rejected: all six platforms.
+
+## D-023 — Strings in design_system widgets (avoids shared generated files)
+- Context: C-09, C-32, C-33, C-34 all need a few localized labels (close, cancel, confirm, show password…) and would all edit `assets/translations/*.json` and the generated `lib/generated/*.g.dart`.
+- Decision: every widget family keeps its key constants in its own `*_strings.dart` (e.g. `overlays_strings.dart`: `const closeKey = 'ds_overlays.close';`) and resolves them with `.tr()`; widgets also accept an optional override parameter for each label. Each task adds its keys to BOTH `ar.json` and `en.json` under ONE distinct top-level object (`ds_buttons`, `ds_inputs`, `ds_selection`, `ds_overlays`, `ds_feedback`, `ds_display`, `ds_layout`) appended at the end of the file. These tasks do NOT regenerate or commit `lib/generated/*.g.dart`; the Lead regenerates them once after merging (conflicts in the JSON tails are trivially resolved by the Lead).
+- Why: no two in-progress tasks edit the same generated file; a merge conflict can only occur in the JSON tail.
+- Rejected: one central strings task blocking all widgets.
+
+## D-024 — dotenv config and automatic debug/release flavor (supersedes D-006 and D-018)
+- Context: owner finds `--dart-define-from-file` + three entrypoints too heavy; wants plain `flutter run` and a clear debug/release split.
+- Decision: use `flutter_dotenv` (MIT; latest stable resolved in C-37). Files `env/dev.env`, `env/staging.env`, `env/prod.env` are real (git-ignored, bundled as assets) and `env/*.env.example` are committed; first setup step is copying the examples. The flavor is chosen in code in ONE place (`Flavor.current`): `kReleaseMode ? Flavor.prod : Flavor.dev`. Staging is the only explicit case: `lib/main_staging.dart` calls `bootstrap(Flavor.staging)`. `lib/main.dart` calls `bootstrap(Flavor.current)`. `bootstrap` loads `env/<flavor>.env` via dotenv and passes the map to `AppConfig.fromMap` (validation unchanged). The `FLAVOR` key disappears from env files; `AppConfig.ensureFlavor` is removed. Only `core/config` may touch `dotenv`/`fromEnvironment`.
+- Why: simplest developer experience; debug builds can never accidentally use prod config and release builds can never use dev config.
+- Trade-off recorded: dotenv values are bundled in the app, so they must never be real secrets (a client app cannot keep secrets anyway: API keys that must stay private belong on the server). Real secrets are still never committed (hard rule 5: real env files are git-ignored).
+- Rejected: keeping dart-define (friction); committing real env files (rule 5).
+
+## D-025 — Component size tokens and OTP direction exception
+- Decision: component sizes (button heights 40/48/56, icon sizes, min target 48 dp, OTP box size) live in `design_system/tokens/app_sizes.dart` (`AppSizes`, a field of `AppTokens`); `searchDebounce` (300 ms) lives in `AppDurations`. Validators in `core/utils` return a `ValidationError` enum; the design_system maps it to localized text. `AppOtpField` is the ONLY place allowed a hard-coded `TextDirection.ltr` (digit order must stay left-to-right in RTL), with an explanatory comment.
+- Why: no numeric sizes outside tokens; `core/` must not depend on UI or localization of widgets.

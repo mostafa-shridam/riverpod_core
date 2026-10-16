@@ -8,7 +8,7 @@ Shared things live in `core/`, `design_system/` or `shared/`. Current code diffe
 ## Folder tree
 ```
 lib/
-├── main_dev.dart / main_staging.dart / main_prod.dart   # thin: call bootstrap(flavor)
+├── main.dart / main_staging.dart   # thin: bootstrap(Flavor.current) / bootstrap(Flavor.staging) (D-024)
 ├── bootstrap.dart              # zones, error handlers, config load+validate, ProviderScope, runApp
 ├── app/
 │   ├── app.dart                # MaterialApp.router: theme, locale, router, builders
@@ -18,7 +18,7 @@ lib/
 │   │   └── guards/             # auth, onboarding, maintenance/force-update
 │   └── startup/                # splash + startup sequence (config, session restore, remote flags)
 ├── core/                       # no UI; app-agnostic infrastructure
-│   ├── config/                 # AppConfig (from --dart-define-from-file), Flavor, validation
+│   ├── config/                 # AppConfig (from env/<flavor>.env via flutter_dotenv), Flavor.current (kReleaseMode ? prod : dev), validation
 │   ├── network/
 │   │   ├── dio_client.dart     # one Dio provider
 │   │   ├── interceptors/       # auth, refresh_token (queued), retry_backoff, idempotency, logging (dev)
@@ -67,7 +67,7 @@ assets/translations/{ar,en}.json   assets/images/   assets/fonts/
 test/              mirrors lib/ exactly (+ test/helpers: pumpApp, ProviderContainer factory, fakes)
 integration_test/  auth flow + one feature flow
 tool/              scripts: rename_app, new_feature, check_l10n_keys, release builds
-env/               *.example.json (real env files git-ignored)
+env/               *.env.example (real *.env files git-ignored)
 .fttemplates/      feature scaffold
 ```
 
@@ -88,7 +88,7 @@ env/               *.example.json (real env files git-ignored)
 - No hard-coded user text, colors, sizes or durations in features: l10n keys + tokens only.
 - Directional (RTL-safe) APIs only: `EdgeInsetsDirectional`, `AlignmentDirectional`, start/end.
 - Navigation only through typed routes; deep links and notification taps resolve to the same routes.
-- Config only through `AppConfig`; no `String.fromEnvironment` outside `core/config`.
+- Config only through `AppConfig`; no `dotenv`/`String.fromEnvironment` outside `core/config`. Debug builds use `Flavor.dev`, release builds `Flavor.prod`, staging only via `main_staging.dart`.
 - Logout = one function that clears tokens, DB, caches, analytics user and invalidates providers.
 - A new folder or a layer exception requires a DECISION. A file that does not fit the tree is in the wrong place.
 
@@ -104,5 +104,5 @@ Sealed `AppException` (`core/errors/app_exception.dart`): `NetworkException`, `R
 UI text comes from `error_messages.dart` (key → `.tr()`), never `e.toString()`. Unexpected exceptions go to `CrashReporter` and surface as `UnknownException`.
 
 ## Startup (bootstrap)
-`main_<flavor>.dart` → `bootstrap(flavor)`: ensureInitialized → load + validate `AppConfig` (clear error screen on failure) → global error handlers (logger + crash) →
+`main.dart` / `main_staging.dart` → `bootstrap(flavor)`: ensureInitialized → load `env/<flavor>.env` + validate `AppConfig` (clear error screen on failure) → global error handlers (logger + crash) →
 storage/localization → `runApp(ProviderScope(...App()))`. Optional services (analytics, notifications) must not block startup; config failure must.

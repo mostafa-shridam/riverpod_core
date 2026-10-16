@@ -14,6 +14,8 @@ All tokens are `ThemeExtension`s read via `context.tokens` (and `Theme.of(contex
 | Elevation | `none, low, mid, high` mapped to M3 surface tint levels. |
 | Motion | `fast 150ms, normal 250ms, slow 400ms` + standard curves. |
 
+The resolved light/dark color role table (seed `#4A6FA5`, success/warning/info accents) is in `ai-docs/reports/C-05.md`. Dark mode uses the dark tonal palette (surfaces `#111318` → `#32353A`), not an inverted light scheme.
+
 ## Modes
 Light, dark, system. Persisted in prefs, switchable at runtime. Every widget must be checked in both.
 
