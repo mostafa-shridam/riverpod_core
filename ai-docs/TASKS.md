@@ -259,7 +259,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-27 — GitHub Actions CI
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | worker-m | — |
 - Goal: every push/PR runs the gate.
 - Files: `.github/workflows/ci.yml`, `.github/workflows/README.md` (how it works, how to add secrets, nothing secret inside)
 - Done when: workflow on `push` and `pull_request` using the stable Flutter channel pinned through `subosito/flutter-action` with caching (`cache: true`), steps: checkout, `flutter pub get`, create `env/*.env` from the committed `*.env.example` files, `dart run easy_localization:generate` x2 (as in `build.sh`), `dart run build_runner build --delete-conflicting-outputs`, `git diff --exit-code` on tracked generated files (fails when generated code is stale), `dart format --set-exit-if-changed lib test tool`, `flutter analyze`, `flutter test --coverage`, upload `coverage/lcov.info` as an artifact, and a build job `flutter build apk --debug` (Android) plus `flutter build ios --no-codesign --debug` on macOS runner (separate job, `needs` the test job); concurrency group cancels superseded runs; least-privilege `permissions: contents: read`. No secrets required. Pin action versions to the latest stable major/sha you verify, record them in the README.
