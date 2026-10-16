@@ -295,7 +295,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-18 — Onboarding and splash pages
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | Worker A | — |
 - Goal: real splash startup sequence and onboarding carousel.
 - Files: `lib/core/startup/**` (splash page + `startup_controller.dart`), `lib/features/onboarding/**` (`providers/onboarding_controller.dart`, `presentation/pages/onboarding_page.dart`, `presentation/widgets/**`), `lib/core/router/placeholder_pages.dart` (remove the onboarding placeholder), `assets/translations/*.json` (top-level `onboarding`), `test/core/startup/**`, `test/features/onboarding/**`, `test/goldens/onboarding/**`
 - Done when: splash runs the startup sequence (config already loaded; session restore; onboarding-seen flag; remote flags later) with a minimum display time token and a retry state when a mandatory step fails; onboarding: 3 pages (title, body, illustration built from icons + tokens, no image assets), page indicator, skip/next/get-started, RTL-correct swipe direction, persists `onboardingSeen`; guards (C-11) route correctly afterwards.

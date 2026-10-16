@@ -454,5 +454,25 @@
       "title": "Videos",
       "subtitle": "Reference feature with mock data (dev and staging only)"
     }
+  },
+  "onboarding": {
+    "skip": "Skip",
+    "next": "Next",
+    "getStarted": "Get started",
+    "pageOf": "Page {} of {}",
+    "slides": {
+      "welcome": {
+        "title": "Welcome",
+        "body": "Everything you need, in one place."
+      },
+      "progress": {
+        "title": "Keep track",
+        "body": "Your items and progress stay up to date."
+      },
+      "secure": {
+        "title": "Your account is safe",
+        "body": "Sign in to keep your data protected."
+      }
+    }
   }
 }

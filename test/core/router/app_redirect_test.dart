@@ -134,4 +134,41 @@ void main() {
       );
     });
   });
+  group('startup readiness', () {
+    test('stays on splash until the startup sequence is done', () {
+      expect(
+        appRedirect(
+          location: HomePage.routeName,
+          session: SessionStatus.signedIn,
+          onboardingSeen: true,
+          startupReady: false,
+        ),
+        SplashPage.routeName,
+      );
+    });
+
+    test('splash stays put while the startup sequence runs', () {
+      expect(
+        appRedirect(
+          location: SplashPage.routeName,
+          session: SessionStatus.signedOut,
+          onboardingSeen: true,
+          startupReady: false,
+        ),
+        isNull,
+      );
+    });
+
+    test('once ready, the normal rules apply again', () {
+      expect(
+        appRedirect(
+          location: HomePage.routeName,
+          session: SessionStatus.signedOut,
+          onboardingSeen: true,
+          startupReady: true,
+        ),
+        LoginPage.routeName,
+      );
+    });
+  });
 }

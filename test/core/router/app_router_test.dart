@@ -14,6 +14,7 @@ import 'package:riverpod_core/core/notifications/models/notification_tap.dart';
 import 'package:riverpod_core/core/notifications/models/notification_tap_source.dart';
 import 'package:riverpod_core/core/notifications/routing/notification_router_provider.dart';
 import 'package:riverpod_core/core/router/app_router.dart';
+import 'package:riverpod_core/core/startup/startup_controller.dart';
 import 'package:riverpod_core/core/storage/prefs_storage.dart';
 import 'package:riverpod_core/core/storage/secure_storage.dart';
 import 'package:riverpod_core/generated/codegen_loader.g.dart';
@@ -31,7 +32,7 @@ Future<ProviderContainer> _container(
   final prefs = await tester.runAsync(
     () => fakePrefsStorage({if (onboardingSeen) PrefKeys.onboardingSeen: true}),
   );
-  return createContainer(
+  final container = createContainer(
     overrides: [
       // The home page reads the flavor for the dev-only gallery entry.
       appConfigProvider.overrideWithValue(
@@ -44,8 +45,12 @@ Future<ProviderContainer> _container(
       ),
       prefsStorageProvider.overrideWith((ref) => Future.value(prefs)),
       secureStorageProvider.overrideWithValue(FakeSecureStorage()),
+      splashMinimumDisplayProvider.overrideWithValue(Duration.zero),
     ],
   );
+  // The router waits for the startup sequence (restore, settings read).
+  await tester.runAsync(() => container.read(startupControllerProvider.future));
+  return container;
 }
 
 Future<void> _pumpRouter(
@@ -96,7 +101,6 @@ void main() {
     testWidgets('a new user sees onboarding first', (tester) async {
       final container = await _container(tester, onboardingSeen: false);
       addTearDown(container.dispose);
-      await container.read(sessionControllerProvider.notifier).restore();
 
       await _pumpRouter(tester, container);
 
@@ -106,7 +110,6 @@ void main() {
     testWidgets('signed out after onboarding shows login', (tester) async {
       final container = await _container(tester, onboardingSeen: true);
       addTearDown(container.dispose);
-      await container.read(sessionControllerProvider.notifier).restore();
 
       await _pumpRouter(tester, container);
 
@@ -134,6 +137,9 @@ void main() {
       expect(_page('home-page'), findsOneWidget);
 
       container.read(sessionEventsProvider).notifyExpired();
+      // The expiry handler deletes the stored user asynchronously; let it
+      // finish before the router is pumped.
+      await tester.runAsync(() => Future<void>.delayed(Duration.zero));
       await tester.pumpAndSettle();
 
       expect(_page('login-page'), findsOneWidget);
