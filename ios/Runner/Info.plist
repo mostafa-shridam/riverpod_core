@@ -24,6 +24,12 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app uses the camera so you can take photos and videos.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app uses the microphone so you can record audio and videos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app accesses your photos so you can choose pictures to use.</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>
