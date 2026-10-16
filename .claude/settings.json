@@ -1,39 +1,15 @@
 {
   "permissions": {
+    "defaultMode": "acceptEdits",
     "allow": [
+      "Bash",
+      "Edit",
+      "Write",
       "Read",
       "Glob",
       "Grep",
-      "Bash(ls:*)",
-      "Bash(pwd)",
-      "Bash(git status:*)",
-      "Bash(git diff:*)",
-      "Bash(git log:*)",
-      "Bash(git show:*)",
-      "Bash(git branch:*)",
-      "Bash(git worktree list:*)",
-      "Bash(flutter pub get)",
-      "Bash(flutter analyze:*)",
-      "Bash(flutter test:*)",
-      "Bash(flutter --version)",
-      "Bash(flutter pub outdated:*)",
-      "Bash(dart format:*)",
-      "Bash(dart analyze:*)",
-      "Bash(dart run build_runner build:*)",
-      "Bash(dart run custom_lint:*)",
-      "Bash(dart run easy_localization:generate:*)",
-      "Bash(mkdir /tmp/riverpod_core.lock)",
-      "Bash(rmdir /tmp/riverpod_core.lock)"
-    ],
-    "ask": [
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(git merge:*)",
-      "Bash(git worktree add:*)",
-      "Bash(git worktree remove:*)",
-      "Bash(flutter pub add:*)",
-      "Bash(flutter pub upgrade:*)",
-      "Bash(flutter build:*)"
+      "WebFetch",
+      "WebSearch"
     ],
     "deny": [
       "Bash(git push:*)",
