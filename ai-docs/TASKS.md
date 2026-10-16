@@ -46,7 +46,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-04 — Test infrastructure and translation parity test
 | status | owner | blocked by |
 |---|---|---|
-| REVIEW | Worker A | — |
+| DONE | worker-a | — |
 - Goal: helpers from TESTING.md and the ar/en parity test.
 - Files: `test/helpers/pump_app.dart`, `test/helpers/create_container.dart`, `test/helpers/fake_http_adapter.dart`, `test/helpers/helpers.dart` (barrel), `test/helpers/helpers_test.dart`, `test/l10n/translation_parity_test.dart`
 - Done when: `pumpApp` wraps `ProviderScope(overrides)`, `EasyLocalization` with an in-memory loader, `MaterialApp` using the design_system themes, configurable locale/themeMode/textScale/size; `createContainer` disposes via `addTearDown`; `FakeHttpAdapter` queues responses/errors and records requests; parity test = same flattened keys in ar/en, no empty values, same `{}` placeholders. Fakes for later interfaces are added by the tasks that create them.
@@ -96,7 +96,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-09 — design_system widgets: buttons and text inputs
 | status | owner | blocked by |
 |---|---|---|
-| BLOCKED | — | C-04 |
+| READY | — | — |
 - Goal: the most-used primitives, beautiful by default (D-020). Replace `app_button.dart`, `custom_button.dart`, `my_text_filed.dart`.
 - Files: `lib/design_system/widgets/buttons/**`, `lib/design_system/widgets/inputs/**`, `lib/core/widgets/**` (deleted), `lib/core/utils/validators.dart`, `test/design_system/widgets/buttons/**`, `test/design_system/widgets/inputs/**`, `test/goldens/buttons/**`, `test/goldens/inputs/**`
 - Done when:
