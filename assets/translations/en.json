@@ -169,8 +169,7 @@
   },
   "app_nav": {
     "home": "Home",
-    "more": "More",
-    "continue": "Continue"
+    "more": "More"
   },
   "auth": {
     "login": {

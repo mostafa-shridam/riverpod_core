@@ -1,10 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-import 'package:riverpod_core/core/design_system/widgets/async/async_strings.dart';
 import 'package:riverpod_core/core/design_system/widgets/async/state_illustration.dart';
 import 'package:riverpod_core/core/design_system/widgets/async/state_message.dart';
 import 'package:riverpod_core/core/design_system/widgets/buttons/app_button.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Success with zero items: illustration, message and an optional action.
 /// All texts default to localized copy; pass your own for specific pages.
@@ -39,8 +39,8 @@ class EmptyState extends StatelessWidget {
         container: scheme.primaryContainer,
         onContainer: scheme.onPrimaryContainer,
       ),
-      title: title ?? asyncEmptyTitleKey.tr(),
-      message: message ?? asyncEmptyMessageKey.tr(),
+      title: title ?? LocaleKeys.ds_async_emptyTitle.tr(),
+      message: message ?? LocaleKeys.ds_async_emptyMessage.tr(),
       action: actionLabel != null && onAction != null
           ? AppButton(
               label: actionLabel!,

@@ -117,7 +117,6 @@ abstract class LocaleKeys {
   static const ds_lists = 'ds_lists';
   static const app_nav_home = 'app_nav.home';
   static const app_nav_more = 'app_nav.more';
-  static const app_nav_continue = 'app_nav.continue';
   static const app_nav = 'app_nav';
   static const auth_login_title = 'auth.login.title';
   static const auth_login_submit = 'auth.login.submit';

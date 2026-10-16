@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
-import 'package:riverpod_core/core/design_system/widgets/inputs/inputs_strings.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// One-time-code input: [length] boxes, one hidden text field.
 ///
@@ -83,7 +83,7 @@ class _AppOtpFieldState extends State<AppOtpField> {
           if (i > 0) SizedBox(width: tokens.spacing.sm),
           _OtpBox(
             digit: i < text.length ? text[i] : '',
-            semanticsLabel: otpDigitLabelKey.tr(
+            semanticsLabel: LocaleKeys.ds_inputs_otpDigitLabel.tr(
               args: ['${i + 1}', '${widget.length}'],
             ),
             highlighted: _focusNode.hasFocus && i == active,

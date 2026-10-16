@@ -4,7 +4,7 @@ import 'package:intl/intl.dart' as intl;
 
 import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
 import 'package:riverpod_core/core/design_system/widgets/selection/app_form_field.dart';
-import 'package:riverpod_core/core/design_system/widgets/selection/selection_strings.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Star rating from 0 to [max] in whole steps, filling from the start edge
 /// (right in Arabic). Controlled: pass [value]; tapping the selected star
@@ -62,7 +62,9 @@ class AppRating extends StatelessWidget {
         return Semantics(
           container: true,
           label: label,
-          value: ratingValueKey.tr(args: [nf.format(value), nf.format(max)]),
+          value: LocaleKeys.ds_selection_ratingValue.tr(
+            args: [nf.format(value), nf.format(max)],
+          ),
           increasedValue: nf.format((value + 1).clamp(0, max)),
           decreasedValue: nf.format((value - 1).clamp(0, max)),
           onIncrease: interactive && value < max ? () => set(value + 1) : null,

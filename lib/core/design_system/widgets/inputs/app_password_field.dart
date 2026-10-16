@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 
 import 'package:riverpod_core/core/design_system/widgets/inputs/app_text_field.dart';
-import 'package:riverpod_core/core/design_system/widgets/inputs/inputs_strings.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Password input with a show/hide toggle. Hidden by default.
 class AppPasswordField extends StatefulWidget {
@@ -61,7 +61,11 @@ class _AppPasswordFieldState extends State<AppPasswordField> {
       keyboardType: TextInputType.visiblePassword,
       autofillHints: const [AutofillHints.password],
       suffixIcon: IconButton(
-        tooltip: (_visible ? hidePasswordKey : showPasswordKey).tr(),
+        tooltip:
+            (_visible
+                    ? LocaleKeys.ds_inputs_hidePassword
+                    : LocaleKeys.ds_inputs_showPassword)
+                .tr(),
         icon: Icon(
           _visible ? Icons.visibility_off_outlined : Icons.visibility_outlined,
         ),

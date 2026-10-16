@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
-import 'package:riverpod_core/core/design_system/widgets/feedback/feedback_strings.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Linear progress. `value` 0..1 is determinate, null is indeterminate.
 /// Rounded track, optional [label] and localized percent text.
@@ -39,7 +39,7 @@ class AppProgressBar extends StatelessWidget {
     final hasText = label != null || (showPercent && percent != null);
 
     return Semantics(
-      label: semanticLabel ?? label ?? progressLabelKey.tr(),
+      label: semanticLabel ?? label ?? LocaleKeys.ds_feedback_progress.tr(),
       value: percent,
       child: Column(
         mainAxisSize: MainAxisSize.min,

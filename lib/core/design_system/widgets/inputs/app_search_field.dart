@@ -4,7 +4,7 @@ import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 
 import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
-import 'package:riverpod_core/core/design_system/widgets/inputs/inputs_strings.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Search input. [onChanged] fires after typing pauses for the
 /// `searchDebounce` token; clearing fires it at once.
@@ -79,12 +79,12 @@ class _AppSearchFieldState extends State<AppSearchField> {
           onChanged: _onChanged,
           onSubmitted: widget.onSubmitted,
           decoration: InputDecoration(
-            hintText: widget.hint ?? searchHintKey.tr(),
+            hintText: widget.hint ?? LocaleKeys.ds_inputs_searchHint.tr(),
             prefixIcon: const Icon(Icons.search),
             suffixIcon: value.text.isEmpty
                 ? null
                 : IconButton(
-                    tooltip: clearKey.tr(),
+                    tooltip: LocaleKeys.ds_inputs_clear.tr(),
                     icon: const Icon(Icons.close),
                     onPressed: _clear,
                   ),

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
 import 'package:riverpod_core/core/design_system/widgets/dialogs/overlay_metrics.dart';
-import 'package:riverpod_core/core/design_system/widgets/dialogs/overlays_strings.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Blocking "please wait" card with a spinner and an optional message.
 /// Not dismissible by the user: close it with the callback from [show].
@@ -50,7 +50,7 @@ class AppLoadingCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = context.tokens;
     final scheme = Theme.of(context).colorScheme;
-    final label = message ?? loadingKey.tr();
+    final label = message ?? LocaleKeys.ds_overlays_loading.tr();
     return Semantics(
       liveRegion: true,
       label: label,

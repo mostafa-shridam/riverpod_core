@@ -6,14 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
 import 'package:riverpod_core/core/design_system/widgets/dialogs/overlay_metrics.dart';
 import 'package:riverpod_core/core/design_system/widgets/feedback/app_status_type.dart';
-import 'package:riverpod_core/core/design_system/widgets/feedback/feedback_strings.dart';
 import 'package:riverpod_core/core/design_system/widgets/feedback/snackbar/app_message.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 String _typeLabel(AppStatusType type) => switch (type) {
-  AppStatusType.info => infoLabelKey.tr(),
-  AppStatusType.success => successLabelKey.tr(),
-  AppStatusType.warning => warningLabelKey.tr(),
-  AppStatusType.error => errorLabelKey.tr(),
+  AppStatusType.info => LocaleKeys.ds_feedback_info.tr(),
+  AppStatusType.success => LocaleKeys.ds_feedback_success.tr(),
+  AppStatusType.warning => LocaleKeys.ds_feedback_warning.tr(),
+  AppStatusType.error => LocaleKeys.ds_feedback_error.tr(),
 };
 
 /// The floating pill: rounded, tinted by type, status icon, optional action.

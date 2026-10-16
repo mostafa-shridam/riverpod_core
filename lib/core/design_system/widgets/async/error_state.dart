@@ -1,13 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-import 'package:riverpod_core/core/design_system/widgets/async/async_strings.dart';
 import 'package:riverpod_core/core/design_system/widgets/async/state_illustration.dart';
 import 'package:riverpod_core/core/design_system/widgets/async/state_message.dart';
 import 'package:riverpod_core/core/design_system/widgets/buttons/app_button.dart';
 import 'package:riverpod_core/core/design_system/widgets/feedback/app_status_type.dart';
 import 'package:riverpod_core/core/errors/app_exception.dart';
 import 'package:riverpod_core/core/errors/error_messages.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Failure with no data to show. The text comes from [exception] through
 /// `errorMessageKey` (never `toString()`); [isOffline] switches to the
@@ -56,12 +56,16 @@ class ErrorState extends StatelessWidget {
       ),
       title:
           title ??
-          (isOffline ? asyncOfflineTitleKey.tr() : asyncErrorTitleKey.tr()),
-      message: message ?? (isOffline ? asyncOfflineMessageKey.tr() : derived),
+          (isOffline
+              ? LocaleKeys.ds_async_offlineTitle.tr()
+              : LocaleKeys.ds_async_errorTitle.tr()),
+      message:
+          message ??
+          (isOffline ? LocaleKeys.ds_async_offlineMessage.tr() : derived),
       action: onRetry == null
           ? null
           : AppButton(
-              label: retryLabel ?? asyncRetryKey.tr(),
+              label: retryLabel ?? LocaleKeys.ds_async_retry.tr(),
               icon: Icons.refresh_rounded,
               onPressed: onRetry,
             ),

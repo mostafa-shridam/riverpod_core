@@ -304,7 +304,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-42 — Migrate to LocaleKeys everywhere (D-037) and add the guard test
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | Worker A | — |
 - Goal: no literal translation keys anywhere.
 - Files: every `lib/core/design_system/widgets/**/**_strings.dart` (deleted; their key constants replaced by `LocaleKeys.<generated>` at the call sites in the same widget folders), `lib/core/**` and `lib/features/**` files that call `.tr()`/`.plural()` on a string literal (grep `'[a-zA-Z_]+\.[a-zA-Z_.]+'\.tr\(` and `.plural(`), `lib/generated/*.g.dart` (regenerated), `test/translations/no_literal_keys_test.dart`, tests that referenced the old key constants
 - Done when: the repo contains no `*_strings.dart` key-constant files; no `.tr()`/`.plural()` receives a string literal in `lib/` (override parameters of widgets still accept plain `String`); the guard test scans every `.dart` file under `lib/` (excluding generated) and fails on `'<literal>'.tr(` / `"<literal>".tr(` / `.plural('<literal>'`; widgets behave exactly as before (all existing widget and golden tests pass unchanged).

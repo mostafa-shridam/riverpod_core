@@ -2,8 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import 'package:riverpod_core/core/design_system/widgets/dialogs/app_dialog.dart';
-import 'package:riverpod_core/core/design_system/widgets/dialogs/overlays_strings.dart';
 import 'package:riverpod_core/core/design_system/widgets/feedback/app_status_type.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Confirm / cancel dialog. Pops `true` on confirm, `false` otherwise.
 /// [isDestructive] paints the confirm button with the error color and shows a
@@ -67,12 +67,12 @@ class AppConfirmDialog extends StatelessWidget {
           foregroundColor: isDestructive ? scheme.onError : null,
         ),
         onPressed: () => Navigator.of(context).pop(true),
-        child: Text(confirmLabel ?? confirmKey.tr()),
+        child: Text(confirmLabel ?? LocaleKeys.ds_overlays_confirm.tr()),
       ),
       secondary: TextButton(
         style: TextButton.styleFrom(minimumSize: minSize),
         onPressed: () => Navigator.of(context).pop(false),
-        child: Text(cancelLabel ?? cancelKey.tr()),
+        child: Text(cancelLabel ?? LocaleKeys.ds_overlays_cancel.tr()),
       ),
     );
   }

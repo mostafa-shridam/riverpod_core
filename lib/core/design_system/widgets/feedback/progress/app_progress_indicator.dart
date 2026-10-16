@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
-import 'package:riverpod_core/core/design_system/widgets/feedback/feedback_strings.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 enum AppProgressSize { sm, md, lg }
 
@@ -34,7 +34,7 @@ class AppProgressIndicator extends StatelessWidget {
       AppProgressSize.lg => (spacing.xxxl, spacing.xs),
     };
     return Semantics(
-      label: semanticLabel ?? progressLabelKey.tr(),
+      label: semanticLabel ?? LocaleKeys.ds_feedback_progress.tr(),
       value: value == null ? null : '${(value! * 100).round()}%',
       child: ExcludeSemantics(
         child: SizedBox.square(

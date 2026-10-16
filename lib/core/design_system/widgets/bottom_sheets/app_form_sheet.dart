@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
 import 'package:riverpod_core/core/design_system/widgets/bottom_sheets/app_bottom_sheet.dart';
 import 'package:riverpod_core/core/design_system/widgets/dialogs/overlay_metrics.dart';
-import 'package:riverpod_core/core/design_system/widgets/dialogs/overlays_strings.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Title + form content + sticky primary/secondary buttons. The footer stays
 /// pinned above the keyboard while the content scrolls.
@@ -32,7 +32,7 @@ class AppFormSheet {
       builder: content,
       footer: _FormFooter(
         primaryLabel: primaryLabel,
-        secondaryLabel: secondaryLabel ?? cancelKey.tr(),
+        secondaryLabel: secondaryLabel ?? LocaleKeys.ds_overlays_cancel.tr(),
         primaryEnabled: primaryEnabled,
         onPrimary: onPrimary,
         onSecondary: onSecondary,

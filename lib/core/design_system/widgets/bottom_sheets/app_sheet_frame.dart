@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
-import 'package:riverpod_core/core/design_system/widgets/dialogs/overlays_strings.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Visual shell of every bottom sheet: rounded surface, drag handle, optional
 /// title + close button, scrollable body and a sticky footer. Keyboard and
@@ -80,7 +80,7 @@ class AppSheetFrame extends StatelessWidget {
               _Header(
                 title: title,
                 showClose: showCloseButton,
-                closeLabel: closeLabel ?? closeKey.tr(),
+                closeLabel: closeLabel ?? LocaleKeys.ds_overlays_close.tr(),
               ),
             if (expand) Expanded(child: content) else Flexible(child: content),
             if (footer != null)

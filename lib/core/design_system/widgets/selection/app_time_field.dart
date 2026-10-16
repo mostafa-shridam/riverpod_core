@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import 'package:riverpod_core/core/design_system/widgets/selection/app_picker_field.dart';
-import 'package:riverpod_core/core/design_system/widgets/selection/selection_strings.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Time field that opens the platform time picker and shows the time in the
 /// active locale and the device's 12/24-hour setting.
@@ -53,7 +53,7 @@ class AppTimeField extends StatelessWidget {
               ),
             ),
       label: label,
-      hint: hint ?? selectTimeKey.tr(),
+      hint: hint ?? LocaleKeys.ds_selection_selectTime.tr(),
       helper: helper,
       errorText: errorText,
       validator: validator,
@@ -66,7 +66,7 @@ class AppTimeField extends StatelessWidget {
           : () => showTimePicker(
               context: context,
               initialTime: value ?? initialTime,
-              helpText: pickerHelp ?? selectTimeKey.tr(),
+              helpText: pickerHelp ?? LocaleKeys.ds_selection_selectTime.tr(),
             ),
     );
   }
