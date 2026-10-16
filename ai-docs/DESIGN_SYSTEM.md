@@ -22,14 +22,15 @@ Light, dark, system. Persisted in prefs, switchable at runtime. Every widget mus
 Use layout builders/adaptive widgets — never fork a whole router per device. Content max width on large screens: 720 dp for forms/lists.
 
 ## Shared widgets catalog (`design_system/widgets/`)
-Each primitive has ONE implementation here. A feature that needs something missing asks the Lead for a task.
+Folder rule: one folder per widget family, one file per widget (`app_button.dart`, not a mega-file), so anyone can find a widget by browsing. Each primitive has ONE implementation here. A feature that needs something missing asks the Lead for a task.
 | Folder | Widgets | Task |
 |---|---|---|
 | `buttons/` | `AppButton` (primary, secondary, tonal, outlined, text, destructive; sizes; loading; icons; full width), `AppIconButton`, `AppFab` | C-09 |
 | `inputs/` | `AppTextField`, `AppPasswordField`, `AppSearchField`, `AppOtpField`, `AppPhoneField` | C-09 |
 | `selection/` | `AppCheckbox`, `AppRadioGroup`, `AppSwitch`, `AppDropdown`, `AppSegmentedControl`, `AppSlider`, `AppDateField`, `AppTimeField`, `AppRating`, `AppChipGroup`, `AppFormField` | C-32 |
-| `overlays/` | `showAppBottomSheet` (+ `AppActionSheet`, `AppSelectionSheet`, `AppFormSheet`), `showAppDialog` (+ `AppAlertDialog`, `AppConfirmDialog`, `AppInputDialog`, `AppLoadingDialog`/`AppLoadingOverlay`) | C-33 |
-| `feedback/` | `showAppSnackbar`/`showAppToast`, `AppMessenger`, `AppTooltip`, `AppProgressBar`, `AppProgressIndicator`, `AppBanner` | C-33 |
+| `bottom_sheets/` | `showAppBottomSheet` (+ `AppActionSheet`, `AppSelectionSheet`, `AppFormSheet`) | C-33 |
+| `dialogs/` | `showAppDialog` (+ `AppAlertDialog`, `AppConfirmDialog`, `AppInputDialog`, `AppLoadingDialog`/`AppLoadingOverlay`) | C-33 |
+| `feedback/snackbar/`, `feedback/progress/`, `feedback/banner/`, `feedback/tooltip/` | `showAppSnackbar`/`showAppToast`, `AppMessenger`; `AppProgressBar`, `AppProgressIndicator`; `AppBanner`; `AppTooltip` | C-33 |
 | `display/` | `AppCard`, `AppListTile`, `AppSectionHeader`, `AppDivider`, `AppAvatar`, `AppBadge`, `AppChip`, `AppImage`, `AppAccordion` | C-34 |
 | `layout/` | `AppScaffold`, `AppAppBar`, `AppTabBar`, `AppBottomNavBar`, `AppStepper` | C-34 |
 | `async/` | `AsyncValueView`, `EmptyState`, `ErrorState`, `Skeleton`, `OfflineBanner`, `PaginatedListView` | C-10, C-14 |

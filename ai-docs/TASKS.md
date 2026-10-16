@@ -120,7 +120,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 |---|---|---|
 | BLOCKED | — | C-05 |
 - Goal: everything that appears on top of a page. Replace `alert_utils.dart` and `scaffold_messeneger.dart`.
-- Files: `lib/design_system/widgets/overlays/**`, `lib/design_system/widgets/feedback/**`, `lib/core/mixins/alert_utils.dart` (deleted), `lib/core/mixins/scaffold_messeneger.dart` (deleted), `test/design_system/widgets/overlays/**`, `test/design_system/widgets/feedback/**`, `test/goldens/overlays/**`
+- Files: `lib/design_system/widgets/bottom_sheets/**`, `lib/design_system/widgets/dialogs/**`, `lib/design_system/widgets/feedback/**` (subfolders `snackbar/`, `progress/`, `banner/`, `tooltip/`), `lib/core/mixins/alert_utils.dart` (deleted), `lib/core/mixins/scaffold_messeneger.dart` (deleted), `test/design_system/widgets/bottom_sheets/**`, `test/design_system/widgets/dialogs/**`, `test/design_system/widgets/feedback/**`, `test/goldens/bottom_sheets/**`, `test/goldens/dialogs/**`
 - Done when:
   - `showAppBottomSheet<T>` modal sheet: drag handle, rounded top (radius token xl), safe-area + keyboard aware, `isScrollControlled`, draggable/scrollable variant, max width 560 on tablets, optional title/close, barrier dismiss rules, themed scrim; presets: `AppActionSheet` (list of actions with icons, destructive item, cancel), `AppSelectionSheet<T>` (single/multi choice with search), `AppFormSheet` (title + content + primary/secondary buttons, sticky footer above keyboard).
   - `showAppDialog` + presets: `AppAlertDialog` (info/success/warning/error icon variants), `AppConfirmDialog` (destructive option, returns bool), `AppInputDialog` (text + validation), `AppLoadingDialog`/`AppLoadingOverlay` (blocking, optional message).
