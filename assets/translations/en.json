@@ -9,5 +9,23 @@
   "cancelButton": "Cancel",
   "selectLanguage": "Select Language",
   "goodEvening":"Good Evening",
-  "goodMorning":"Good Morning"
+  "goodMorning":"Good Morning",
+  "ds_overlays": {
+    "close": "Close",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "ok": "OK",
+    "done": "Done",
+    "search": "Search",
+    "noResults": "No results",
+    "loading": "Loading"
+  },
+  "ds_feedback": {
+    "dismiss": "Dismiss",
+    "info": "Information",
+    "success": "Success",
+    "warning": "Warning",
+    "error": "Error",
+    "progress": "Progress"
+  }
 }

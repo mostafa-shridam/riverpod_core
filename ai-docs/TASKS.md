@@ -118,7 +118,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-33 — design_system widgets: overlays and feedback
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | Worker C | — |
 - Goal: everything that appears on top of a page. Replace `alert_utils.dart` and `scaffold_messeneger.dart`.
 - Files: `lib/design_system/widgets/bottom_sheets/**`, `lib/design_system/widgets/dialogs/**`, `lib/design_system/widgets/feedback/**` (subfolders `snackbar/`, `progress/`, `banner/`, `tooltip/`), `lib/core/mixins/alert_utils.dart` (deleted), `lib/core/mixins/scaffold_messeneger.dart` (deleted), `test/design_system/widgets/bottom_sheets/**`, `test/design_system/widgets/dialogs/**`, `test/design_system/widgets/feedback/**`, `test/goldens/bottom_sheets/**`, `test/goldens/dialogs/**`
 - Done when:
