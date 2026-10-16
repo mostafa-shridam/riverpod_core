@@ -141,7 +141,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-35 — Widget showcase page ("component gallery")
 | status | owner | blocked by |
 |---|---|---|
-| BLOCKED | — | C-10, C-11, C-32, C-38 |
+| READY | — | — |
 - Goal: one page where anyone can see and try every design_system widget fast (D-020). Registered only in `dev` and `staging` flavors at the typed route `/showcase`; reachable from a dev-only entry on the home page.
 - Files: `lib/features/showcase/presentation/pages/showcase_page.dart`, `lib/features/showcase/presentation/widgets/**` (section widgets), `lib/core/design_system/widgets/widgets.dart` (the barrel export of every widget), `lib/app/router/routes.dart` (add the route only), `assets/translations/*.json` + generated (`showcase.*` keys), `test/features/showcase/**`
 - Done when: sections with headers — Buttons (all variants/sizes/loading/disabled), Inputs, Selection, Overlays (one button each: modal bottom sheet, action sheet, selection sheet, form sheet, alert, confirm, input dialog, loading overlay, snackbar ×4 types, toast, banner), Display (card, avatar, badge, chip, image, accordion, tabs), Media (`AppVideoPlayer` playing a public sample video, with a link to the `videos` feature), Feedback/States (skeleton, empty, error, offline banner, progress), Tokens (color swatches with names, type scale, spacing, radius, elevation). App bar actions: toggle light/dark, toggle ar/en, text scale slider, so every widget can be checked in all modes live. Works on phone and tablet.
@@ -159,7 +159,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-11 — Router: typed routes, guards, shell
 | status | owner | blocked by |
 |---|---|---|
-| REVIEW | Worker A | — |
+| DONE | worker-a | — |
 - Goal: D-016. Single `appRouterProvider`, typed routes (go_router_builder), guards, bottom-nav shell with separate stacks, error page.
 - Files: `lib/app/router/app_router.dart`, `lib/app/router/routes.dart`, `lib/app/router/guards/**`, `lib/app/startup/**` (splash), `lib/app/app.dart`, delete `lib/core/router/**`, delete `lib/core/services/app_router.dart`, `lib/core/helper/deep_link_helper.dart` (adapt to the provider only), `lib/features/home/presentation/pages/home_page.dart` (moved), `pubspec.yaml`/`pubspec.lock` (add `go_router_builder`), `test/app/router/**`
 - Done when: splash → onboarding → auth → home skeleton with guards driven by a stub `SessionController` (`lib/core/auth/`); no `Routes.instance`/`MobileRouting.instance`; deep link resolves through typed routes.
@@ -205,7 +205,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-39 — Reference feature: videos (complete feature with mock data)
 | status | owner | blocked by |
 |---|---|---|
-| BLOCKED | — | C-10, C-11, C-38 |
+| READY | — | — |
 - Goal: D-028. A complete feature following ARCHITECTURE.md end to end, runnable without a backend.
 - Files: `lib/features/videos/**` (`data/models/video.dart`, `data/sources/videos_remote_source.dart` + `videos_mock_source.dart` + `sample_videos.dart`, `data/videos_repository.dart`, `providers/videos_controller.dart`, `providers/video_player_page_controller.dart` if needed, `presentation/pages/videos_page.dart`, `presentation/pages/video_detail_page.dart`, `presentation/widgets/**`), `lib/app/router/routes.dart` (add the two routes only), `assets/translations/*.json` + generated (`videos.*`), `test/features/videos/**`
 - Done when: list page with `AsyncValueView` (all 8 states reachable through a "simulate" menu that switches the mock source: success, empty, error, offline, slow, partial), pull-to-refresh, search field filtering, item cards (thumbnail `AppImage`, title, duration badge); detail page with `AppVideoPlayer`, description, related list, favorite toggle persisted in prefs; repository returns models or throws `AppException`; mock source is selected by a provider override flag so it can be replaced by the real Dio source in one place; typed routes; registered only in dev/staging; sample videos come from D-029 (the vetted list, in `data/sources/sample_videos.dart`: 2 Flutter MP4s, 3 test-videos.co.uk MP4s, 2 Apple HLS streams); include a custom-URL input in the list page app bar so the owner can paste any MP4/HLS link and play it; no hard-coded text, tokens only.
@@ -232,7 +232,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-40 — Wire locale, digit pref and provider retry policy into bootstrap
 | status | owner | blocked by |
 |---|---|---|
-| BLOCKED | — | C-11 |
+| READY | — | — |
 - Goal: close loose ends of C-08/C-12/C-14 after D-035: bootstrap uses easy_localization's own persistence and plurals, Riverpod auto-retry policy is explicit.
 - Files: `lib/bootstrap.dart`, `lib/app/app.dart`, `test/bootstrap_test.dart`, `test/helpers/pump_app.dart` (pass `ignorePluralRules: false`), `ai-docs/STATE_AND_DATA.md` (copyWithPrevious note)
 - Done when: `EasyLocalization(saveLocale: true, ignorePluralRules: false, startLocale: null (device locale if supported, else fallback))` + `await initFormatting()` before `runApp`; no reference to the legacy `getLanguageCodeHelper` stubs; the root `ProviderContainer` is created with `retry: (retryCount, error) => null` (D-032); STATE_AND_DATA.md no longer shows the internal `copyWithPrevious` pattern (see D-031).
@@ -283,12 +283,29 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 - Done when: no import of shared_preferences or drift remains (grep); boxes are opened once in bootstrap and exposed through keepAlive providers; tests use a temp-dir Hive (`Hive.init(tempDir)`), no platform channel; cache expiry/etag/user-scoping behave exactly as in C-16 tests; `clearUserData` wipes secure storage, cache box and user-scoped prefs; the old Drift generated files are deleted.
 - Tests: ports of all existing prefs, cache and clear tests (none dropped); box reopened after restart keeps data; bootstrap still starts.
 
+## C-17 — Auth: session, login/register pages, logout resets everything
+| status | owner | blocked by |
+|---|---|---|
+| READY | — | — |
+- Goal: checklist "Auth & security": real `SessionController`, token handling, login/register/forgot-password pages, logout.
+- Files: `lib/core/auth/**` (`session_controller.dart` real implementation replacing the C-11 stub, `auth_tokens.dart`, `logout.dart`), `lib/features/auth/**` (`data/models/{auth_tokens,auth_user,login_request,register_request}.dart` freezed, `data/sources/auth_remote_source.dart`, `data/auth_repository.dart`, `providers/{login_controller,register_controller,forgot_password_controller}.dart`, `presentation/pages/{login_page,register_page,forgot_password_page}.dart`, `presentation/widgets/**`), `lib/app/router/routes.dart` + `placeholder_pages.dart` (replace the placeholder LoginPage by the real one, add register/forgot routes only), `assets/translations/*.json` (top-level `auth`, appended), `test/core/auth/**`, `test/features/auth/**`, `test/goldens/auth/**`
+- Done when: `SessionController` (keepAlive): restores the session from `SecureStorage` at startup, exposes `SessionStatus {unknown, signedOut, signedIn}` + current `AuthUser?`, `signIn(tokens, user)`, `signOut()`; implements `AccessTokenRefresher` (override of `accessTokenRefresherProvider`, C-07) so the Dio single-flight refresh works; listens to `SessionEvents.expired`; `logout()` is ONE function: calls the repository logout (best effort), then `clearUserData` (secure storage, cache, user-scoped prefs), clears analytics user, and invalidates the provider graph (root container reset via a `ProviderScope` key or `ref.invalidate` of user-scoped providers; document the chosen mechanism); the auth repository talks to endpoints configured in ONE file (`auth_endpoints.dart`; defaults `/auth/login`, `/auth/register`, `/auth/refresh`, `/auth/logout`, `/auth/forgot-password`) and has a mock source switch like the videos feature (D-028) so the app runs without a backend; pages use only design_system widgets (AppTextField, AppPasswordField, AppButton with loading, AppSnackbar for errors, field errors from `ValidationException`), all 8 states where they apply, ar/en keys, validators from `core/utils`; social sign-in (google_sign_in/firebase_auth are dependencies) is NOT built here: leave an `AuthProvider` extension point and say in the report how to add it.
+- Tests: session restore/sign-in/sign-out, refresher override, logout clears everything (fakes), login controller success/validation error/network error, pages widget tests + goldens (light/dark x ar/en).
+
+## C-18 — Onboarding and splash pages
+| status | owner | blocked by |
+|---|---|---|
+| BLOCKED | — | C-17 |
+- Goal: real splash startup sequence and onboarding carousel.
+- Files: `lib/app/startup/**` (splash page + `startup_controller.dart`), `lib/features/onboarding/**` (`providers/onboarding_controller.dart`, `presentation/pages/onboarding_page.dart`, `presentation/widgets/**`), `lib/app/router/placeholder_pages.dart` (remove the onboarding placeholder), `assets/translations/*.json` (top-level `onboarding`), `test/app/startup/**`, `test/features/onboarding/**`, `test/goldens/onboarding/**`
+- Done when: splash runs the startup sequence (config already loaded; session restore; onboarding-seen flag; remote flags later) with a minimum display time token and a retry state when a mandatory step fails; onboarding: 3 pages (title, body, illustration built from icons + tokens, no image assets), page indicator, skip/next/get-started, RTL-correct swipe direction, persists `onboardingSeen`; guards (C-11) route correctly afterwards.
+- Tests: startup states, onboarding flow persists flag, goldens light/dark x ar/en.
+
 ---
 
 ## Backlog (full tasks written when dependencies near DONE)
 C-31 Native flavors (Android flavors / iOS schemes) + launcher icons + native splash ·
-C-17 Auth (session controller, token handling, logout reset) ·
-C-18 Onboarding + splash pages · C-19 Biometric lock, screenshot blocking, root check ·
+C-19 Biometric lock, screenshot blocking, root check ·
 C-20 FCM end-to-end + local notifications cleanup (singletons → providers) ·
 C-21 Remote config: force update, maintenance · C-22 Share, external links, in-app review, version page ·
 C-25 `.fttemplates/feature` + `tool/new_feature` ·
