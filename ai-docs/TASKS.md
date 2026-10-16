@@ -187,7 +187,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-37 — Config from dotenv, automatic flavor (D-024)
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | worker-e | — |
 - Goal: replace the dart-define loading from C-02 with flutter_dotenv and `Flavor.current`.
 - Files: `lib/core/config/app_config.dart` (+ `.g.dart`), `lib/core/config/flavor.dart`, `lib/core/config/env_loader.dart` (new: loads `env/<flavor>.env` via dotenv and returns the map), `env/dev.env.example`, `env/staging.env.example`, `env/prod.env.example`, delete `env/*.example.json`, `.gitignore` (`env/*.env`, `!env/*.env.example`), `pubspec.yaml` (add `flutter_dotenv`; add the three `env/*.env` files under `flutter: assets:`), `pubspec.lock`, `test/core/config/**`
 - Done when: `Flavor.current` = `kReleaseMode ? prod : dev` (testable via an injectable `isRelease` parameter in a pure function); `AppConfig.fromEnvironment()` and `ensureFlavor` removed; `FLAVOR` key removed from env files and parsing (flavor is an input to `AppConfig.fromMap(flavor, map)`); `EnvLoader.load(Flavor)` throws `ConfigException` with a clear message when the file is missing or empty ("copy env/dev.env.example to env/dev.env"); example files contain placeholders only; asset declarations don't break `flutter pub get`/test when the real `.env` files are absent (use the strategy: tests inject maps; document in the report how a fresh clone runs: copy examples). No other file in `lib/` imports dotenv.
