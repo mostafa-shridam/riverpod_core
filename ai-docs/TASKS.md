@@ -177,7 +177,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-13 — App rename script (name, package id, Dart package)
 | status | owner | blocked by |
 |---|---|---|
-| REVIEW | — | — |
+| DONE | worker-b | — |
 - Goal: one command makes a copy of the template into a real app: users never see "riverpod_core" anywhere.
 - Files: `tool/rename_app.dart`, `tool/lib/rename_app_logic.dart` (pure logic), `test/tool/rename_app_test.dart`, `test/tool/fixtures/**` (tiny fake project tree)
 - Done when: `dart run tool/rename_app.dart --name "My App" --id com.company.myapp [--package my_app] [--dry-run]` updates, only when the file exists: `pubspec.yaml` (`name`, `description`), every `package:riverpod_core/` import in `lib/`, `test/`, `integration_test/`, Android `namespace` + `applicationId` in `android/app/build.gradle.kts`, the Kotlin `MainActivity` package line AND its folder path, `android:label` in `AndroidManifest.xml`, iOS `CFBundleDisplayName`/`CFBundleName`/`PRODUCT_BUNDLE_IDENTIFIER`, web `index.html`/`manifest.json`, `env/*.example.json` `APP_NAME`, README title. Validates inputs (reverse-DNS id, snake_case package, non-empty name), is idempotent, prints a summary of changed files, `--dry-run` changes nothing, refuses to run when the new values equal the current ones, and never touches `.git`, `build/`, `.dart_tool/`. Pure Dart, no new package.
@@ -211,12 +211,30 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 - Done when: list page with `AsyncValueView` (all 8 states reachable through a "simulate" menu that switches the mock source: success, empty, error, offline, slow, partial), pull-to-refresh, search field filtering, item cards (thumbnail `AppImage`, title, duration badge); detail page with `AppVideoPlayer`, description, related list, favorite toggle persisted in prefs; repository returns models or throws `AppException`; mock source is selected by a provider override flag so it can be replaced by the real Dio source in one place; typed routes; registered only in dev/staging; sample videos come from D-029 (the vetted list, in `data/sources/sample_videos.dart`: 2 Flutter MP4s, 3 test-videos.co.uk MP4s, 2 Apple HLS streams); include a custom-URL input in the list page app bar so the owner can paste any MP4/HLS link and play it; no hard-coded text, tokens only.
 - Tests: repository (success/each exception), controller (initial/success/failure/refresh/search), pages (8 states + goldens), detail page with fake player controller.
 
+## C-14 — Pagination helpers and PaginatedListView
+| status | owner | blocked by |
+|---|---|---|
+| READY | — | — |
+- Goal: NETWORKING.md "Pagination" (cursor + offset) with infinite scroll.
+- Files: `lib/core/network/pagination/**` (`page.dart`, `page_request.dart`, `paginated_state.dart` freezed, `paginated_notifier.dart`), `lib/core/design_system/widgets/lists/**` (`paginated_list_view.dart`, `pagination_footer.dart`, `lists_strings.dart`), `assets/translations/ar.json` + `en.json` (top-level `ds_lists`, appended, D-023), `test/core/network/pagination/**`, `test/core/design_system/widgets/lists/**`, `test/goldens/lists/**`
+- Done when: `Page<T>(items, nextCursor/nextOffset, hasMore)`; `PageRequest` sealed (cursor | offset, pageSize); `PaginatedNotifier<T>` base for `@riverpod` notifiers: abstract `fetchPage(PageRequest)`, `build` loads the first page, `loadMore()` (ignores calls while loading or when `!hasMore`), `refresh()` keeps previous items while reloading, de-duplication by an overridable `idOf`, error on a next page keeps the loaded items and exposes a retryable page error (the `partial` state), cancels in-flight work on dispose; `PaginatedListView` (sliver-based, pull-to-refresh, triggers `loadMore` at 80% scroll, footer shows loader / retry row / end-of-list, empty and first-load states left to the caller via builders, RTL-safe, tokens only, Semantics).
+- Tests: notifier with a fake fetcher (first page, next page, cursor and offset, dedupe, concurrent loadMore ignored, error keeps items + retry, refresh keeps data, dispose cancels), widget tests (scroll threshold, footer states), goldens for footer states (light/dark x ar/en).
+
+## C-16 — Stale-while-revalidate cache helper
+| status | owner | blocked by |
+|---|---|---|
+| READY | — | — |
+- Goal: STATE_AND_DATA.md "Caching: stale-while-revalidate", on top of the C-06 Drift `cache_entries` table.
+- Files: `lib/core/storage/cache/**` (`cache_result.dart`, `cached_repository_helper.dart`, `cache_policy.dart`), `test/core/storage/cache/**`
+- Done when: `CacheResult<T>(data, isStale, savedAt, error?)`; `CachedRepositoryHelper.watch<T>({key, fetch, decode, encode, ttl})` returns `Stream<CacheResult<T>>`: (1) emits the cached value immediately with `isStale = expired(ttl)` if present, (2) fetches in the background, on success writes the cache and emits the fresh value (`isStale=false`), (3) on failure emits the cached value flagged stale together with the `AppException` (mapped with `mapError`), or just errors when there is no cache; `read` (one-shot) and `invalidate(key)`/`clearAll` helpers; keys for user-scoped data take a `userId` parameter and are prefixed; `etag` stored when the fetch provides one; time source injectable (`Clock`-style function) so tests need no real time; `keepAlive` provider for the helper using `AppDatabase`.
+- Tests (in-memory Drift): cache miss, hit fresh, hit expired, fetch failure with and without cache, write on success, invalidate, user scoping, concurrent watchers share one fetch.
+
 ---
 
 ## Backlog (full tasks written when dependencies near DONE)
 C-31 Platform folders (ios/web) + native flavors + launcher icons + native splash ·
-C-14 Pagination helpers + `PaginatedListView` · C-15 Upload/download with progress/cancel ·
-C-16 SWR cache helper · C-17 Auth (session controller, token handling, logout reset) ·
+C-15 Upload/download with progress/cancel ·
+C-17 Auth (session controller, token handling, logout reset) ·
 C-18 Onboarding + splash pages · C-19 Biometric lock, screenshot blocking, root check ·
 C-20 FCM end-to-end + local notifications cleanup (singletons → providers) ·
 C-21 Remote config: force update, maintenance · C-22 Share, external links, in-app review, version page ·
