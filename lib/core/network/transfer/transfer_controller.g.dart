@@ -48,7 +48,7 @@ final class TransferControllerProvider
 }
 
 String _$transferControllerHash() =>
-    r'9b88a20c3d2a10aa1c526d4e00efd874f2ae1dbe';
+    r'90332f7da50ef17ac1a277d4cbb0886d2a182382';
 
 /// State and actions of one transfer. AutoDispose: leaving the screen cancels
 /// a running transfer.

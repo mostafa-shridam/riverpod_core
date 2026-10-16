@@ -115,4 +115,8 @@ abstract class LocaleKeys {
   static const ds_lists_endOfList = 'ds_lists.endOfList';
   static const ds_lists_retry = 'ds_lists.retry';
   static const ds_lists = 'ds_lists';
+  static const app_nav_home = 'app_nav.home';
+  static const app_nav_more = 'app_nav.more';
+  static const app_nav_continue = 'app_nav.continue';
+  static const app_nav = 'app_nav';
 }

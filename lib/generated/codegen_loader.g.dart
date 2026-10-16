@@ -178,6 +178,7 @@ class CodegenLoader extends AssetLoader {
       "endOfList": "You've reached the end",
       "retry": "Try again",
     },
+    "app_nav": {"home": "Home", "more": "More", "continue": "Continue"},
   };
   static const Map<String, dynamic> _ar = {
     "hello": "مرحبا",
@@ -343,6 +344,7 @@ class CodegenLoader extends AssetLoader {
       "endOfList": "لقد وصلت إلى النهاية",
       "retry": "إعادة المحاولة",
     },
+    "app_nav": {"home": "الرئيسية", "more": "المزيد", "continue": "متابعة"},
   };
   static const Map<String, Map<String, dynamic>> mapLocales = {
     "en": _en,
