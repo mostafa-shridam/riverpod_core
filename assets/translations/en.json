@@ -72,5 +72,10 @@
     "selectDate": "Select date",
     "selectTime": "Select time",
     "ratingValue": "{} of {}"
+  },
+  "ds_lists": {
+    "loadingMore": "Loading more",
+    "endOfList": "You've reached the end",
+    "retry": "Try again"
   }
 }

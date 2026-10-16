@@ -72,5 +72,10 @@
     "selectDate": "اختر التاريخ",
     "selectTime": "اختر الوقت",
     "ratingValue": "{} من {}"
+  },
+  "ds_lists": {
+    "loadingMore": "جارٍ تحميل المزيد",
+    "endOfList": "لقد وصلت إلى النهاية",
+    "retry": "إعادة المحاولة"
   }
 }
