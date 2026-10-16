@@ -158,3 +158,12 @@ at implementation time and record them in its report.
 - Decision: `video_player` plays direct media files (MP4) and HLS (`.m3u8`) only; YouTube page links cannot be played by it (they need a WebView/iframe plugin and have ToS limits) and are out of scope. The demo list uses public test media verified with HTTP 200 on 2026-10-16: `https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4`, `.../bee.mp4`; `https://test-videos.co.uk/vids/{bigbuckbunny,sintel,jellyfish}/mp4/h264/720/{Big_Buck_Bunny,Sintel,Jellyfish}_720_10s_5MB.mp4`; HLS `https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8` and `.../img_bipbop_adv_example_ts/master.m3u8`. The Google `gtv-videos-bucket` samples return 403 and are not used. The URLs live in ONE file (`features/videos/data/sources/sample_videos.dart`) so they can be replaced.
 - Why: reliable demo content without a backend; honest about what the plugin supports.
 - Rejected: embedding YouTube via WebView in the core player.
+
+## D-030 — Digit policy
+- Decision: numbers, dates and percentages use Latin digits and ASCII separators in both languages by default (`AppFormatters` normalises intl output). A persisted flag `useArabicIndicDigits` switches Arabic-locale output to Arabic-Indic digits and never affects English (C-40 adds the pref and wiring).
+- Why: consistent prices, IDs and phone numbers; apps that want Arabic-Indic digits opt in.
+- Rejected: always Arabic-Indic.
+
+## D-031 — core/design_system may import core/connectivity and core/errors
+- Decision: `AsyncValueView`/`OfflineBanner` read `connectivityProvider`; error widgets read `AppException`. So `core/design_system` may import `core/connectivity`, `core/errors`, `core/utils` (supersedes the narrower rule in ARCHITECTURE.md). `copyWithPrevious` is internal in riverpod 3.4.x: STATE_AND_DATA.md examples use `AsyncLoading<T>().copyWithPrevious(state)` only through the helper in `core/utils` created when first needed, or the notifier keeps `state` and flags `isRefreshing` itself.
+- Why: the task requires them; keeps the data-state logic in one widget.

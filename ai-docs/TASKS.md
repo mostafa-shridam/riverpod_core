@@ -150,7 +150,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-10 — AsyncValueView, 8 data states, connectivity, offline banner
 | status | owner | blocked by |
 |---|---|---|
-| REVIEW | worker-j | — |
+| DONE | worker-j | — |
 - Goal: `AsyncValueView`, `EmptyState`, `ErrorState`, `Skeleton`, `OfflineBanner`; `core/connectivity/` provider replacing `network_service.dart`.
 - Files: `lib/core/design_system/widgets/async/**`, `lib/core/connectivity/**`, delete `lib/core/services/network_service.dart`, `test/core/design_system/widgets/async/**`, `test/core/connectivity/**`, `test/helpers/fake_connectivity.dart`
 - Done when: all 8 states per DESIGN_SYSTEM.md; connectivity from plugin events (no DNS lookup of third-party hosts) with a `backOnline` event.
@@ -168,7 +168,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-12 — Localization completion
 | status | owner | blocked by |
 |---|---|---|
-| REVIEW | worker-k | — |
+| DONE | worker-k | — |
 - Goal: runtime locale switch persisted in prefs, plural keys, locale-aware number/date/currency formatters.
 - Files: `lib/l10n/**`, `assets/translations/*.json`, `lib/generated/*.g.dart`, `lib/core/extension/language.dart`, `test/l10n/**`
 - Done when: switching ar↔en updates the UI without restart and survives restart; formatters tested in both locales; digit policy recorded as a DECISION; parity test green.

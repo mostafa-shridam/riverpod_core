@@ -73,7 +73,7 @@ env/               *.env.example (real *.env files git-ignored)
 
 ## Dependency direction
 - `features/x/presentation` → `features/x/providers` → `features/x/data` → `core/`, `shared/`.
-- `core/design_system/` imports only Flutter, `core/utils`, `core/errors`, and `l10n/`. It never imports `features/`, `app/` or providers of a feature.
+- `core/design_system/` imports only Flutter, `core/utils`, `core/errors`, `core/connectivity` and `l10n/` (D-031). It never imports `features/`, `app/` or providers of a feature.
 - `core/` never imports `features/` or `app/`. Non-UI core folders (network, storage, errors…) never import `core/design_system/`.
 - A feature never imports another feature's `data/`, `providers/` or `presentation/`. Shared need → `core/`, `shared/` or `core/design_system/`.
 - `app/` may import everything.
