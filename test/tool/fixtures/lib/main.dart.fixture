@@ -1,0 +1,3 @@
+import 'package:riverpod_core/src/theme.dart';
+
+void main() {}
