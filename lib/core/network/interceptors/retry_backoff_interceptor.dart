@@ -9,6 +9,7 @@ import 'package:riverpod_core/core/network/interceptors/idempotency_interceptor.
 ///
 /// - Only idempotent requests: GET, HEAD, PUT, DELETE, or any request that
 ///   carries an `Idempotency-Key`.
+/// - Never `FormData` bodies (uploads are single-use streams).
 /// - Only transient errors: connection and timeout errors, 429, 502, 503, 504.
 ///   Other 4xx are never retried.
 /// - Delay before retry n is `baseDelay * 2^(n-1) + jitter` (jitter is below
@@ -61,6 +62,8 @@ class RetryBackoffInterceptor extends Interceptor {
 
   bool _isRetryable(DioException err) {
     if (!_isIdempotent(err.requestOptions)) return false;
+    // A FormData body (uploads) is a one-shot stream: it cannot be sent twice.
+    if (err.requestOptions.data is FormData) return false;
     switch (err.type) {
       case DioExceptionType.connectionError:
       case DioExceptionType.connectionTimeout:

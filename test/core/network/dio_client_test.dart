@@ -281,6 +281,20 @@ void main() {
       expect(sleeps[1].inMilliseconds, inInclusiveRange(1000, 1499));
     });
 
+    test('a FormData upload is never retried (single-use stream)', () async {
+      final adapter = FakeHttpAdapter()
+        ..enqueueJson(503, {})
+        ..enqueueJson(200, {'ok': true});
+      final dio = _container(adapter: adapter, sleeps: []).read(dioProvider);
+
+      await expectLater(
+        dio.post<dynamic>('/upload', data: FormData.fromMap({'a': 'b'})),
+        throwsA(isA<DioException>()),
+      );
+
+      expect(adapter.requests, hasLength(1));
+    });
+
     test('gives up after three attempts with a ServerException', () async {
       final adapter = FakeHttpAdapter()
         ..enqueueJson(503, {})
