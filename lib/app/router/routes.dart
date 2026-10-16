@@ -1,14 +1,13 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_core/app/router/app_shell.dart';
-import 'package:riverpod_core/app/router/paths.dart';
 import 'package:riverpod_core/app/router/placeholder_pages.dart';
 import 'package:riverpod_core/app/startup/splash_page.dart';
 import 'package:riverpod_core/features/home/presentation/pages/home_page.dart';
 
 part 'routes.g.dart';
 
-@TypedGoRoute<SplashRoute>(path: AppPaths.splash)
+@TypedGoRoute<SplashRoute>(path: SplashPage.routeName)
 class SplashRoute extends GoRouteData with $SplashRoute {
   const SplashRoute();
 
@@ -16,7 +15,7 @@ class SplashRoute extends GoRouteData with $SplashRoute {
   Widget build(BuildContext context, GoRouterState state) => const SplashPage();
 }
 
-@TypedGoRoute<OnboardingRoute>(path: AppPaths.onboarding)
+@TypedGoRoute<OnboardingRoute>(path: OnboardingPage.routeName)
 class OnboardingRoute extends GoRouteData with $OnboardingRoute {
   const OnboardingRoute();
 
@@ -25,7 +24,7 @@ class OnboardingRoute extends GoRouteData with $OnboardingRoute {
       const OnboardingPage();
 }
 
-@TypedGoRoute<LoginRoute>(path: AppPaths.login)
+@TypedGoRoute<LoginRoute>(path: LoginPage.routeName)
 class LoginRoute extends GoRouteData with $LoginRoute {
   const LoginRoute();
 
@@ -36,10 +35,10 @@ class LoginRoute extends GoRouteData with $LoginRoute {
 @TypedStatefulShellRoute<AppShellRoute>(
   branches: [
     TypedStatefulShellBranch<HomeBranch>(
-      routes: [TypedGoRoute<HomeRoute>(path: AppPaths.home)],
+      routes: [TypedGoRoute<HomeRoute>(path: HomePage.routeName)],
     ),
     TypedStatefulShellBranch<MoreBranch>(
-      routes: [TypedGoRoute<MoreRoute>(path: AppPaths.more)],
+      routes: [TypedGoRoute<MoreRoute>(path: MorePage.routeName)],
     ),
   ],
 )
@@ -78,7 +77,7 @@ class MoreRoute extends GoRouteData with $MoreRoute {
   Widget build(BuildContext context, GoRouterState state) => const MorePage();
 }
 
-@TypedGoRoute<ItemDetailRoute>(path: '${AppPaths.itemPrefix}/:id')
+@TypedGoRoute<ItemDetailRoute>(path: '${ItemDetailPage.routeName}/:id')
 class ItemDetailRoute extends GoRouteData with $ItemDetailRoute {
   const ItemDetailRoute({required this.id});
 

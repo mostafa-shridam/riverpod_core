@@ -1,7 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod_core/app/router/guards/app_redirect.dart';
-import 'package:riverpod_core/app/router/paths.dart';
+import 'package:riverpod_core/app/router/placeholder_pages.dart';
+import 'package:riverpod_core/app/startup/splash_page.dart';
 import 'package:riverpod_core/core/auth/session_controller.dart';
+import 'package:riverpod_core/features/home/presentation/pages/home_page.dart';
 
 void main() {
   String? redirect(
@@ -20,15 +22,15 @@ void main() {
     test('stays on splash while session or onboarding is unknown', () {
       expect(
         redirect(
-          AppPaths.home,
+          HomePage.routeName,
           session: SessionStatus.unknown,
           onboardingSeen: true,
         ),
-        AppPaths.splash,
+        SplashPage.routeName,
       );
       expect(
         redirect(
-          AppPaths.splash,
+          SplashPage.routeName,
           session: SessionStatus.signedIn,
           onboardingSeen: null,
         ),
@@ -39,14 +41,18 @@ void main() {
 
   group('onboarding', () {
     test('an unseen onboarding sends every location to onboarding', () {
-      for (final location in [AppPaths.home, AppPaths.login, AppPaths.more]) {
+      for (final location in [
+        HomePage.routeName,
+        LoginPage.routeName,
+        MorePage.routeName,
+      ]) {
         expect(
           redirect(
             location,
             session: SessionStatus.signedOut,
             onboardingSeen: false,
           ),
-          AppPaths.onboarding,
+          OnboardingPage.routeName,
           reason: location,
         );
       }
@@ -55,7 +61,7 @@ void main() {
     test('onboarding itself is allowed until seen', () {
       expect(
         redirect(
-          AppPaths.onboarding,
+          OnboardingPage.routeName,
           session: SessionStatus.signedOut,
           onboardingSeen: false,
         ),
@@ -68,18 +74,18 @@ void main() {
     test('signed out goes to login from the app', () {
       expect(
         redirect(
-          AppPaths.home,
+          HomePage.routeName,
           session: SessionStatus.signedOut,
           onboardingSeen: true,
         ),
-        AppPaths.login,
+        LoginPage.routeName,
       );
     });
 
     test('signed out may stay on login', () {
       expect(
         redirect(
-          AppPaths.login,
+          LoginPage.routeName,
           session: SessionStatus.signedOut,
           onboardingSeen: true,
         ),
@@ -88,21 +94,25 @@ void main() {
     });
 
     test('signed in leaves login and splash for home', () {
-      for (final location in [AppPaths.login, AppPaths.splash]) {
+      for (final location in [LoginPage.routeName, SplashPage.routeName]) {
         expect(
           redirect(
             location,
             session: SessionStatus.signedIn,
             onboardingSeen: true,
           ),
-          AppPaths.home,
+          HomePage.routeName,
           reason: location,
         );
       }
     });
 
     test('signed in may open any app location', () {
-      for (final location in [AppPaths.home, AppPaths.more, '/items/1']) {
+      for (final location in [
+        HomePage.routeName,
+        MorePage.routeName,
+        '/items/1',
+      ]) {
         expect(
           redirect(
             location,
@@ -118,7 +128,7 @@ void main() {
     test('root redirects to home', () {
       expect(
         redirect('/', session: SessionStatus.signedIn, onboardingSeen: true),
-        AppPaths.home,
+        HomePage.routeName,
       );
     });
   });

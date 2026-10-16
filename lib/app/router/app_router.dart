@@ -3,8 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:riverpod_core/app/router/app_error_page.dart';
 import 'package:riverpod_core/app/router/guards/app_redirect.dart';
-import 'package:riverpod_core/app/router/paths.dart';
 import 'package:riverpod_core/app/router/routes.dart';
+import 'package:riverpod_core/app/startup/splash_page.dart';
 import 'package:riverpod_core/core/auth/session_controller.dart';
 import 'package:riverpod_core/core/helper/deep_link_helper.dart';
 import 'package:riverpod_core/core/storage/prefs_storage.dart';
@@ -28,7 +28,7 @@ GoRouter appRouter(Ref ref) {
     ..listen(onboardingSeenProvider, (previous, next) => refresh.value++);
 
   final router = GoRouter(
-    initialLocation: AppPaths.splash,
+    initialLocation: SplashPage.routeName,
     refreshListenable: refresh,
     redirect: (context, state) => appRedirect(
       location: state.uri.path,

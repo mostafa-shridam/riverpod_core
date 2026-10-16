@@ -5,6 +5,8 @@ import 'package:riverpod_core/core/auth/session_controller.dart';
 /// Shown while the session and onboarding state load. The router moves on by
 /// itself once both are known.
 class SplashPage extends ConsumerStatefulWidget {
+  static const routeName = '/splash';
+
   const SplashPage({super.key});
 
   @override

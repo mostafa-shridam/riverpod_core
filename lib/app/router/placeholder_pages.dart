@@ -9,6 +9,8 @@ import 'package:riverpod_core/core/storage/prefs_storage.dart';
 // C-18 (onboarding) replace them. Each one is keyed so tests can find it.
 
 class OnboardingPage extends ConsumerWidget {
+  static const routeName = '/onboarding';
+
   const OnboardingPage({super.key});
 
   @override
@@ -31,6 +33,8 @@ class OnboardingPage extends ConsumerWidget {
 }
 
 class LoginPage extends ConsumerWidget {
+  static const routeName = '/login';
+
   const LoginPage({super.key});
 
   @override
@@ -50,6 +54,8 @@ class LoginPage extends ConsumerWidget {
 }
 
 class MorePage extends StatelessWidget {
+  static const routeName = '/more';
+
   const MorePage({super.key});
 
   @override
@@ -59,6 +65,8 @@ class MorePage extends StatelessWidget {
 }
 
 class ItemDetailPage extends StatelessWidget {
+  static const routeName = '/items';
+
   const ItemDetailPage({super.key, required this.id});
 
   final String id;

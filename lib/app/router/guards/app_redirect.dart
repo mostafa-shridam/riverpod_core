@@ -1,5 +1,7 @@
-import 'package:riverpod_core/app/router/paths.dart';
+import 'package:riverpod_core/app/router/placeholder_pages.dart';
+import 'package:riverpod_core/app/startup/splash_page.dart';
 import 'package:riverpod_core/core/auth/session_controller.dart';
+import 'package:riverpod_core/features/home/presentation/pages/home_page.dart';
 
 /// Redirect rules, pure so they can be tested without a router.
 ///
@@ -11,27 +13,27 @@ String? appRedirect({
   required SessionStatus session,
   required bool? onboardingSeen,
 }) {
-  final target = location == '/' ? AppPaths.home : location;
+  final target = location == '/' ? HomePage.routeName : location;
 
   if (session == SessionStatus.unknown || onboardingSeen == null) {
-    return target == AppPaths.splash ? null : AppPaths.splash;
+    return target == SplashPage.routeName ? null : SplashPage.routeName;
   }
 
   final bool allowed;
   final String destination;
   if (!onboardingSeen) {
-    allowed = target == AppPaths.onboarding;
-    destination = AppPaths.onboarding;
+    allowed = target == OnboardingPage.routeName;
+    destination = OnboardingPage.routeName;
   } else if (session == SessionStatus.signedOut) {
-    allowed = target == AppPaths.login;
-    destination = AppPaths.login;
+    allowed = target == LoginPage.routeName;
+    destination = LoginPage.routeName;
   } else {
     allowed = !const {
-      AppPaths.splash,
-      AppPaths.onboarding,
-      AppPaths.login,
+      SplashPage.routeName,
+      OnboardingPage.routeName,
+      LoginPage.routeName,
     }.contains(target);
-    destination = AppPaths.home;
+    destination = HomePage.routeName;
   }
 
   if (allowed) return target == location ? null : target;

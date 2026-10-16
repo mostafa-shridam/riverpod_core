@@ -1,14 +1,16 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:riverpod_core/app/router/paths.dart';
+import 'package:riverpod_core/app/router/placeholder_pages.dart';
 import 'package:riverpod_core/app/router/routes.dart';
+import 'package:riverpod_core/app/startup/splash_page.dart';
+import 'package:riverpod_core/features/home/presentation/pages/home_page.dart';
 
 void main() {
   test('typed routes produce the paths in AppPaths', () {
-    expect(const SplashRoute().location, AppPaths.splash);
-    expect(const OnboardingRoute().location, AppPaths.onboarding);
-    expect(const LoginRoute().location, AppPaths.login);
-    expect(const HomeRoute().location, AppPaths.home);
-    expect(const MoreRoute().location, AppPaths.more);
+    expect(const SplashRoute().location, SplashPage.routeName);
+    expect(const OnboardingRoute().location, OnboardingPage.routeName);
+    expect(const LoginRoute().location, LoginPage.routeName);
+    expect(const HomeRoute().location, HomePage.routeName);
+    expect(const MoreRoute().location, MorePage.routeName);
   });
 
   test('item route carries its id in the path', () {
