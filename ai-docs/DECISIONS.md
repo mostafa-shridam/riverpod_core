@@ -142,3 +142,13 @@ at implementation time and record them in its report.
 - Decision (owner instruction): everything is under `lib/core/`; `design_system/` moved to `lib/core/design_system/` (tokens, theme, responsive, widgets). Import path `package:riverpod_core/core/design_system/...`. Rule: non-UI core folders never import `core/design_system/`.
 - Why: owner wants one `core` root and no extra top-level folders.
 - Rejected: top-level `lib/design_system/`.
+
+## D-027 — video_player for AppVideoPlayer
+- Decision (owner request: a video controller playing a video): add `video_player` (official flutter.dev plugin, BSD-3; latest stable resolved in C-38) behind `AppVideoPlayer` in `core/design_system/widgets/media/`. Features never use `video_player` directly. Custom controls (not Chewie): play/pause, seek bar, elapsed/total time, mute, speed, fullscreen toggle, buffering/error states, auto-hide.
+- Why: official, maintained, covers Android/iOS; controls are ~300 lines of our own and match the design system.
+- Rejected: `chewie` (extra dependency with its own look), `better_player` (unmaintained).
+
+## D-028 — Reference (demo) features
+- Decision: two generic demo features ship with the template and double as the source for the `.fttemplates/feature` scaffold (C-25): `features/showcase` (C-35, the component gallery) and `features/videos` (C-39, a complete feature: model, mock remote source, repository, providers, list page + player page, all 8 data states, tests). Both are registered only in dev/staging flavors, contain no app-specific names, and can be deleted without touching anything else (nothing imports them).
+- Why: a complete working example is the best documentation of ARCHITECTURE.md; the mock source lets every data state be demonstrated without a backend.
+- Rejected: documentation-only examples (drift from code).

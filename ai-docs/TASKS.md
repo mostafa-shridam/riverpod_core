@@ -141,10 +141,10 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-35 — Widget showcase page ("component gallery")
 | status | owner | blocked by |
 |---|---|---|
-| BLOCKED | — | C-09, C-10, C-11, C-32, C-33, C-34 |
+| BLOCKED | — | C-10, C-11, C-32, C-38 |
 - Goal: one page where anyone can see and try every design_system widget fast (D-020). Registered only in `dev` and `staging` flavors at the typed route `/showcase`; reachable from a dev-only entry on the home page.
 - Files: `lib/features/showcase/presentation/pages/showcase_page.dart`, `lib/features/showcase/presentation/widgets/**` (section widgets), `lib/core/design_system/widgets/widgets.dart` (the barrel export of every widget), `lib/app/router/routes.dart` (add the route only), `assets/translations/*.json` + generated (`showcase.*` keys), `test/features/showcase/**`
-- Done when: sections with headers — Buttons (all variants/sizes/loading/disabled), Inputs, Selection, Overlays (one button each: modal bottom sheet, action sheet, selection sheet, form sheet, alert, confirm, input dialog, loading overlay, snackbar ×4 types, toast, banner), Display (card, avatar, badge, chip, image, accordion, tabs), Feedback/States (skeleton, empty, error, offline banner, progress), Tokens (color swatches with names, type scale, spacing, radius, elevation). App bar actions: toggle light/dark, toggle ar/en, text scale slider, so every widget can be checked in all modes live. Works on phone and tablet.
+- Done when: sections with headers — Buttons (all variants/sizes/loading/disabled), Inputs, Selection, Overlays (one button each: modal bottom sheet, action sheet, selection sheet, form sheet, alert, confirm, input dialog, loading overlay, snackbar ×4 types, toast, banner), Display (card, avatar, badge, chip, image, accordion, tabs), Media (`AppVideoPlayer` playing a public sample video, with a link to the `videos` feature), Feedback/States (skeleton, empty, error, offline banner, progress), Tokens (color swatches with names, type scale, spacing, radius, elevation). App bar actions: toggle light/dark, toggle ar/en, text scale slider, so every widget can be checked in all modes live. Works on phone and tablet.
 - Tests: page builds in light/dark × ar/en; each overlay button opens its overlay; mode toggles work; no overflow at text scale 2.0.
 
 ## C-10 — AsyncValueView, 8 data states, connectivity, offline banner
@@ -192,6 +192,24 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 - Files: `lib/core/config/app_config.dart` (+ `.g.dart`), `lib/core/config/flavor.dart`, `lib/core/config/env_loader.dart` (new: loads `env/<flavor>.env` via dotenv and returns the map), `env/dev.env.example`, `env/staging.env.example`, `env/prod.env.example`, delete `env/*.example.json`, `.gitignore` (`env/*.env`, `!env/*.env.example`), `pubspec.yaml` (add `flutter_dotenv`; add the three `env/*.env` files under `flutter: assets:`), `pubspec.lock`, `test/core/config/**`
 - Done when: `Flavor.current` = `kReleaseMode ? prod : dev` (testable via an injectable `isRelease` parameter in a pure function); `AppConfig.fromEnvironment()` and `ensureFlavor` removed; `FLAVOR` key removed from env files and parsing (flavor is an input to `AppConfig.fromMap(flavor, map)`); `EnvLoader.load(Flavor)` throws `ConfigException` with a clear message when the file is missing or empty ("copy env/dev.env.example to env/dev.env"); example files contain placeholders only; asset declarations don't break `flutter pub get`/test when the real `.env` files are absent (use the strategy: tests inject maps; document in the report how a fresh clone runs: copy examples). No other file in `lib/` imports dotenv.
 - Tests: Flavor.current for debug/release; EnvLoader missing/empty file via an injected asset reader; all existing AppConfig validation tests ported to the new signature (none dropped).
+
+## C-38 — AppVideoPlayer (design_system media widget)
+| status | owner | blocked by |
+|---|---|---|
+| READY | — | — (D-027) |
+- Goal: a reusable, good-looking video player widget with a controller provider.
+- Files: `lib/core/design_system/widgets/media/**` (`app_video_player.dart`, `app_video_controls.dart`, `app_video_controller.dart`, `media_strings.dart`), `pubspec.yaml`, `pubspec.lock` (add `video_player`), `assets/translations/ar.json` + `en.json` (top-level `ds_media`, appended at the end, D-023), `test/core/design_system/widgets/media/**`, `test/goldens/media/**`
+- Done when: `AppVideoPlayer(source: AppVideoSource.network(url) | .asset(path) | .file(path), autoPlay, looping, aspectRatio, placeholder/poster, onEnded)`; an `AppVideoController` (wraps `VideoPlayerController`, exposes state as a `ValueListenable`/Riverpod-friendly notifier: initializing, ready, playing, paused, buffering, ended, error + position/duration/volume/speed) with `play/pause/seekTo/setSpeed/setMuted`, disposed correctly and testable through an injectable controller factory (so tests need no platform channel); overlay controls built from tokens: big center play/pause, seek bar with buffered + position, elapsed/total time (locale-aware digits), mute, speed menu (0.5/1/1.5/2), fullscreen toggle (landscape route with `SystemChrome` restore), double-tap seek ±10 s, auto-hide after 3 s, tap to show; buffering spinner, error state with retry; keeps working in RTL (seek bar direction stays LTR, controls row directional, comment why); pauses on app background (`WidgetsBindingObserver`); respects text scale 2.0; Semantics for every control.
+- Tests: with a fake controller factory: state transitions, controls visibility timer (fakeAsync), seek/mute/speed calls, error + retry, dispose, ended callback, goldens (controls visible, buffering, error; light/dark x ar/en).
+
+## C-39 — Reference feature: videos (complete feature with mock data)
+| status | owner | blocked by |
+|---|---|---|
+| BLOCKED | — | C-10, C-11, C-38 |
+- Goal: D-028. A complete feature following ARCHITECTURE.md end to end, runnable without a backend.
+- Files: `lib/features/videos/**` (`data/models/video.dart`, `data/sources/videos_remote_source.dart` + `videos_mock_source.dart`, `data/videos_repository.dart`, `providers/videos_controller.dart`, `providers/video_player_page_controller.dart` if needed, `presentation/pages/videos_page.dart`, `presentation/pages/video_detail_page.dart`, `presentation/widgets/**`), `lib/app/router/routes.dart` (add the two routes only), `assets/translations/*.json` + generated (`videos.*`), `test/features/videos/**`
+- Done when: list page with `AsyncValueView` (all 8 states reachable through a "simulate" menu that switches the mock source: success, empty, error, offline, slow, partial), pull-to-refresh, search field filtering, item cards (thumbnail `AppImage`, title, duration badge); detail page with `AppVideoPlayer`, description, related list, favorite toggle persisted in prefs; repository returns models or throws `AppException`; mock source is selected by a provider override flag so it can be replaced by the real Dio source in one place; typed routes; registered only in dev/staging; sample video URLs are public test videos documented in the report; no hard-coded text, tokens only.
+- Tests: repository (success/each exception), controller (initial/success/failure/refresh/search), pages (8 states + goldens), detail page with fake player controller.
 
 ---
 
