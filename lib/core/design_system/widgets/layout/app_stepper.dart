@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
 import 'package:riverpod_core/core/design_system/tokens/app_tokens.dart';
-import 'package:riverpod_core/core/design_system/widgets/layout/layout_strings.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// One step of an [AppStepper].
 class AppStep {
@@ -45,13 +45,13 @@ class AppStepper extends StatelessWidget {
   }
 
   String _semanticLabel(int i) {
-    final position = dsLayoutStepOfKey.tr(
+    final position = LocaleKeys.ds_layout_stepOf.tr(
       args: ['${i + 1}', '${steps.length}'],
     );
     final state = i < currentStep
-        ? dsLayoutStepCompletedKey.tr()
+        ? LocaleKeys.ds_layout_stepCompleted.tr()
         : i == currentStep
-        ? dsLayoutStepCurrentKey.tr()
+        ? LocaleKeys.ds_layout_stepCurrent.tr()
         : '';
     return [
       position,

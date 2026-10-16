@@ -178,7 +178,7 @@ class CodegenLoader extends AssetLoader {
       "endOfList": "You've reached the end",
       "retry": "Try again",
     },
-    "app_nav": {"home": "Home", "more": "More", "continue": "Continue"},
+    "app_nav": {"home": "Home", "more": "More"},
     "auth": {
       "login": {
         "title": "Sign in",
@@ -651,7 +651,7 @@ class CodegenLoader extends AssetLoader {
       "endOfList": "لقد وصلت إلى النهاية",
       "retry": "إعادة المحاولة",
     },
-    "app_nav": {"home": "الرئيسية", "more": "المزيد", "continue": "متابعة"},
+    "app_nav": {"home": "الرئيسية", "more": "المزيد"},
     "auth": {
       "login": {
         "title": "تسجيل الدخول",

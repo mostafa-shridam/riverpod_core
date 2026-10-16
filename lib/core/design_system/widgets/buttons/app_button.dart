@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 
 import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
-import 'package:riverpod_core/core/design_system/widgets/buttons/buttons_strings.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Visual weight. Use one [primary] per screen; [destructive] only for
 /// irreversible actions.
@@ -97,7 +97,7 @@ class AppButton extends StatelessWidget {
         ),
         if (isLoading)
           Semantics(
-            label: loadingLabel ?? buttonLoadingKey.tr(),
+            label: loadingLabel ?? LocaleKeys.ds_buttons_loading.tr(),
             child: SizedBox.square(
               dimension: iconSize,
               child: CircularProgressIndicator(

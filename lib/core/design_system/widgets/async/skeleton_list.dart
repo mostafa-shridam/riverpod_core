@@ -2,9 +2,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
-import 'package:riverpod_core/core/design_system/widgets/async/async_strings.dart';
 import 'package:riverpod_core/core/design_system/widgets/async/skeleton.dart';
 import 'package:riverpod_core/core/design_system/widgets/async/skeleton_block.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Default loading placeholder: [itemCount] rows with a leading circle and
 /// two text lines. Pages with a different layout pass their own skeleton.
@@ -23,7 +23,7 @@ class SkeletonList extends StatelessWidget {
     final avatar = tokens.sizes.minTouchTarget;
     final line = tokens.sizes.iconSm;
     return Semantics(
-      label: semanticLabel ?? asyncLoadingKey.tr(),
+      label: semanticLabel ?? LocaleKeys.ds_async_loading.tr(),
       container: true,
       liveRegion: true,
       child: ExcludeSemantics(

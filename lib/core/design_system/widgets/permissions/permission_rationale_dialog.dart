@@ -2,9 +2,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import 'package:riverpod_core/core/design_system/widgets/dialogs/app_dialog.dart';
-import 'package:riverpod_core/core/design_system/widgets/permissions/permissions_strings.dart';
 import 'package:riverpod_core/core/permissions/app_permission.dart';
 import 'package:riverpod_core/core/permissions/permission_rationale.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Explains why a permission is needed. Pops `true` when the user accepts
 /// ("Allow", or "Open settings" when [openSettings]) and `false` otherwise.
@@ -39,26 +39,28 @@ class PermissionRationaleDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const minSize = Size(0, kMinInteractiveDimension);
-    final body = message ?? permissionMessageKey(permission).tr();
+    final body = message ?? _messageKey(permission).tr();
     return AppDialogFrame(
       icon: _iconOf(permission),
-      title: title ?? permissionTitleKey(permission).tr(),
+      title: title ?? _titleKey(permission).tr(),
       message: openSettings
-          ? '$body\n\n${permissionSettingsHintKey.tr()}'
+          ? '$body\n\n${LocaleKeys.ds_permissions_settingsHint.tr()}'
           : body,
       primary: FilledButton(
         style: FilledButton.styleFrom(minimumSize: minSize),
         onPressed: () => Navigator.of(context).pop(true),
         child: Text(
           confirmLabel ??
-              (openSettings ? permissionOpenSettingsKey : permissionAllowKey)
+              (openSettings
+                      ? LocaleKeys.ds_permissions_openSettings
+                      : LocaleKeys.ds_permissions_allow)
                   .tr(),
         ),
       ),
       secondary: TextButton(
         style: TextButton.styleFrom(minimumSize: minSize),
         onPressed: () => Navigator.of(context).pop(false),
-        child: Text(cancelLabel ?? permissionNotNowKey.tr()),
+        child: Text(cancelLabel ?? LocaleKeys.ds_permissions_notNow.tr()),
       ),
     );
   }
@@ -80,3 +82,18 @@ Future<bool> showPermissionRationale(
   );
   return accepted ?? false;
 }
+
+/// Title key per permission. A switch, so a new [AppPermission] fails to compile
+/// until it has its copy.
+String _titleKey(AppPermission permission) => switch (permission) {
+  AppPermission.camera => LocaleKeys.ds_permissions_cameraTitle,
+  AppPermission.photos => LocaleKeys.ds_permissions_photosTitle,
+  AppPermission.microphone => LocaleKeys.ds_permissions_microphoneTitle,
+};
+
+/// Message key per permission (see [_titleKey]).
+String _messageKey(AppPermission permission) => switch (permission) {
+  AppPermission.camera => LocaleKeys.ds_permissions_cameraMessage,
+  AppPermission.photos => LocaleKeys.ds_permissions_photosMessage,
+  AppPermission.microphone => LocaleKeys.ds_permissions_microphoneMessage,
+};

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:riverpod_core/core/design_system/widgets/bottom_sheets/app_selection_sheet.dart';
 import 'package:riverpod_core/core/design_system/widgets/selection/app_picker_field.dart';
-import 'package:riverpod_core/core/design_system/widgets/selection/selection_strings.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Single choice field. Tapping opens an `AppSelectionSheet` (with a search
 /// box when [searchable]); the chosen label is shown in the field.
@@ -61,7 +61,7 @@ class AppDropdown<T> extends StatelessWidget {
       value: value,
       displayText: _selectedLabel,
       label: label,
-      hint: hint ?? selectKey.tr(),
+      hint: hint ?? LocaleKeys.ds_selection_select.tr(),
       helper: helper,
       errorText: errorText,
       validator: validator,

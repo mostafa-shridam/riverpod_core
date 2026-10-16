@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
 import 'package:riverpod_core/core/design_system/widgets/buttons/app_button.dart';
-import 'package:riverpod_core/core/design_system/widgets/lists/lists_strings.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// What the footer of a paginated list shows after the last item.
 enum PaginationFooterStatus { none, loading, end, error }
@@ -30,12 +30,12 @@ class PaginationFooter extends StatelessWidget {
       PaginationFooterStatus.none => const SizedBox.shrink(),
       PaginationFooterStatus.loading => Semantics(
         liveRegion: true,
-        label: dsListsLoadingMoreKey.tr(),
+        label: LocaleKeys.ds_lists_loadingMore.tr(),
         child: const Center(child: CircularProgressIndicator()),
       ),
       PaginationFooterStatus.end => Center(
         child: Text(
-          dsListsEndOfListKey.tr(),
+          LocaleKeys.ds_lists_endOfList.tr(),
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
@@ -53,7 +53,7 @@ class PaginationFooter extends StatelessWidget {
           ),
           SizedBox(height: tokens.spacing.sm),
           AppButton(
-            label: dsListsRetryKey.tr(),
+            label: LocaleKeys.ds_lists_retry.tr(),
             variant: AppButtonVariant.tonal,
             onPressed: onRetry,
           ),

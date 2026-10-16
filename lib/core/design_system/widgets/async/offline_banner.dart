@@ -6,8 +6,8 @@ import 'package:riverpod_core/core/connectivity/connectivity_provider.dart';
 import 'package:riverpod_core/core/connectivity/connectivity_service.dart';
 import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
 import 'package:riverpod_core/core/design_system/widgets/async/async_motion.dart';
-import 'package:riverpod_core/core/design_system/widgets/async/async_strings.dart';
 import 'package:riverpod_core/core/design_system/widgets/feedback/app_status_type.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Subtle full-width strip that explains why the data on screen may be old.
 ///
@@ -78,12 +78,17 @@ class _Strip extends StatelessWidget {
         : scheme.surfaceContainerHigh;
     final foreground = offline ? warning.onContainer : scheme.onSurfaceVariant;
     final title = offline
-        ? (savedData ? asyncBannerOfflineSavedKey : asyncBannerOfflineKey).tr()
+        ? (savedData
+                  ? LocaleKeys.ds_async_bannerOfflineSaved
+                  : LocaleKeys.ds_async_bannerOffline)
+              .tr()
         : (lastUpdated == null
-              ? asyncBannerStaleKey.tr()
-              : asyncBannerLastUpdatedKey.tr(args: [_format(context)]));
+              ? LocaleKeys.ds_async_bannerStale.tr()
+              : LocaleKeys.ds_async_bannerLastUpdated.tr(
+                  args: [_format(context)],
+                ));
     final subtitle = offline && lastUpdated != null
-        ? asyncBannerLastUpdatedKey.tr(args: [_format(context)])
+        ? LocaleKeys.ds_async_bannerLastUpdated.tr(args: [_format(context)])
         : null;
     return Semantics(
       container: true,

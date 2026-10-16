@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import 'package:riverpod_core/core/design_system/widgets/selection/app_picker_field.dart';
-import 'package:riverpod_core/core/design_system/widgets/selection/selection_strings.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Date field that opens the platform date picker and shows the date in the
 /// active locale (digits and month names follow ar/en).
@@ -61,7 +61,7 @@ class AppDateField extends StatelessWidget {
           ? null
           : MaterialLocalizations.of(context).formatMediumDate(current),
       label: label,
-      hint: hint ?? selectDateKey.tr(),
+      hint: hint ?? LocaleKeys.ds_selection_selectDate.tr(),
       helper: helper,
       errorText: errorText,
       validator: validator,
@@ -76,7 +76,7 @@ class AppDateField extends StatelessWidget {
               initialDate: _opening(),
               firstDate: firstDate,
               lastDate: lastDate,
-              helpText: pickerHelp ?? selectDateKey.tr(),
+              helpText: pickerHelp ?? LocaleKeys.ds_selection_selectDate.tr(),
             ),
     );
   }

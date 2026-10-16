@@ -2,8 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import 'package:riverpod_core/core/design_system/widgets/dialogs/app_dialog.dart';
-import 'package:riverpod_core/core/design_system/widgets/dialogs/overlays_strings.dart';
 import 'package:riverpod_core/core/design_system/widgets/feedback/app_status_type.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Single-button alert with an info / success / warning / error icon.
 class AppAlertDialog extends StatelessWidget {
@@ -63,7 +63,7 @@ class AppAlertDialog extends StatelessWidget {
           Navigator.of(context).pop();
           onConfirm?.call();
         },
-        child: Text(confirmLabel ?? okKey.tr()),
+        child: Text(confirmLabel ?? LocaleKeys.ds_overlays_ok.tr()),
       ),
     );
   }

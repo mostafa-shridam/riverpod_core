@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
 import 'package:riverpod_core/core/design_system/widgets/bottom_sheets/app_bottom_sheet.dart';
-import 'package:riverpod_core/core/design_system/widgets/dialogs/overlays_strings.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// One row of an [AppActionSheet]. [value] is what the sheet returns.
 @immutable
@@ -110,7 +110,7 @@ class AppActionSheet<T> extends StatelessWidget {
                 minimumSize: const Size.fromHeight(kMinInteractiveDimension),
               ),
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(cancelLabel ?? cancelKey.tr()),
+              child: Text(cancelLabel ?? LocaleKeys.ds_overlays_cancel.tr()),
             ),
           ),
       ],

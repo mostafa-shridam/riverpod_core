@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
 import 'package:riverpod_core/core/design_system/widgets/bottom_sheets/app_bottom_sheet.dart';
-import 'package:riverpod_core/core/design_system/widgets/dialogs/overlays_strings.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// One choice of an [AppSelectionSheet].
 @immutable
@@ -137,7 +137,7 @@ class _AppSelectionSheetState<T> extends State<AppSelectionSheet<T>> {
             padding: EdgeInsetsDirectional.all(tokens.spacing.xl),
             child: Center(
               child: Text(
-                widget.noResultsLabel ?? noResultsKey.tr(),
+                widget.noResultsLabel ?? LocaleKeys.ds_overlays_noResults.tr(),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),
@@ -168,7 +168,8 @@ class _AppSelectionSheetState<T> extends State<AppSelectionSheet<T>> {
               onChanged: (v) => setState(() => _query = v),
               textInputAction: TextInputAction.search,
               decoration: InputDecoration(
-                hintText: widget.searchHint ?? searchKey.tr(),
+                hintText:
+                    widget.searchHint ?? LocaleKeys.ds_overlays_search.tr(),
                 prefixIcon: const Icon(Icons.search_rounded),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(tokens.radius.full),
@@ -186,7 +187,7 @@ class _AppSelectionSheetState<T> extends State<AppSelectionSheet<T>> {
                 minimumSize: const Size.fromHeight(kMinInteractiveDimension),
               ),
               onPressed: () => Navigator.of(context).pop(_selected),
-              child: Text(widget.doneLabel ?? doneKey.tr()),
+              child: Text(widget.doneLabel ?? LocaleKeys.ds_overlays_done.tr()),
             ),
           ),
       ],

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
 import 'package:riverpod_core/core/design_system/widgets/buttons/app_button.dart';
 import 'package:riverpod_core/core/design_system/widgets/media/app_video_labels.dart';
-import 'package:riverpod_core/core/design_system/widgets/media/media_strings.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Brief rewind/forward badge after a double-tap.
 class AppVideoSeekFlash extends StatelessWidget {
@@ -26,8 +26,8 @@ class AppVideoSeekFlash extends StatelessWidget {
       alignment: Alignment(forward ? 0.6 : -0.6, 0),
       child: Semantics(
         label: forward
-            ? labels.forward ?? dsMediaForwardKey.tr()
-            : labels.rewind ?? dsMediaRewindKey.tr(),
+            ? labels.forward ?? LocaleKeys.ds_media_forward.tr()
+            : labels.rewind ?? LocaleKeys.ds_media_rewind.tr(),
         child: DecoratedBox(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
@@ -75,7 +75,7 @@ class AppVideoErrorPanel extends StatelessWidget {
             ),
             SizedBox(height: tokens.spacing.sm),
             Text(
-              labels.error ?? dsMediaErrorKey.tr(),
+              labels.error ?? LocaleKeys.ds_media_error.tr(),
               textAlign: TextAlign.center,
               style: Theme.of(
                 context,
@@ -83,7 +83,7 @@ class AppVideoErrorPanel extends StatelessWidget {
             ),
             SizedBox(height: tokens.spacing.md),
             AppButton(
-              label: labels.retry ?? dsMediaRetryKey.tr(),
+              label: labels.retry ?? LocaleKeys.ds_media_retry.tr(),
               icon: Icons.refresh_rounded,
               variant: AppButtonVariant.tonal,
               size: AppButtonSize.sm,

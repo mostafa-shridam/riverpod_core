@@ -20,7 +20,7 @@ class HomePage extends ConsumerWidget {
     final devArea = flavor != Flavor.prod;
     return Scaffold(
       key: const ValueKey('home-page'),
-      appBar: AppBar(title: Text('app_nav.home'.tr())),
+      appBar: AppBar(title: Text(LocaleKeys.app_nav_home.tr())),
       body: ListView(
         children: [
           if (ShowcasePage.isEnabled(flavor))

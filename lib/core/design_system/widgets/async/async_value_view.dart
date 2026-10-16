@@ -6,7 +6,6 @@ import 'package:riverpod_core/core/connectivity/connectivity_provider.dart';
 import 'package:riverpod_core/core/connectivity/connectivity_service.dart';
 import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
 import 'package:riverpod_core/core/design_system/widgets/async/async_motion.dart';
-import 'package:riverpod_core/core/design_system/widgets/async/async_strings.dart';
 import 'package:riverpod_core/core/design_system/widgets/async/empty_state.dart';
 import 'package:riverpod_core/core/design_system/widgets/async/error_state.dart';
 import 'package:riverpod_core/core/design_system/widgets/async/offline_banner.dart';
@@ -15,6 +14,7 @@ import 'package:riverpod_core/core/design_system/widgets/feedback/app_status_typ
 import 'package:riverpod_core/core/design_system/widgets/feedback/banner/app_banner.dart';
 import 'package:riverpod_core/core/errors/app_exception.dart';
 import 'package:riverpod_core/core/errors/error_mapper.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Renders an [AsyncValue] in the 8 data states of DESIGN_SYSTEM.md.
 ///
@@ -176,8 +176,9 @@ class _AsyncValueViewState<T> extends ConsumerState<AsyncValueView<T>> {
                   child: AppBanner(
                     type: AppStatusType.error,
                     message:
-                        widget.partialErrorMessage ?? asyncPartialErrorKey.tr(),
-                    actionLabel: asyncRetryKey.tr(),
+                        widget.partialErrorMessage ??
+                        LocaleKeys.ds_async_partialError.tr(),
+                    actionLabel: LocaleKeys.ds_async_retry.tr(),
                     onAction: widget.onPartialRetry ?? widget.onRetry,
                   ),
                 )

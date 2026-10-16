@@ -6,7 +6,7 @@ import 'package:easy_localization/easy_localization.dart'
 import 'package:flutter/material.dart';
 
 import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
-import 'package:riverpod_core/core/design_system/widgets/display/display_strings.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// The one image primitive. Network images are cached on disk and in memory
 /// (cached_network_image, D-021); [AppImage.provider] shows any
@@ -136,7 +136,7 @@ class _ImageError extends StatelessWidget {
       child: Icon(
         Icons.broken_image_outlined,
         color: scheme.onSurfaceVariant,
-        semanticLabel: dsDisplayImageErrorKey.tr(),
+        semanticLabel: LocaleKeys.ds_display_imageError.tr(),
       ),
     );
   }

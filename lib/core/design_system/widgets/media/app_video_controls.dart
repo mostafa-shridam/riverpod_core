@@ -12,7 +12,7 @@ import 'package:riverpod_core/core/design_system/widgets/media/app_video_control
 import 'package:riverpod_core/core/design_system/widgets/media/app_video_labels.dart';
 import 'package:riverpod_core/core/design_system/widgets/media/app_video_overlays.dart';
 import 'package:riverpod_core/core/design_system/widgets/media/app_video_seek_bar.dart';
-import 'package:riverpod_core/core/design_system/widgets/media/media_strings.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Formats [d] as `m:ss` or `h:mm:ss` with the digits of [locale].
 String formatVideoDuration(Duration d, String locale) {
@@ -190,7 +190,8 @@ class _AppVideoControlsState extends State<AppVideoControls> {
                         size: AppProgressSize.lg,
                         color: Theme.of(context).colorScheme.onSurface,
                         semanticLabel:
-                            widget.labels.buffering ?? dsMediaBufferingKey.tr(),
+                            widget.labels.buffering ??
+                            LocaleKeys.ds_media_buffering.tr(),
                       ),
                     ),
                   ),
@@ -284,10 +285,10 @@ class _Chrome extends StatelessWidget {
                   ? Icons.replay_rounded
                   : (playing ? Icons.pause_rounded : Icons.play_arrow_rounded),
               tooltip: ended
-                  ? labels.replay ?? dsMediaReplayKey.tr()
+                  ? labels.replay ?? LocaleKeys.ds_media_replay.tr()
                   : (playing
-                        ? labels.pause ?? dsMediaPauseKey.tr()
-                        : labels.play ?? dsMediaPlayKey.tr()),
+                        ? labels.pause ?? LocaleKeys.ds_media_pause.tr()
+                        : labels.play ?? LocaleKeys.ds_media_play.tr()),
               variant: AppIconButtonVariant.filled,
               size: AppButtonSize.lg,
               onPressed: () => act(controller.togglePlay),
@@ -308,7 +309,8 @@ class _Chrome extends StatelessWidget {
                   position: state.position,
                   buffered: state.buffered,
                   duration: state.duration,
-                  semanticLabel: labels.seekBar ?? dsMediaSeekBarKey.tr(),
+                  semanticLabel:
+                      labels.seekBar ?? LocaleKeys.ds_media_seekBar.tr(),
                   semanticValue: '$elapsed / $total',
                   semanticIncreasedValue:
                       '${stepped(appVideoSeekStep)} / $total',
@@ -347,12 +349,12 @@ class _Chrome extends StatelessWidget {
                           ? Icons.volume_off_rounded
                           : Icons.volume_up_rounded,
                       tooltip: state.isMuted
-                          ? labels.unmute ?? dsMediaUnmuteKey.tr()
-                          : labels.mute ?? dsMediaMuteKey.tr(),
+                          ? labels.unmute ?? LocaleKeys.ds_media_unmute.tr()
+                          : labels.mute ?? LocaleKeys.ds_media_mute.tr(),
                       onPressed: () => act(controller.toggleMute),
                     ),
                     PopupMenuButton<double>(
-                      tooltip: labels.speed ?? dsMediaSpeedKey.tr(),
+                      tooltip: labels.speed ?? LocaleKeys.ds_media_speed.tr(),
                       initialValue: state.speed,
                       onOpened: () => onHold(true),
                       onCanceled: () => onHold(false),
@@ -388,8 +390,9 @@ class _Chrome extends StatelessWidget {
                           : Icons.fullscreen_rounded,
                       tooltip: isFullscreen
                           ? labels.exitFullscreen ??
-                                dsMediaExitFullscreenKey.tr()
-                          : labels.fullscreen ?? dsMediaFullscreenKey.tr(),
+                                LocaleKeys.ds_media_exitFullscreen.tr()
+                          : labels.fullscreen ??
+                                LocaleKeys.ds_media_fullscreen.tr(),
                       onPressed: () {
                         onInteraction();
                         onToggleFullscreen();

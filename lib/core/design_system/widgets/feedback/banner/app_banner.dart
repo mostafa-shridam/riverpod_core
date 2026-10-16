@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
 import 'package:riverpod_core/core/design_system/widgets/feedback/app_status_type.dart';
-import 'package:riverpod_core/core/design_system/widgets/feedback/feedback_strings.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Inline message with a status icon, optional action and dismiss button.
 /// Lives inside the page flow (unlike a toast, which floats above it).
@@ -107,7 +107,7 @@ class AppBanner extends StatelessWidget {
               if (onDismiss != null)
                 IconButton(
                   icon: Icon(Icons.close_rounded, color: colors.onContainer),
-                  tooltip: dismissLabel ?? dismissKey.tr(),
+                  tooltip: dismissLabel ?? LocaleKeys.ds_feedback_dismiss.tr(),
                   onPressed: onDismiss,
                 ),
             ],

@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import 'package:riverpod_core/core/design_system/widgets/dialogs/app_dialog.dart';
-import 'package:riverpod_core/core/design_system/widgets/dialogs/overlays_strings.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Dialog with one text field and validation. Pops the entered text on
 /// confirm (only when [validator] returns null), or null on cancel.
@@ -119,12 +119,12 @@ class _AppInputDialogState extends State<AppInputDialog> {
       primary: FilledButton(
         style: FilledButton.styleFrom(minimumSize: minSize),
         onPressed: _submit,
-        child: Text(widget.confirmLabel ?? confirmKey.tr()),
+        child: Text(widget.confirmLabel ?? LocaleKeys.ds_overlays_confirm.tr()),
       ),
       secondary: TextButton(
         style: TextButton.styleFrom(minimumSize: minSize),
         onPressed: () => Navigator.of(context).pop(),
-        child: Text(widget.cancelLabel ?? cancelKey.tr()),
+        child: Text(widget.cancelLabel ?? LocaleKeys.ds_overlays_cancel.tr()),
       ),
     );
   }

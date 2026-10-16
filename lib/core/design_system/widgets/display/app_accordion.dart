@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
-import 'package:riverpod_core/core/design_system/widgets/display/display_strings.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Expandable section: tappable header with a rotating chevron, animated
 /// content. Content is not built while collapsed.
@@ -52,8 +52,8 @@ class _AppAccordionState extends State<AppAccordion> {
       side: BorderSide(color: scheme.outlineVariant),
     );
     final hint = _expanded
-        ? widget.collapseLabel ?? dsDisplayCollapseKey.tr()
-        : widget.expandLabel ?? dsDisplayExpandKey.tr();
+        ? widget.collapseLabel ?? LocaleKeys.ds_display_collapse.tr()
+        : widget.expandLabel ?? LocaleKeys.ds_display_expand.tr();
 
     return Material(
       color: scheme.surface,
