@@ -162,16 +162,11 @@ AppException _mapStatus(
       return NotFoundException(cause: e, stackTrace: trace);
     case 400 || 409 || 422:
       final body = parser.parse(e.response?.data);
-      if (body.fieldErrors.isNotEmpty) {
-        return ValidationException(
-          fieldErrors: body.fieldErrors,
-          userMessage: body.messageIsUserSafe ? body.message : null,
-          cause: e,
-          stackTrace: trace,
-        );
-      }
-      return UnknownException(
-        message: 'HTTP $status without field errors',
+      // 400/409/422 are validation failures even when the body carries no
+      // per-field messages: showing "validation" beats "unknown error".
+      return ValidationException(
+        fieldErrors: body.fieldErrors,
+        userMessage: body.messageIsUserSafe ? body.message : null,
         cause: e,
         stackTrace: trace,
       );

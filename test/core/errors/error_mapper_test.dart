@@ -113,9 +113,14 @@ void main() {
         expect(v.userMessage, isNull, reason: 'not trusted by default');
       });
 
-      test('$code without field errors -> UnknownException', () async {
-        expect(await _status(code, {'message': 'x'}), isA<UnknownException>());
-      });
+      test(
+        '$code without field errors -> ValidationException (empty fields)',
+        () async {
+          final e = await _status(code, {'message': 'x'});
+          expect(e, isA<ValidationException>());
+          expect((e as ValidationException).fieldErrors, isEmpty);
+        },
+      );
     }
 
     for (final code in [500, 502, 503, 599]) {

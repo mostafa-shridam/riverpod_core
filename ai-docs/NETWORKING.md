@@ -24,7 +24,7 @@ Unified `AppException` (`core/errors/`, see ARCHITECTURE.md); mapping lives ONLY
 | 401 | `UnauthorizedException` |
 | 403 | `ForbiddenException` |
 | 404 | `NotFoundException` |
-| 400/409/422 with field errors | `ValidationException(fieldErrors: Map<String, List<String>>)` |
+| 400/409/422 (field errors when the body has them, otherwise empty) | `ValidationException(fieldErrors: Map<String, List<String>>)` |
 | 5xx | `ServerException(statusCode)` |
 | cancel | `CancelledException` (not shown to the user) |
 | anything else | `UnknownException` |
