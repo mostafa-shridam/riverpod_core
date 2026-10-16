@@ -223,7 +223,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-16 — Stale-while-revalidate cache helper
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | — | — |
 - Goal: STATE_AND_DATA.md "Caching: stale-while-revalidate", on top of the C-06 Drift `cache_entries` table.
 - Files: `lib/core/storage/cache/**` (`cache_result.dart`, `cached_repository_helper.dart`, `cache_policy.dart`), `test/core/storage/cache/**`
 - Done when: `CacheResult<T>(data, isStale, savedAt, error?)`; `CachedRepositoryHelper.watch<T>({key, fetch, decode, encode, ttl})` returns `Stream<CacheResult<T>>`: (1) emits the cached value immediately with `isStale = expired(ttl)` if present, (2) fetches in the background, on success writes the cache and emits the fresh value (`isStale=false`), (3) on failure emits the cached value flagged stale together with the `AppException` (mapped with `mapError`), or just errors when there is no cache; `read` (one-shot) and `invalidate(key)`/`clearAll` helpers; keys for user-scoped data take a `userId` parameter and are prefixed; `etag` stored when the fetch provides one; time source injectable (`Clock`-style function) so tests need no real time; `keepAlive` provider for the helper using `AppDatabase`.
