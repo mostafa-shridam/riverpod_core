@@ -68,7 +68,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-06 — Storage: prefs, secure storage, Drift DB; remove Hive
 | status | owner | blocked by |
 |---|---|---|
-| BLOCKED | — | C-04, C-05 |
+| READY | — | — |
 - Goal: D-004 per ARCHITECTURE.md `core/storage/`.
 - Files: `lib/core/storage/prefs_storage.dart`, `lib/core/storage/secure_storage.dart`, `lib/core/storage/database/**` (`app_database.dart`, `cache_entries` table), delete `lib/core/local_services/**`, `lib/core/enum/constants.dart`, `lib/main.dart` (init calls only), `lib/core/helper/help_functions.dart` (language read/write via prefs), `pubspec.yaml`, `pubspec.lock` (remove `hive_flutter`), `test/core/storage/**`, `test/helpers/fake_secure_storage.dart`, `test/helpers/fake_prefs_storage.dart`
 - Done when: keepAlive providers for each; typed pref keys in one file; `clearUserData()` wipes secure storage, cache table, user-scoped prefs; no Hive import left; fakes exist.
@@ -86,7 +86,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-08 — Bootstrap, flavor entrypoints, logger, crash/analytics interfaces
 | status | owner | blocked by |
 |---|---|---|
-| BLOCKED | — | C-37, C-06 |
+| BLOCKED | — | C-06 |
 - Goal: ARCHITECTURE.md startup; leveled logger; global error handlers; interfaces only (no vendor).
 - Files: `lib/main.dart` (rewritten: only `bootstrap(Flavor.current)`), `lib/main_staging.dart`, `lib/bootstrap.dart`, `lib/app/app.dart`, `lib/core/logger/**`, `lib/core/crash/**`, `lib/core/analytics/**`, `test/core/logger/**`, `test/core/crash/**`, `test/core/analytics/**`, `test/bootstrap_test.dart`, `test/helpers/fake_crash_reporter.dart`, `test/helpers/fake_analytics.dart`
 - Done when: entrypoints only call `bootstrap(flavor)` (D-024); invalid config → minimal error app with the problem list; `FlutterError.onError`, `PlatformDispatcher.onError`, zone errors → logger + `CrashReporter`; logger silent in prod; `CrashReporter`/`AnalyticsService` interfaces with `Noop` and `Console` implementations chosen from `AppConfig`; `dart:developer log` in `lib/core` replaced by the logger; `App` uses the temporary router until C-11.
@@ -96,7 +96,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-09 — design_system widgets: buttons and text inputs
 | status | owner | blocked by |
 |---|---|---|
-| REVIEW | Worker A | — |
+| DONE | worker-a | — |
 - Goal: the most-used primitives, beautiful by default (D-020). Replace `app_button.dart`, `custom_button.dart`, `my_text_filed.dart`.
 - Files: `lib/design_system/widgets/buttons/**`, `lib/design_system/widgets/inputs/**`, `lib/core/widgets/**` (deleted), `lib/core/utils/validators.dart`, `test/design_system/widgets/buttons/**`, `test/design_system/widgets/inputs/**`, `test/goldens/buttons/**`, `test/goldens/inputs/**`
 - Done when:
@@ -118,7 +118,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-33 — design_system widgets: overlays and feedback
 | status | owner | blocked by |
 |---|---|---|
-| REVIEW | Worker C | — |
+| DONE | worker-c | — |
 - Goal: everything that appears on top of a page. Replace `alert_utils.dart` and `scaffold_messeneger.dart`.
 - Files: `lib/design_system/widgets/bottom_sheets/**`, `lib/design_system/widgets/dialogs/**`, `lib/design_system/widgets/feedback/**` (subfolders `snackbar/`, `progress/`, `banner/`, `tooltip/`), `lib/core/mixins/alert_utils.dart` (deleted), `lib/core/mixins/scaffold_messeneger.dart` (deleted), `test/design_system/widgets/bottom_sheets/**`, `test/design_system/widgets/dialogs/**`, `test/design_system/widgets/feedback/**`, `test/goldens/bottom_sheets/**`, `test/goldens/dialogs/**`
 - Done when:
@@ -132,7 +132,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-34 — design_system widgets: display and layout
 | status | owner | blocked by |
 |---|---|---|
-| REVIEW | worker-d | — (D-021) |
+| DONE | worker-d | — |
 - Goal: content and structure primitives.
 - Files: `lib/design_system/widgets/display/**`, `lib/design_system/widgets/layout/**`, `pubspec.yaml`, `pubspec.lock` (add `cached_network_image`, D-021), `test/design_system/widgets/display/**`, `test/design_system/widgets/layout/**`, `test/goldens/display/**`
 - Done when: `AppCard` (filled/outlined/elevated, tappable), `AppListTile`, `AppSectionHeader`, `AppDivider`, `AppAvatar` (image/initials/icon, status dot, sizes), `AppBadge` (count/dot, overflow 99+), `AppChip`, `AppImage` (cached, placeholder shimmer, error widget, fade, `fit`, rounded), `AppAccordion`, `AppTabBar`, `AppBottomNavBar` (adaptive to rail on tablet), `AppAppBar` (large/collapsing optional), `AppScaffold` (adaptive padding, max width, safe area, optional offline banner slot), `AppStepper`, `AppEmptyPlaceholder` is NOT here (C-10 owns empty/error/skeleton).
@@ -187,7 +187,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-37 — Config from dotenv, automatic flavor (D-024)
 | status | owner | blocked by |
 |---|---|---|
-| REVIEW | worker-e | — |
+| DONE | worker-e | — |
 - Goal: replace the dart-define loading from C-02 with flutter_dotenv and `Flavor.current`.
 - Files: `lib/core/config/app_config.dart` (+ `.g.dart`), `lib/core/config/flavor.dart`, `lib/core/config/env_loader.dart` (new: loads `env/<flavor>.env` via dotenv and returns the map), `env/dev.env.example`, `env/staging.env.example`, `env/prod.env.example`, delete `env/*.example.json`, `.gitignore` (`env/*.env`, `!env/*.env.example`), `pubspec.yaml` (add `flutter_dotenv`; add the three `env/*.env` files under `flutter: assets:`), `pubspec.lock`, `test/core/config/**`
 - Done when: `Flavor.current` = `kReleaseMode ? prod : dev` (testable via an injectable `isRelease` parameter in a pure function); `AppConfig.fromEnvironment()` and `ensureFlavor` removed; `FLAVOR` key removed from env files and parsing (flavor is an input to `AppConfig.fromMap(flavor, map)`); `EnvLoader.load(Flavor)` throws `ConfigException` with a clear message when the file is missing or empty ("copy env/dev.env.example to env/dev.env"); example files contain placeholders only; asset declarations don't break `flutter pub get`/test when the real `.env` files are absent (use the strategy: tests inject maps; document in the report how a fresh clone runs: copy examples). No other file in `lib/` imports dotenv.
