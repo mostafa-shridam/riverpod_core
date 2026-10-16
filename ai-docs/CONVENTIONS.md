@@ -23,7 +23,7 @@
 - `dart format` default (80 cols). Trailing commas on multi-line argument lists.
 - Single quotes. `const` wherever possible. `final` locals. No `dynamic` unless decoding JSON at the DTO boundary.
 - Max ~300 lines per file; split when larger. Max one page per file.
-- No `print`. Use the logger (`core/logging`).
+- No `print`. Use the logger (`core/logger`).
 
 ## Comments
 - English only. Explain WHY, not what. No commented-out code, no TODO without a task ID (`// TODO(C-12): ...`).

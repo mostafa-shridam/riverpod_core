@@ -70,4 +70,19 @@ abstract class LocaleKeys {
   static const ds_selection_selectTime = 'ds_selection.selectTime';
   static const ds_selection_ratingValue = 'ds_selection.ratingValue';
   static const ds_selection = 'ds_selection';
+  static const ds_media_play = 'ds_media.play';
+  static const ds_media_pause = 'ds_media.pause';
+  static const ds_media_replay = 'ds_media.replay';
+  static const ds_media_mute = 'ds_media.mute';
+  static const ds_media_unmute = 'ds_media.unmute';
+  static const ds_media_speed = 'ds_media.speed';
+  static const ds_media_fullscreen = 'ds_media.fullscreen';
+  static const ds_media_exitFullscreen = 'ds_media.exitFullscreen';
+  static const ds_media_rewind = 'ds_media.rewind';
+  static const ds_media_forward = 'ds_media.forward';
+  static const ds_media_seekBar = 'ds_media.seekBar';
+  static const ds_media_buffering = 'ds_media.buffering';
+  static const ds_media_error = 'ds_media.error';
+  static const ds_media_retry = 'ds_media.retry';
+  static const ds_media = 'ds_media';
 }
