@@ -18,7 +18,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-02 — AppConfig and flavors
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | — | — |
 - Goal: typed config from `--dart-define-from-file` with startup validation and a clear error (D-006, D-018). Not wired into startup here (C-08).
 - Files: `lib/core/config/app_config.dart`, `lib/core/config/flavor.dart`, `lib/core/config/config_exception.dart`, `env/dev.example.json`, `env/staging.example.json`, `env/prod.example.json`, `.gitignore` (add `env/*.json` and `!env/*.example.json`), `test/core/config/app_config_test.dart`
 - Done when:

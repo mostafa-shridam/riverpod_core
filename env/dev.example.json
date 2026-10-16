@@ -1,0 +1,11 @@
+{
+  "FLAVOR": "dev",
+  "APP_NAME": "My App Dev",
+  "API_BASE_URL": "https://dev-api.example.com",
+  "CONNECT_TIMEOUT_MS": "15000",
+  "RECEIVE_TIMEOUT_MS": "15000",
+  "LOG_LEVEL": "debug",
+  "ENABLE_CRASH_REPORTING": "false",
+  "ENABLE_ANALYTICS": "false",
+  "CRASH_DSN": ""
+}
