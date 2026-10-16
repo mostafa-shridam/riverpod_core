@@ -4,6 +4,7 @@ import 'package:riverpod_core/design_system/tokens/app_colors.dart';
 import 'package:riverpod_core/design_system/tokens/app_durations.dart';
 import 'package:riverpod_core/design_system/tokens/app_elevation.dart';
 import 'package:riverpod_core/design_system/tokens/app_radius.dart';
+import 'package:riverpod_core/design_system/tokens/app_sizes.dart';
 import 'package:riverpod_core/design_system/tokens/app_spacing.dart';
 
 /// Non-M3 design tokens, read in widgets via `context.tokens`.
@@ -16,6 +17,7 @@ class AppTokens extends ThemeExtension<AppTokens> {
     this.elevation = AppElevation.standard,
     this.durations = AppDurations.standard,
     this.colors = AppSemanticColors.light,
+    this.sizes = AppSizes.standard,
   });
 
   static const AppTokens light = AppTokens();
@@ -27,6 +29,7 @@ class AppTokens extends ThemeExtension<AppTokens> {
   final AppElevation elevation;
   final AppDurations durations;
   final AppSemanticColors colors;
+  final AppSizes sizes;
 
   @override
   AppTokens copyWith({
@@ -35,6 +38,7 @@ class AppTokens extends ThemeExtension<AppTokens> {
     AppElevation? elevation,
     AppDurations? durations,
     AppSemanticColors? colors,
+    AppSizes? sizes,
   }) {
     return AppTokens(
       spacing: spacing ?? this.spacing,
@@ -42,6 +46,7 @@ class AppTokens extends ThemeExtension<AppTokens> {
       elevation: elevation ?? this.elevation,
       durations: durations ?? this.durations,
       colors: colors ?? this.colors,
+      sizes: sizes ?? this.sizes,
     );
   }
 

@@ -9,5 +9,22 @@
   "cancelButton": "Cancel",
   "selectLanguage": "Select Language",
   "goodEvening":"Good Evening",
-  "goodMorning":"Good Morning"
+  "goodMorning":"Good Morning",
+  "ds_buttons": {
+    "loading": "Loading"
+  },
+  "ds_inputs": {
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "clear": "Clear",
+    "searchHint": "Search",
+    "otpDigitLabel": "Digit {} of {}",
+    "errors": {
+      "required": "This field is required",
+      "invalidEmail": "Enter a valid email address",
+      "passwordTooShort": "Password must be at least {} characters",
+      "invalidPhone": "Enter a valid phone number",
+      "phoneTooShort": "Phone number is too short"
+    }
+  }
 }

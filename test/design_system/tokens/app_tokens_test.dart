@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod_core/design_system/tokens/app_colors.dart';
+import 'package:riverpod_core/design_system/tokens/app_sizes.dart';
 import 'package:riverpod_core/design_system/tokens/app_tokens.dart';
 
 void main() {
@@ -44,5 +45,19 @@ void main() {
     expect(AppTokens.light.lerp(AppTokens.dark, 0.2), AppTokens.light);
     expect(AppTokens.light.lerp(AppTokens.dark, 0.8), AppTokens.dark);
     expect(AppTokens.light.lerp(null, 0.8), AppTokens.light);
+  });
+
+  test('component sizes and search debounce match the C-09 spec', () {
+    const tokens = AppTokens.light;
+    expect(tokens.sizes.minTouchTarget, 48);
+    expect(tokens.sizes.buttonHeightSm, 40);
+    expect(tokens.sizes.buttonHeightMd, 48);
+    expect(tokens.sizes.buttonHeightLg, 56);
+    expect(tokens.sizes.otpBoxWidth, 48);
+    expect(tokens.durations.searchDebounce, const Duration(milliseconds: 300));
+    expect(
+      AppTokens.light.copyWith(sizes: const AppSizes(iconMd: 30)).sizes.iconMd,
+      30,
+    );
   });
 }
