@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod_core/core/constants.dart';
-import 'package:riverpod_core/design_system/responsive/text_scale.dart';
-import 'package:riverpod_core/design_system/theme/app_theme.dart';
+import 'package:riverpod_core/core/design_system/responsive/text_scale.dart';
+import 'package:riverpod_core/core/design_system/theme/app_theme.dart';
 import 'package:riverpod_core/generated/codegen_loader.g.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

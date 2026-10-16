@@ -6,7 +6,7 @@ Status: skeleton. Steps marked (pending C-xx) depend on a task that is not DONE 
 2. **Rename**: from the project root run `dart run tool/rename_app.dart --name "My App" --id com.company.myapp` (add `--package my_app` to override the Dart package name; `--dry-run` only prints the changes). Then run `flutter pub get`.
 3. **Environments** (pending C-37, C-08): copy `env/dev.env.example` → `env/dev.env` (same for staging/prod), fill values. Then just `flutter run` (debug = dev, release = prod; staging: `flutter run -t lib/main_staging.dart`). The app refuses to start with a clear error if a required key is missing. Never put real secrets in env files: they are bundled in the app.
 4. **Firebase** (only if you use notifications/crash): add your own `google-services.json` and `GoogleService-Info.plist` locally. They are git-ignored; never commit them.
-5. **Branding**: edit ONLY `lib/design_system/tokens/brand_config.dart` (seed color, font) (pending C-05); replace `assets/images/appLogo.png`, then `dart run flutter_launcher_icons` and the splash command (pending C-13).
+5. **Branding**: edit ONLY `lib/core/design_system/tokens/brand_config.dart` (seed color, font) (pending C-05); replace `assets/images/appLogo.png`, then `dart run flutter_launcher_icons` and the splash command (pending C-13).
 6. **Translations**: edit `assets/translations/{ar,en}.json`, run the generation commands in `build.sh`; the parity test must stay green.
 7. **First feature**: follow `.claude/skills/new-feature/SKILL.md` (scaffold from `.fttemplates`, register the route, write tests).
 8. **Gate before every commit**: the Definition of Done commands in `CLAUDE.md`.

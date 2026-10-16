@@ -1,18 +1,19 @@
 # DESIGN SYSTEM (target state)
 
-Material 3, one source of truth in `lib/design_system/` (`tokens/`, `theme/`, `responsive/`, `widgets/`). Generic by default (rule 10):
-the template ships a neutral seed palette; each app changes ONE file (`lib/design_system/tokens/brand_config.dart`) to rebrand.
+Material 3, one source of truth in `lib/core/design_system/` (`tokens/`, `theme/`, `responsive/`, `widgets/`). Generic by default (rule 10):
+the template ships a neutral seed palette; each app changes ONE file (`lib/core/design_system/tokens/brand_config.dart`) to rebrand.
 
 ## Tokens
 All tokens are `ThemeExtension`s read via `context.tokens` (and `Theme.of(context)` for Material parts).
 | Group | Contents |
 |---|---|
-| Color | Generated from one seed with `ColorScheme.fromSeed` for light and dark + semantic extras: `success`, `warning`, `info` (+ `on*`). No raw hex outside `design_system/tokens/`. |
+| Color | Generated from one seed with `ColorScheme.fromSeed` for light and dark + semantic extras: `success`, `warning`, `info` (+ `on*`). No raw hex outside `core/design_system/tokens/`. |
 | Type | Material 3 type scale mapped to `TextTheme`; font family is a config value; sizes are never set in features. |
 | Spacing | 4-pt scale: `xxs 2, xs 4, sm 8, md 12, lg 16, xl 24, xxl 32, xxxl 48`. |
 | Radius | `sm 8, md 12, lg 16, xl 24, full 999`. |
 | Elevation | `none, low, mid, high` mapped to M3 surface tint levels. |
 | Motion | `fast 150ms, normal 250ms, slow 400ms` + standard curves. |
+| Sizes | Component sizes: button height `sm 40, md 48, lg 56`; icons `18/20/24`; `minTouchTarget 48`; OTP box `48×56`; outline `1`, focused outline `2`, spinner stroke `2`. Search debounce `300ms` (in Motion). |
 
 The resolved light/dark color role table (seed `#4A6FA5`, success/warning/info accents) is in `ai-docs/reports/C-05.md`. Dark mode uses the dark tonal palette (surfaces `#111318` → `#32353A`), not an inverted light scheme.
 
@@ -20,10 +21,10 @@ The resolved light/dark color role table (seed `#4A6FA5`, success/warning/info a
 Light, dark, system. Persisted in prefs, switchable at runtime. Every widget must be checked in both.
 
 ## Breakpoints (window width, dp)
-`phone < 600`, `tablet 600–1023`, `desktop ≥ 1024`; plus orientation. Exposed via `context.breakpoint` (`design_system/responsive/`).
+`phone < 600`, `tablet 600–1023`, `desktop ≥ 1024`; plus orientation. Exposed via `context.breakpoint` (`core/design_system/responsive/`).
 Use layout builders/adaptive widgets — never fork a whole router per device. Content max width on large screens: 720 dp for forms/lists.
 
-## Shared widgets catalog (`design_system/widgets/`)
+## Shared widgets catalog (`core/design_system/widgets/`)
 Folder rule: one folder per widget family, one file per widget (`app_button.dart`, not a mega-file), so anyone can find a widget by browsing. Each primitive has ONE implementation here. A feature that needs something missing asks the Lead for a task.
 | Folder | Widgets | Task |
 |---|---|---|

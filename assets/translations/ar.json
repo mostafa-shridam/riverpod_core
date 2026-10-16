@@ -8,6 +8,51 @@
   "confirmButton": "تأكيد",
   "cancelButton": "إلغاء",
   "selectLanguage": "اختر اللغة",
-  "goodEvening":"مساء الخير",
-  "goodMorning":"صباح الخير"
+  "goodEvening": "مساء الخير",
+  "goodMorning": "صباح الخير",
+  "ds_display": {
+    "imageError": "تعذر تحميل الصورة",
+    "expand": "توسيع",
+    "collapse": "طي"
+  },
+  "ds_layout": {
+    "stepOf": "الخطوة {} من {}",
+    "stepCompleted": "مكتملة",
+    "stepCurrent": "الخطوة الحالية"
+  },
+  "ds_overlays": {
+    "close": "إغلاق",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "ok": "حسنًا",
+    "done": "تم",
+    "search": "بحث",
+    "noResults": "لا توجد نتائج",
+    "loading": "جارٍ التحميل"
+  },
+  "ds_feedback": {
+    "dismiss": "إغلاق",
+    "info": "معلومة",
+    "success": "نجاح",
+    "warning": "تنبيه",
+    "error": "خطأ",
+    "progress": "التقدم"
+  },
+  "ds_buttons": {
+    "loading": "جارٍ التحميل"
+  },
+  "ds_inputs": {
+    "showPassword": "إظهار كلمة المرور",
+    "hidePassword": "إخفاء كلمة المرور",
+    "clear": "مسح",
+    "searchHint": "بحث",
+    "otpDigitLabel": "الرقم {} من {}",
+    "errors": {
+      "required": "هذا الحقل مطلوب",
+      "invalidEmail": "أدخل بريدًا إلكترونيًا صحيحًا",
+      "passwordTooShort": "يجب ألا تقل كلمة المرور عن {} أحرف",
+      "invalidPhone": "أدخل رقم هاتف صحيحًا",
+      "phoneTooShort": "رقم الهاتف قصير جدًا"
+    }
+  }
 }

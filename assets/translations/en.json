@@ -8,6 +8,51 @@
   "confirmButton": "Confirm",
   "cancelButton": "Cancel",
   "selectLanguage": "Select Language",
-  "goodEvening":"Good Evening",
-  "goodMorning":"Good Morning"
+  "goodEvening": "Good Evening",
+  "goodMorning": "Good Morning",
+  "ds_display": {
+    "imageError": "Image could not be loaded",
+    "expand": "Expand",
+    "collapse": "Collapse"
+  },
+  "ds_layout": {
+    "stepOf": "Step {} of {}",
+    "stepCompleted": "Completed",
+    "stepCurrent": "Current step"
+  },
+  "ds_overlays": {
+    "close": "Close",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "ok": "OK",
+    "done": "Done",
+    "search": "Search",
+    "noResults": "No results",
+    "loading": "Loading"
+  },
+  "ds_feedback": {
+    "dismiss": "Dismiss",
+    "info": "Information",
+    "success": "Success",
+    "warning": "Warning",
+    "error": "Error",
+    "progress": "Progress"
+  },
+  "ds_buttons": {
+    "loading": "Loading"
+  },
+  "ds_inputs": {
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "clear": "Clear",
+    "searchHint": "Search",
+    "otpDigitLabel": "Digit {} of {}",
+    "errors": {
+      "required": "This field is required",
+      "invalidEmail": "Enter a valid email address",
+      "passwordTooShort": "Password must be at least {} characters",
+      "invalidPhone": "Enter a valid phone number",
+      "phoneTooShort": "Phone number is too short"
+    }
+  }
 }

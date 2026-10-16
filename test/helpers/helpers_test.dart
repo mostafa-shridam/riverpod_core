@@ -3,8 +3,8 @@ import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:riverpod_core/design_system/theme/theme_context.dart';
-import 'package:riverpod_core/design_system/tokens/app_tokens.dart';
+import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
+import 'package:riverpod_core/core/design_system/tokens/app_tokens.dart';
 
 import 'helpers.dart';
 

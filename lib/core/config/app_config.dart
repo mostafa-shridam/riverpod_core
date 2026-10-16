@@ -5,7 +5,7 @@ import 'package:riverpod_core/core/config/log_level.dart';
 
 part 'app_config.g.dart';
 
-/// Typed, validated configuration loaded from `--dart-define-from-file` (D-006, D-018).
+/// Typed, validated configuration loaded from `env/<flavor>.env` (D-024).
 class AppConfig {
   const AppConfig({
     required this.flavor,
@@ -19,33 +19,16 @@ class AppConfig {
     this.crashDsn,
   });
 
-  /// Reads the compile-time defines. The only place that touches `*.fromEnvironment`.
-  /// Values are read as strings so [AppConfig.fromMap] can report every problem at once.
-  factory AppConfig.fromEnvironment() => AppConfig.fromMap({
-    'FLAVOR': const String.fromEnvironment('FLAVOR'),
-    'APP_NAME': const String.fromEnvironment('APP_NAME'),
-    'API_BASE_URL': const String.fromEnvironment('API_BASE_URL'),
-    'CONNECT_TIMEOUT_MS': const String.fromEnvironment('CONNECT_TIMEOUT_MS'),
-    'RECEIVE_TIMEOUT_MS': const String.fromEnvironment('RECEIVE_TIMEOUT_MS'),
-    'LOG_LEVEL': const String.fromEnvironment('LOG_LEVEL'),
-    'ENABLE_CRASH_REPORTING': const String.fromEnvironment(
-      'ENABLE_CRASH_REPORTING',
-    ),
-    'ENABLE_ANALYTICS': const String.fromEnvironment('ENABLE_ANALYTICS'),
-    'CRASH_DSN': const String.fromEnvironment('CRASH_DSN'),
-  });
-
-  /// Parses and validates [env]. Empty values count as missing.
+  /// Parses and validates [env] for [flavor]. Empty values count as missing.
   /// Throws [ConfigException] listing every problem found.
-  factory AppConfig.fromMap(Map<String, String> env) {
+  factory AppConfig.fromMap(Flavor flavor, Map<String, String> env) {
     final problems = <String>[];
     String? value(String key) {
       final raw = env[key]?.trim();
       return (raw == null || raw.isEmpty) ? null : raw;
     }
 
-    final flavor = _parseFlavor(value('FLAVOR'), problems);
-    final defaults = _FlavorDefaults.of(flavor ?? Flavor.dev);
+    final defaults = _FlavorDefaults.of(flavor);
 
     final appName = value('APP_NAME');
     if (appName == null) {
@@ -84,7 +67,7 @@ class AppConfig {
       throw ConfigException(problems);
     }
     return AppConfig(
-      flavor: flavor!,
+      flavor: flavor,
       appName: appName!,
       apiBaseUrl: apiBaseUrl!,
       connectTimeout: connectTimeout!,
@@ -110,33 +93,9 @@ class AppConfig {
   /// Optional crash-reporter DSN. Null when the crash vendor is not configured.
   final String? crashDsn;
 
-  /// Throws [ConfigException] when this config was built for a different
-  /// [entrypoint] flavor than the one it was loaded for (D-018).
-  void ensureFlavor(Flavor entrypoint) {
-    if (flavor == entrypoint) {
-      return;
-    }
-    throw ConfigException([
-      'FLAVOR is "${flavor.name}" but this entrypoint is '
-          '"${entrypoint.name}". Run the entrypoint that matches FLAVOR.',
-    ]);
-  }
-
-  static Flavor? _parseFlavor(String? raw, List<String> problems) {
-    if (raw == null) {
-      problems.add('FLAVOR is required (dev, staging or prod).');
-      return null;
-    }
-    final flavor = Flavor.values.asNameMap()[raw];
-    if (flavor == null) {
-      problems.add('FLAVOR must be one of dev, staging, prod; got "$raw".');
-    }
-    return flavor;
-  }
-
   static String? _parseApiBaseUrl(
     String? raw,
-    Flavor? flavor,
+    Flavor flavor,
     List<String> problems,
   ) {
     if (raw == null) {
@@ -154,7 +113,7 @@ class AppConfig {
     }
     final requiresHttps = flavor == Flavor.staging || flavor == Flavor.prod;
     if (requiresHttps && uri.scheme != 'https') {
-      problems.add('API_BASE_URL must use https for ${flavor!.name}.');
+      problems.add('API_BASE_URL must use https for ${flavor.name}.');
       return null;
     }
     return raw;
