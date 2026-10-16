@@ -304,7 +304,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-42 — Migrate to LocaleKeys everywhere (D-037) and add the guard test
 | status | owner | blocked by |
 |---|---|---|
-| REVIEW | Worker A | — |
+| DONE | Worker A | — |
 - Goal: no literal translation keys anywhere.
 - Files: every `lib/core/design_system/widgets/**/**_strings.dart` (deleted; their key constants replaced by `LocaleKeys.<generated>` at the call sites in the same widget folders), `lib/core/**` and `lib/features/**` files that call `.tr()`/`.plural()` on a string literal (grep `'[a-zA-Z_]+\.[a-zA-Z_.]+'\.tr\(` and `.plural(`), `lib/generated/*.g.dart` (regenerated), `test/translations/no_literal_keys_test.dart`, tests that referenced the old key constants
 - Done when: the repo contains no `*_strings.dart` key-constant files; no `.tr()`/`.plural()` receives a string literal in `lib/` (override parameters of widgets still accept plain `String`); the guard test scans every `.dart` file under `lib/` (excluding generated) and fails on `'<literal>'.tr(` / `"<literal>".tr(` / `.plural('<literal>'`; widgets behave exactly as before (all existing widget and golden tests pass unchanged).
@@ -353,6 +353,15 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 - Files: `tool/new_feature.dart`, `tool/lib/new_feature_logic.dart`, `.fttemplates/feature/**` (template files with placeholders), `.claude/skills/new-feature/SKILL.md` (update to the command), `ai-docs/HOW_TO_START_A_NEW_APP.md` (step 7 only), `test/tool/new_feature_test.dart`
 - Done when: `dart run tool/new_feature.dart --name product_orders` creates `lib/features/product_orders/{data/{models,sources,product_orders_repository.dart},providers,presentation/{pages,widgets}}` + matching `test/features/product_orders/` skeleton: freezed model, remote source (Dio), repository that reads through ONE `fetch*` method (D-038: cache-first helper plugged in by C-44), AsyncNotifier controller, one page with `static const routeName`, `AsyncValueView`, `LocaleKeys` keys added to BOTH translation JSON files (+ prints the two generation commands), a typed route snippet printed (never edits routes.dart automatically), analyzer-clean when generated into a temp copy; `--dry-run`; refuses existing feature, invalid names; name casing helpers unit-tested; no new package.
 - Tests: logic unit tests (name conversion, file plan, refusal) and one test that generates into a temp dir and checks the tree.
+
+## C-45 — Notification permission through the shared PermissionService (D-039 item 3)
+| status | owner | blocked by |
+|---|---|---|
+| READY | — | — |
+- Goal: one permission flow. Add `AppPermission.notifications` (permission_handler maps to the platform notification permission), shared rationale copy in en/ar via LocaleKeys, and make `NotificationPermissionFlow` use `PermissionService` + the shared rationale dialog instead of its own presenter provider; delete `notificationRationalePresenterProvider`.
+- Files: `lib/core/permissions/**`, `lib/core/notifications/permission/**`, `lib/core/design_system/widgets/permissions/**` (copy switch only), `assets/translations/*.json` (+ generated), `test/core/permissions/**`, `test/core/notifications/**`, `test/helpers/**` fakes if needed
+- Done when: no second rationale mechanism remains (grep); Android 13+ and iOS prompts go through the service; existing notification tests keep their meaning; gate green.
+- Tests: service maps notifications status; flow shows the shared rationale, handles denied/permanently denied/granted.
 
 ---
 
