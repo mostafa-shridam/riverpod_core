@@ -8,6 +8,7 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'package:riverpod_core/core/constants.dart';
 import 'package:riverpod_core/core/design_system/responsive/text_scale.dart';
 import 'package:riverpod_core/core/design_system/theme/app_theme.dart';
+import 'package:riverpod_core/core/design_system/widgets/feedback/snackbar/app_messenger.dart';
 import 'package:riverpod_core/core/local_services/local_storage.dart';
 import 'package:riverpod_core/core/notifications/local_notifications_service.dart';
 import 'package:riverpod_core/core/router/index.dart';
@@ -68,7 +69,7 @@ class MyApp extends ConsumerWidget {
       ],
       child: LifeCycleManager(
         child: MaterialApp.router(
-          scaffoldMessengerKey: scaffoldMessengerKey,
+          scaffoldMessengerKey: ref.watch(appMessengerProvider).key,
           scrollBehavior: CustomScrollBehavior(),
           debugShowCheckedModeBanner: false,
           localizationsDelegates: context.localizationDelegates,
@@ -97,5 +98,3 @@ class MyApp extends ConsumerWidget {
     );
   }
 }
-
-final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
