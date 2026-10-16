@@ -1,5 +1,8 @@
 import 'package:riverpod_core/core/auth/session_controller.dart';
+import 'package:riverpod_core/core/remote_config/app_gate.dart';
 import 'package:riverpod_core/core/startup/splash_page.dart';
+import 'package:riverpod_core/features/app_gate/presentation/pages/force_update_page.dart';
+import 'package:riverpod_core/features/app_gate/presentation/pages/maintenance_page.dart';
 import 'package:riverpod_core/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:riverpod_core/features/auth/presentation/pages/login_page.dart';
 import 'package:riverpod_core/features/auth/presentation/pages/register_page.dart';
@@ -17,6 +20,7 @@ String? appRedirect({
   required SessionStatus session,
   required bool? onboardingSeen,
   bool startupReady = true,
+  AppGateStatus gate = AppGateStatus.ok,
 }) {
   final target = location == '/' ? HomePage.routeName : location;
 
@@ -24,6 +28,17 @@ String? appRedirect({
       session == SessionStatus.unknown ||
       onboardingSeen == null) {
     return target == SplashPage.routeName ? null : SplashPage.routeName;
+  }
+
+  // The gate wins over onboarding and sign-in: maintenance and forced updates
+  // block everything until the server (or the store) resolves them.
+  final gateRoute = switch (gate) {
+    AppGateStatus.maintenance => MaintenancePage.routeName,
+    AppGateStatus.updateRequired => ForceUpdatePage.routeName,
+    AppGateStatus.ok || AppGateStatus.updateAvailable => null,
+  };
+  if (gateRoute != null) {
+    return location == gateRoute ? null : gateRoute;
   }
 
   final bool allowed;
@@ -45,6 +60,8 @@ String? appRedirect({
       LoginPage.routeName,
       RegisterPage.routeName,
       ForgotPasswordPage.routeName,
+      ForceUpdatePage.routeName,
+      MaintenancePage.routeName,
     }.contains(target);
     destination = HomePage.routeName;
   }

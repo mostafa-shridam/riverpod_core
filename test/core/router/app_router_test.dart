@@ -13,8 +13,11 @@ import 'package:riverpod_core/core/notifications/models/notification_payload.dar
 import 'package:riverpod_core/core/notifications/models/notification_tap.dart';
 import 'package:riverpod_core/core/notifications/models/notification_tap_source.dart';
 import 'package:riverpod_core/core/notifications/routing/notification_router_provider.dart';
+import 'package:riverpod_core/core/remote_config/remote_config_provider.dart';
+import 'package:riverpod_core/core/remote_config/remote_config_source.dart';
 import 'package:riverpod_core/core/router/app_router.dart';
 import 'package:riverpod_core/core/startup/startup_controller.dart';
+import 'package:riverpod_core/core/storage/database/app_database.dart';
 import 'package:riverpod_core/core/storage/prefs_storage.dart';
 import 'package:riverpod_core/core/storage/secure_storage.dart';
 import 'package:riverpod_core/generated/codegen_loader.g.dart';
@@ -46,6 +49,10 @@ Future<ProviderContainer> _container(
       prefsStorageProvider.overrideWith((ref) => Future.value(prefs)),
       secureStorageProvider.overrideWithValue(FakeSecureStorage()),
       splashMinimumDisplayProvider.overrideWithValue(Duration.zero),
+      appDatabaseProvider.overrideWithValue(AppDatabase.inMemory()),
+      remoteConfigSourceProvider.overrideWithValue(
+        const MockRemoteConfigSource(),
+      ),
     ],
   );
   // The router waits for the startup sequence (restore, settings read).

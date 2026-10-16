@@ -475,5 +475,21 @@
         "body": "Sign in to keep your data protected."
       }
     }
+  },
+  "app_gate": {
+    "forceUpdate": {
+      "title": "Update required",
+      "body": "This version of the app is no longer supported. Update to keep going.",
+      "store": "Update now"
+    },
+    "maintenance": {
+      "title": "We'll be right back",
+      "body": "The app is under maintenance. Please try again shortly."
+    },
+    "update": {
+      "banner": "A new version of the app is available.",
+      "action": "Update",
+      "later": "Later"
+    }
   }
 }

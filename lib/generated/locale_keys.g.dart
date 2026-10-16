@@ -435,4 +435,16 @@ abstract class LocaleKeys {
   static const onboarding_slides_secure = 'onboarding.slides.secure';
   static const onboarding_slides = 'onboarding.slides';
   static const onboarding = 'onboarding';
+  static const app_gate_forceUpdate_title = 'app_gate.forceUpdate.title';
+  static const app_gate_forceUpdate_body = 'app_gate.forceUpdate.body';
+  static const app_gate_forceUpdate_store = 'app_gate.forceUpdate.store';
+  static const app_gate_forceUpdate = 'app_gate.forceUpdate';
+  static const app_gate_maintenance_title = 'app_gate.maintenance.title';
+  static const app_gate_maintenance_body = 'app_gate.maintenance.body';
+  static const app_gate_maintenance = 'app_gate.maintenance';
+  static const app_gate_update_banner = 'app_gate.update.banner';
+  static const app_gate_update_action = 'app_gate.update.action';
+  static const app_gate_update_later = 'app_gate.update.later';
+  static const app_gate_update = 'app_gate.update';
+  static const app_gate = 'app_gate';
 }

@@ -489,6 +489,23 @@ class CodegenLoader extends AssetLoader {
         },
       },
     },
+    "app_gate": {
+      "forceUpdate": {
+        "title": "Update required",
+        "body":
+            "This version of the app is no longer supported. Update to keep going.",
+        "store": "Update now",
+      },
+      "maintenance": {
+        "title": "We'll be right back",
+        "body": "The app is under maintenance. Please try again shortly.",
+      },
+      "update": {
+        "banner": "A new version of the app is available.",
+        "action": "Update",
+        "later": "Later",
+      },
+    },
   };
   static const Map<String, dynamic> _ar = {
     "hello": "مرحبا",
@@ -956,6 +973,23 @@ class CodegenLoader extends AssetLoader {
           "body": "عناصرك وتقدمك محدّثة دائمًا.",
         },
         "secure": {"title": "حسابك آمن", "body": "سجّل الدخول لحماية بياناتك."},
+      },
+    },
+    "app_gate": {
+      "forceUpdate": {
+        "title": "مطلوب تحديث",
+        "body":
+            "هذا الإصدار من التطبيق لم يعد مدعومًا. حدّث التطبيق لمتابعة الاستخدام.",
+        "store": "تحديث الآن",
+      },
+      "maintenance": {
+        "title": "نعود إليك قريبًا",
+        "body": "التطبيق قيد الصيانة حاليًا. يرجى المحاولة بعد قليل.",
+      },
+      "update": {
+        "banner": "يتوفر إصدار جديد من التطبيق.",
+        "action": "تحديث",
+        "later": "لاحقًا",
       },
     },
   };
