@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,8 +5,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod_core/core/auth/session_controller.dart';
 import 'package:riverpod_core/core/constants.dart';
 import 'package:riverpod_core/core/design_system/theme/app_theme.dart';
-import 'package:riverpod_core/core/helper/deep_link_helper.dart';
 import 'package:riverpod_core/core/network/session_events.dart';
+import 'package:riverpod_core/core/notifications/models/notification_payload.dart';
+import 'package:riverpod_core/core/notifications/models/notification_tap.dart';
+import 'package:riverpod_core/core/notifications/models/notification_tap_source.dart';
+import 'package:riverpod_core/core/notifications/routing/notification_router_provider.dart';
 import 'package:riverpod_core/core/router/app_router.dart';
 import 'package:riverpod_core/core/storage/prefs_storage.dart';
 import 'package:riverpod_core/generated/codegen_loader.g.dart';
@@ -134,11 +135,14 @@ void main() {
       container.read(sessionControllerProvider.notifier).signIn();
       await _pumpRouter(tester, container);
 
-      await tester.runAsync(
-        () => DeepLinkHelper.instance.handleRouteById(
-          pyload: jsonEncode({'id': '42', 'page': 'myEvents'}),
-        ),
-      );
+      container
+          .read(notificationRouterProvider)
+          .handle(
+            const NotificationTap(
+              payload: NotificationPayload(type: 'myEvents', id: '42'),
+              source: NotificationTapSource.localTap,
+            ),
+          );
       await tester.pumpAndSettle();
 
       expect(_page('item-detail-page'), findsOneWidget);

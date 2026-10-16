@@ -195,6 +195,25 @@ class CodegenLoader extends AssetLoader {
       "microphoneMessage":
           "Allow microphone access to record audio inside the app.",
     },
+    "notifications": {
+      "groupUpdates": "Updates",
+      "groupReminders": "Reminders",
+      "channelGeneralName": "General",
+      "channelGeneralDescription": "News and everyday updates.",
+      "channelHighPriorityName": "Important",
+      "channelHighPriorityDescription":
+          "Time-sensitive alerts that need your attention.",
+      "channelSilentName": "Silent",
+      "channelSilentDescription":
+          "Updates delivered without sound or vibration.",
+      "channelRemindersName": "Reminders",
+      "channelRemindersDescription": "Reminders you asked for.",
+      "actionReply": "Reply",
+      "actionReplySend": "Send",
+      "actionReplyHint": "Write a reply",
+      "actionMarkRead": "Mark as read",
+      "groupSummary": "{} new notifications",
+    },
   };
   static const Map<String, dynamic> _ar = {
     "hello": "مرحبا",
@@ -375,6 +394,23 @@ class CodegenLoader extends AssetLoader {
       "microphoneTitle": "الوصول إلى الميكروفون",
       "microphoneMessage":
           "اسمح بالوصول إلى الميكروفون لتسجيل الصوت داخل التطبيق.",
+    },
+    "notifications": {
+      "groupUpdates": "التحديثات",
+      "groupReminders": "التذكيرات",
+      "channelGeneralName": "عام",
+      "channelGeneralDescription": "الأخبار والتحديثات اليومية.",
+      "channelHighPriorityName": "مهم",
+      "channelHighPriorityDescription": "تنبيهات عاجلة تحتاج إلى انتباهك.",
+      "channelSilentName": "صامت",
+      "channelSilentDescription": "تحديثات تصل بدون صوت أو اهتزاز.",
+      "channelRemindersName": "التذكيرات",
+      "channelRemindersDescription": "التذكيرات التي طلبتها.",
+      "actionReply": "رد",
+      "actionReplySend": "إرسال",
+      "actionReplyHint": "اكتب رداً",
+      "actionMarkRead": "تعليم كمقروء",
+      "groupSummary": "{} إشعارات جديدة",
     },
   };
   static const Map<String, Map<String, dynamic>> mapLocales = {

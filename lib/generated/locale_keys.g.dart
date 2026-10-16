@@ -132,4 +132,28 @@ abstract class LocaleKeys {
   static const ds_permissions_microphoneMessage =
       'ds_permissions.microphoneMessage';
   static const ds_permissions = 'ds_permissions';
+  static const notifications_groupUpdates = 'notifications.groupUpdates';
+  static const notifications_groupReminders = 'notifications.groupReminders';
+  static const notifications_channelGeneralName =
+      'notifications.channelGeneralName';
+  static const notifications_channelGeneralDescription =
+      'notifications.channelGeneralDescription';
+  static const notifications_channelHighPriorityName =
+      'notifications.channelHighPriorityName';
+  static const notifications_channelHighPriorityDescription =
+      'notifications.channelHighPriorityDescription';
+  static const notifications_channelSilentName =
+      'notifications.channelSilentName';
+  static const notifications_channelSilentDescription =
+      'notifications.channelSilentDescription';
+  static const notifications_channelRemindersName =
+      'notifications.channelRemindersName';
+  static const notifications_channelRemindersDescription =
+      'notifications.channelRemindersDescription';
+  static const notifications_actionReply = 'notifications.actionReply';
+  static const notifications_actionReplySend = 'notifications.actionReplySend';
+  static const notifications_actionReplyHint = 'notifications.actionReplyHint';
+  static const notifications_actionMarkRead = 'notifications.actionMarkRead';
+  static const notifications_groupSummary = 'notifications.groupSummary';
+  static const notifications = 'notifications';
 }
