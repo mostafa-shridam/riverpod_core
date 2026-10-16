@@ -196,7 +196,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-38 — AppVideoPlayer (design_system media widget)
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — (D-027) |
+| REVIEW | worker-h | — (D-027) |
 - Goal: a reusable, good-looking video player widget with a controller provider.
 - Files: `lib/core/design_system/widgets/media/**` (`app_video_player.dart`, `app_video_controls.dart`, `app_video_controller.dart`, `media_strings.dart`), `pubspec.yaml`, `pubspec.lock` (add `video_player`), `assets/translations/ar.json` + `en.json` (top-level `ds_media`, appended at the end, D-023), `test/core/design_system/widgets/media/**`, `test/goldens/media/**`
 - Done when: `AppVideoPlayer(source: AppVideoSource.network(url) | .asset(path) | .file(path), autoPlay, looping, aspectRatio, placeholder/poster, onEnded)`; an `AppVideoController` (wraps `VideoPlayerController`, exposes state as a `ValueListenable`/Riverpod-friendly notifier: initializing, ready, playing, paused, buffering, ended, error + position/duration/volume/speed) with `play/pause/seekTo/setSpeed/setMuted`, disposed correctly and testable through an injectable controller factory (so tests need no platform channel); overlay controls built from tokens: big center play/pause, seek bar with buffered + position, elapsed/total time (locale-aware digits), mute, speed menu (0.5/1/1.5/2), fullscreen toggle (landscape route with `SystemChrome` restore), double-tap seek ±10 s, auto-hide after 3 s, tap to show; buffering spinner, error state with retry; keeps working in RTL (seek bar direction stays LTR, controls row directional, comment why); pauses on app background (`WidgetsBindingObserver`); respects text scale 2.0; Semantics for every control.
