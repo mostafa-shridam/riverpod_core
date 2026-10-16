@@ -77,7 +77,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-07 — Dio client, interceptors, wiring of error mapping
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | Worker A | — |
 - Goal: NETWORKING.md "Client" and "Interceptors" (D-008).
 - Files: `lib/core/network/dio_client.dart`, `lib/core/network/interceptors/**` (`idempotency`, `auth`, `refresh_token`, `retry_backoff`, `logging`, `error_mapping`), delete `lib/core/remote_services/**` and `lib/core/error_handler/**`, `test/core/network/**`
 - Done when: `dioProvider`/`refreshDioProvider` (keepAlive) read `AppConfig`; interceptors in documented order; single-flight refresh with request queue; retry/backoff rules; idempotency key; redacted dev-only logging; error interceptor uses `mapError`; old `ApiResult/ApiService/ErrorHandler/FailureMessages` deleted, no references.
