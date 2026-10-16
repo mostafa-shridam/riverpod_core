@@ -54,5 +54,11 @@
       "invalidPhone": "Enter a valid phone number",
       "phoneTooShort": "Phone number is too short"
     }
+  },
+  "ds_selection": {
+    "select": "Select",
+    "selectDate": "Select date",
+    "selectTime": "Select time",
+    "ratingValue": "{} of {}"
   }
 }

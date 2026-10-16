@@ -54,5 +54,11 @@
       "invalidPhone": "أدخل رقم هاتف صحيحًا",
       "phoneTooShort": "رقم الهاتف قصير جدًا"
     }
+  },
+  "ds_selection": {
+    "select": "اختر",
+    "selectDate": "اختر التاريخ",
+    "selectTime": "اختر الوقت",
+    "ratingValue": "{} من {}"
   }
 }
