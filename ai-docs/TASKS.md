@@ -141,7 +141,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-35 — Widget showcase page ("component gallery")
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| DONE | worker-p | — |
 - Goal: one page where anyone can see and try every design_system widget fast (D-020). Registered only in `dev` and `staging` flavors at the typed route `/showcase`; reachable from a dev-only entry on the home page.
 - Files: `lib/features/showcase/presentation/pages/showcase_page.dart`, `lib/features/showcase/presentation/widgets/**` (section widgets), `lib/core/design_system/widgets/widgets.dart` (the barrel export of every widget), `lib/core/router/routes.dart` (add the route only), `assets/translations/*.json` + generated (`showcase.*` keys), `test/features/showcase/**`
 - Done when: sections with headers — Buttons (all variants/sizes/loading/disabled), Inputs, Selection, Overlays (one button each: modal bottom sheet, action sheet, selection sheet, form sheet, alert, confirm, input dialog, loading overlay, snackbar ×4 types, toast, banner), Display (card, avatar, badge, chip, image, accordion, tabs), Media (`AppVideoPlayer` playing a public sample video, with a link to the `videos` feature), Feedback/States (skeleton, empty, error, offline banner, progress), Tokens (color swatches with names, type scale, spacing, radius, elevation). App bar actions: toggle light/dark, toggle ar/en, text scale slider, so every widget can be checked in all modes live. Works on phone and tablet.

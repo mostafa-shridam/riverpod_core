@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:riverpod_core/core/config/app_config.dart';
 import 'package:riverpod_core/core/router/app_shell.dart';
 import 'package:riverpod_core/core/startup/splash_page.dart';
 import 'package:riverpod_core/features/auth/presentation/pages/login_page.dart';
@@ -7,6 +9,7 @@ import 'package:riverpod_core/features/home/presentation/pages/home_page.dart';
 import 'package:riverpod_core/features/items/presentation/pages/item_detail_page.dart';
 import 'package:riverpod_core/features/more/presentation/pages/more_page.dart';
 import 'package:riverpod_core/features/onboarding/presentation/pages/onboarding_page.dart';
+import 'package:riverpod_core/features/showcase/presentation/pages/showcase_page.dart';
 
 part 'routes.g.dart';
 
@@ -98,4 +101,24 @@ GoRouteData? routeForDeepLink({required String type, required String id}) {
     'myEvents' => ItemDetailRoute(id: id),
     _ => null,
   };
+}
+
+/// The component gallery (C-35). Only dev and staging builds have it: in prod
+/// the redirect sends the request to the home route.
+@TypedGoRoute<ShowcaseRoute>(path: ShowcasePage.routeName)
+class ShowcaseRoute extends GoRouteData with $ShowcaseRoute {
+  const ShowcaseRoute();
+
+  @override
+  String? redirect(BuildContext context, GoRouterState state) {
+    final flavor = ProviderScope.containerOf(
+      context,
+      listen: false,
+    ).read(appConfigProvider).flavor;
+    return ShowcasePage.isEnabled(flavor) ? null : HomePage.routeName;
+  }
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const ShowcasePage();
 }
