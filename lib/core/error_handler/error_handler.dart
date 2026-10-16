@@ -1,4 +1,4 @@
-import '../remote_services/api_exceptions.dart';
+import 'package:riverpod_core/core/remote_services/api_exceptions.dart';
 
 class ErrorHandler {
   static String getErrorMessage(Exception exception) {

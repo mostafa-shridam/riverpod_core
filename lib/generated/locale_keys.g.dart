@@ -2,7 +2,7 @@
 
 // ignore_for_file: constant_identifier_names
 
-abstract class  LocaleKeys {
+abstract class LocaleKeys {
   static const hello = 'hello';
   static const arabic = 'arabic';
   static const english = 'english';
@@ -14,5 +14,4 @@ abstract class  LocaleKeys {
   static const selectLanguage = 'selectLanguage';
   static const goodEvening = 'goodEvening';
   static const goodMorning = 'goodMorning';
-
 }

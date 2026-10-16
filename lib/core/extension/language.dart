@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-import '../../generated/locale_keys.g.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 enum Language {
   arabic('ar'),
@@ -42,9 +42,9 @@ enum Language {
   static Locale getLanguageLocale(Language language) {
     switch (language) {
       case Language.arabic:
-        return Locale('ar');
+        return const Locale('ar');
       case Language.english:
-        return Locale('en');
+        return const Locale('en');
     }
   }
 }

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:riverpod_core/core/extension/font_family.dart';
 import 'package:riverpod_core/core/themes/app_colors.dart';
-
-import '../extension/font_family.dart';
 
 const MaterialColor greenSwatch = MaterialColor(0XFF000000, {
   50: Color(0xFFF3FAF6), // خلفية فاتحة جدًا فيها لمسة خضار
@@ -224,7 +223,7 @@ ThemeData _buildTheme({
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: surfaceColor,
-      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
       enabledBorder: OutlineInputBorder(
         borderSide: BorderSide(color: dividerColor),
@@ -263,7 +262,7 @@ ThemeData _buildTheme({
         color: surfaceColor,
         borderRadius: BorderRadius.circular(8),
       ),
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
     ),
     expansionTileTheme: ExpansionTileThemeData(
       textColor: AppColors.primary,

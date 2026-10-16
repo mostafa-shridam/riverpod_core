@@ -2,10 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_framework/responsive_framework.dart';
-
-import '../../generated/locale_keys.g.dart';
-import '../enum/alert_type.dart';
-
+import 'package:riverpod_core/core/enum/alert_type.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 mixin AlertUtils {
   // Info Alert - معلومات
@@ -102,7 +100,7 @@ mixin AlertUtils {
     final alertConfig = _getAlertConfig(type);
     final isDesktop = ResponsiveBreakpoints.of(context).isDesktop;
 
-    showDialog(
+    showDialog<void>(
       barrierDismissible: true,
       barrierColor: Colors.black.withAlpha(120),
 
@@ -388,7 +386,6 @@ mixin AlertUtils {
         );
     }
   }
-  
 }
 
 // Alert configuration class

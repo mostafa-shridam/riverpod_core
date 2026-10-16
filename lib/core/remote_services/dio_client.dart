@@ -26,27 +26,27 @@ class DioClient {
       InterceptorsWrapper(
         onRequest: (options, handler) {
           if (kDebugMode) {
-            log("REQUEST[${options.method}] => PATH: ${options.path}");
-            log("Headers: ${options.headers}");
-            log("Data: ${options.data}");
+            log('REQUEST[${options.method}] => PATH: ${options.path}');
+            log('Headers: ${options.headers}');
+            log('Data: ${options.data}');
           }
           return handler.next(options);
         },
         onResponse: (response, handler) {
           if (kDebugMode) {
             log(
-              "RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}",
+              'RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}',
             );
-            log("Data: ${response.data}");
+            log('Data: ${response.data}');
           }
           return handler.next(response);
         },
         onError: (DioException e, handler) {
           if (kDebugMode) {
             log(
-              "ERROR[${e.response?.statusCode}] => PATH: ${e.requestOptions.path}",
+              'ERROR[${e.response?.statusCode}] => PATH: ${e.requestOptions.path}',
             );
-            log("Message: ${e.message}");
+            log('Message: ${e.message}');
           }
           return handler.next(e);
         },

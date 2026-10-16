@@ -1,16 +1,15 @@
 import 'package:hive_flutter/adapters.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../enum/constants.dart';
+import 'package:riverpod_core/core/enum/constants.dart';
 
-
-part 'generated/local_storage.g.dart';
+part 'local_storage.g.dart';
 
 class LocalStorage {
   static final LocalStorage _instance = LocalStorage._internal();
   LocalStorage._internal();
   static LocalStorage get instance => _instance;
-  late Box _box;
+  late Box<dynamic> _box;
 
   Future<void> init() async {
     await Hive.initFlutter();

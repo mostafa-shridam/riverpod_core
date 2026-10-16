@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import '../helper/deep_link_helper.dart';
-import '../services/info_service.dart';
-import 'local_notifications_service.dart';
+import 'package:riverpod_core/core/helper/deep_link_helper.dart';
+import 'package:riverpod_core/core/notifications/local_notifications_service.dart';
+import 'package:riverpod_core/core/services/info_service.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {

@@ -1,6 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
-import 'help_functions.dart';
+import 'package:riverpod_core/core/helper/help_functions.dart';
 
 class DeepLinkHelper {
   DeepLinkHelper._();
@@ -20,21 +21,23 @@ class DeepLinkHelper {
       return;
     }
 
-    Future.microtask(() async {
-      switch (type) {
-        case 'myEvents':
-        // router.goNamed(page name here.routeName);
-          // router.pushNamed(
-          //   MyEventDetailsPage.routeName,
-          //   pathParameters: {'id': id},
-          // );
-          break;
+    unawaited(
+      Future<void>.microtask(() async {
+        switch (type) {
+          case 'myEvents':
+            // router.goNamed(page name here.routeName);
+            // router.pushNamed(
+            //   MyEventDetailsPage.routeName,
+            //   pathParameters: {'id': id},
+            // );
+            break;
 
-        default:
-          // router.goNamed(MainPage.routeName);
-          log('❌ Unsupported navigation type: $type');
-      }
-    });
+          default:
+            // router.goNamed(MainPage.routeName);
+            log('❌ Unsupported navigation type: $type');
+        }
+      }),
+    );
 
     log('✅ Navigation executed successfully');
   }

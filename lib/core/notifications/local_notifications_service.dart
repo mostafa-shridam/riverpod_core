@@ -1,14 +1,15 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 import 'dart:math' as m;
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_native_timezone_latest/flutter_native_timezone_latest.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:riverpod_core/core/helper/deep_link_helper.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-
-import '../helper/deep_link_helper.dart';
 
 class LocalNotificationsService {
   static final LocalNotificationsService instance =
@@ -196,7 +197,7 @@ class LocalNotificationsService {
         enableVibration: true,
         visibility: NotificationVisibility.public,
         ticker: 'ticker',
-        largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
+        largeIcon: const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
       ),
       iOS: const DarwinNotificationDetails(
         presentAlert: true,
@@ -216,15 +217,17 @@ class LocalNotificationsService {
   Future<void> _handleLocalNotification(NotificationResponse response) async {
     final handle = DeepLinkHelper.instance;
     if (response.payload != null) {
-      log("🧭 Notification Tap Detected with Payload: ${response.id}");
+      log('🧭 Notification Tap Detected with Payload: ${response.id}');
 
-      Future.microtask(() async {
-        if (response.payload != null && response.payload!.contains('url')) {
-          await handle.launchUrl(response.payload ?? '');
-        } else {
-          await handle.handleRouteById(pyload: response.payload ?? '');
-        }
-      });
+      unawaited(
+        Future<void>.microtask(() async {
+          if (response.payload != null && response.payload!.contains('url')) {
+            await handle.launchUrl(response.payload ?? '');
+          } else {
+            await handle.handleRouteById(pyload: response.payload ?? '');
+          }
+        }),
+      );
     }
   }
 
@@ -235,9 +238,9 @@ class LocalNotificationsService {
         details.didNotificationLaunchApp &&
         details.notificationResponse != null) {
       log(
-        "🚀 App launched via Notification with payload: ${details.notificationResponse?.payload}",
+        '🚀 App launched via Notification with payload: ${details.notificationResponse?.payload}',
       );
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future<void>.delayed(const Duration(milliseconds: 100));
 
       await _handleLocalNotification(details.notificationResponse!);
     }
@@ -251,9 +254,9 @@ final localNotificationsServiceProvider = Provider<LocalNotificationsService>(
 Future<void> notificationTapBackground(NotificationResponse response) async {
   if (response.payload != null) {
     await DeepLinkHelper.instance.handleRouteById(
-      pyload: response.payload ?? "0",
+      pyload: response.payload ?? '0',
     );
   } else {
-    log("No event ID found in the notification data.");
+    log('No event ID found in the notification data.');
   }
 }

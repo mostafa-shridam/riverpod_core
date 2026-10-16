@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../app_routing_base.dart';
+import 'package:riverpod_core/core/router/app_routing_base.dart';
 
 class MobileRouting extends AppRoutingBase {
   // 1. Singleton Setup
@@ -28,7 +28,7 @@ class MobileRouting extends AppRoutingBase {
       debugLogDiagnostics: true,
       initialLocation: '/',
 
-      errorBuilder: (context, state) => Scaffold(),
+      errorBuilder: (context, state) => const Scaffold(),
       redirect: (context, state) {
         // final isOnSplash = state.matchedLocation == SplashPage.routeName;
 

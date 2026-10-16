@@ -1,12 +1,10 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'dart:io';
-
 import 'package:riverpod_core/core/enum/constants.dart' show Constants;
-
 
 class DeviceInfoService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -19,18 +17,19 @@ class DeviceInfoService {
       String? deviceId;
 
       if (Platform.isAndroid) {
-        AndroidDeviceInfo androidInfo = await _deviceInfo.androidInfo;
+        final AndroidDeviceInfo androidInfo = await _deviceInfo.androidInfo;
         deviceName = androidInfo.model;
         deviceId = androidInfo.id;
       } else if (Platform.isIOS) {
-        IosDeviceInfo iosInfo = await _deviceInfo.iosInfo;
+        final IosDeviceInfo iosInfo = await _deviceInfo.iosInfo;
         deviceName = iosInfo.name;
         deviceId = iosInfo.identifierForVendor;
       }
-      String? token = await _fcm.getToken();
-      String? aPNSToken = await _fcm.getAPNSToken();
+      final String? token = await _fcm
+          .getToken(); // ignore: deprecated_member_use -- TODO(C-20): migrate to register()
+      final String? aPNSToken = await _fcm.getAPNSToken();
 
-      Map<String, dynamic> userData = {
+      final Map<String, dynamic> userData = {
         'deviceName': deviceName,
         'deviceId': deviceId,
         'fcmToken': token ?? aPNSToken ?? '',
@@ -43,23 +42,23 @@ class DeviceInfoService {
           .doc(deviceId)
           .set(userData, SetOptions(merge: true));
 
-      log("User data saved successfully!");
+      log('User data saved successfully!');
     } catch (e) {
-      log("Error saving user data: $e");
+      log('Error saving user data: $e');
     }
   }
 
   Future<String> getDeviceId() async {
     try {
       if (Platform.isAndroid) {
-        AndroidDeviceInfo androidInfo = await _deviceInfo.androidInfo;
+        final AndroidDeviceInfo androidInfo = await _deviceInfo.androidInfo;
         return androidInfo.id;
       } else if (Platform.isIOS) {
-        IosDeviceInfo iosInfo = await _deviceInfo.iosInfo;
+        final IosDeviceInfo iosInfo = await _deviceInfo.iosInfo;
         return iosInfo.identifierForVendor ?? '';
       }
     } catch (e) {
-      log("Error retrieving device ID: $e");
+      log('Error retrieving device ID: $e');
     }
     return '';
   }

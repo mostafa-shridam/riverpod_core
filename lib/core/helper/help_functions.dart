@@ -1,14 +1,15 @@
 import 'dart:developer';
 import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:riverpod_core/core/constants.dart';
+import 'package:riverpod_core/core/extension/theme_extenison.dart';
+import 'package:riverpod_core/core/themes/app_colors.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
+import 'package:riverpod_core/main.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../generated/locale_keys.g.dart';
-import '../../main.dart';
-import '../constants.dart';
-import '../extension/theme_extenison.dart';
-import '../themes/app_colors.dart';
 
 String getLanguageCodeHelper() {
   if (kIsWeb) {
@@ -25,8 +26,8 @@ String getLanguageCodeHelper() {
 
 void unfocusCurrent() => FocusManager.instance.primaryFocus?.unfocus();
 
-bool dataIsNotEmpty({List? list, String? data}) {
-  if (list != null && list.isNotEmpty && list != []) {
+bool dataIsNotEmpty({List<Object?>? list, String? data}) {
+  if (list != null && list.isNotEmpty) {
     return true;
   }
   if (data != null && data.isNotEmpty && data != '') {
@@ -56,7 +57,7 @@ String formatDateTime(String date, BuildContext context, {String? format}) {
       final parts = date.split('.');
       final fractionalSeconds = parts[1];
       if (fractionalSeconds.length > 3) {
-        cleanedDate = "${parts[0]}.${fractionalSeconds.substring(0, 3)}";
+        cleanedDate = '${parts[0]}.${fractionalSeconds.substring(0, 3)}';
       }
     }
 

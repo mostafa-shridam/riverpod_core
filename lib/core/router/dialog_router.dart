@@ -17,17 +17,18 @@ class DialogGoRoute extends GoRoute {
                child: SizedBox(width: 400, child: Center(child: child)),
              ),
              opaque: false,
-             transitionsBuilder: (
-               BuildContext context,
-               Animation<double> animation,
-               Animation<double> secondaryAnimation,
-               Widget child,
-             ) {
-               return FadeTransition(
-                 opacity: animation,
-                 child: builder?.call(context, state) ?? child,
-               );
-             },
+             transitionsBuilder:
+                 (
+                   BuildContext context,
+                   Animation<double> animation,
+                   Animation<double> secondaryAnimation,
+                   Widget child,
+                 ) {
+                   return FadeTransition(
+                     opacity: animation,
+                     child: builder?.call(context, state) ?? child,
+                   );
+                 },
            );
          },
        );

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../themes/app_colors.dart';
+import 'package:riverpod_core/core/themes/app_colors.dart';
 
 class CustomButton extends StatelessWidget {
   const CustomButton({
@@ -46,7 +46,7 @@ class CustomButton extends StatelessWidget {
         ),
         child: Center(
           child: isLoading
-              ? CircularProgressIndicator()
+              ? const CircularProgressIndicator()
               : Text(
                   text,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(

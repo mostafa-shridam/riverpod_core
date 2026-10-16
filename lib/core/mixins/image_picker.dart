@@ -8,10 +8,10 @@ mixin ImagePickerMixin {
   /// Pick a single image from gallery
   Future<Uint8List?> pickImageFromGallery({
     ImageSource? source,
-    Function(String message)? onError,
+    void Function(String message)? onError,
   }) async {
     try {
-      XFile? image = await _picker.pickImage(
+      final XFile? image = await _picker.pickImage(
         source: source ?? ImageSource.gallery,
       );
       if (image == null) {
@@ -19,7 +19,7 @@ mixin ImagePickerMixin {
       }
 
       // Compress image
-      Uint8List bytes = await _compressImage(await image.readAsBytes());
+      final Uint8List bytes = await _compressImage(await image.readAsBytes());
 
       // Check file size
       if (bytes.lengthInBytes > 1024 * 1024) {
@@ -36,17 +36,17 @@ mixin ImagePickerMixin {
 
   /// Pick multiple images from gallery
   Future<List<Uint8List>?> pickImagesFromGallery({
-    Function(String message)? onError,
+    void Function(String message)? onError,
   }) async {
     try {
-      List<XFile>? images = await _picker.pickMultiImage();
+      final List<XFile> images = await _picker.pickMultiImage();
       if (images.isEmpty) return null;
 
-      List<Uint8List> results = [];
+      final List<Uint8List> results = [];
 
       for (var x in images) {
         // Compress image
-        Uint8List bytes = await _compressImage(await x.readAsBytes());
+        final Uint8List bytes = await _compressImage(await x.readAsBytes());
 
         if (bytes.lengthInBytes > 1024 * 1024) {
           onError?.call(
@@ -68,7 +68,7 @@ mixin ImagePickerMixin {
   /// Compress image using flutter_image_compress
   Future<Uint8List> _compressImage(Uint8List list) async {
     try {
-      var result = Uint8List(1);
+      final result = Uint8List(1);
       return result;
     } catch (e) {
       return list;

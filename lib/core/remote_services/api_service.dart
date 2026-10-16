@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import 'dio_client.dart';
-import 'api_result.dart';
-import 'api_exceptions.dart';
+import 'package:riverpod_core/core/remote_services/api_exceptions.dart';
+import 'package:riverpod_core/core/remote_services/api_result.dart';
+import 'package:riverpod_core/core/remote_services/dio_client.dart';
 
 // Base API Service class that uses DioClient
 // It provides helper methods to make requests and handle errors centrally (simple mapping).
@@ -18,7 +18,7 @@ class ApiService {
     required T Function(dynamic data) fromJson,
   }) async {
     try {
-      final response = await _dio.get(
+      final response = await _dio.get<dynamic>(
         path,
         queryParameters: queryParameters,
         options: options,
@@ -39,7 +39,7 @@ class ApiService {
     required T Function(dynamic data) fromJson,
   }) async {
     try {
-      final response = await _dio.post(
+      final response = await _dio.post<dynamic>(
         path,
         data: data,
         queryParameters: queryParameters,
@@ -59,33 +59,33 @@ class ApiService {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        return NetworkException(message: "Connection timed out");
+        return NetworkException(message: 'Connection timed out');
       case DioExceptionType.badResponse:
         final statusCode = e.response?.statusCode;
         if (statusCode == 401) {
           return UnauthorizedException(
-            message: "Unauthorized",
+            message: 'Unauthorized',
             statusCode: statusCode,
           );
         } else if (statusCode == 400) {
           return BadRequestException(
-            message: "Bad Request",
+            message: 'Bad Request',
             statusCode: statusCode,
           );
         } else if (statusCode != null && statusCode >= 500) {
           return ServerException(
-            message: "Server Error",
+            message: 'Server Error',
             statusCode: statusCode,
           );
         }
         return UnknownException(
-          message: "Received invalid status code: $statusCode",
+          message: 'Received invalid status code: $statusCode',
           statusCode: statusCode,
         );
       case DioExceptionType.cancel:
-        return UnknownException(message: "Request cancelled");
+        return UnknownException(message: 'Request cancelled');
       default:
-        return NetworkException(message: "Network error occurred");
+        return NetworkException(message: 'Network error occurred');
     }
   }
 }

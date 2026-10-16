@@ -4,18 +4,3 @@ targets:
       source_gen|combining_builder:
         generate_for:
           - lib/**.dart
-
-        options:
-          build_extensions:
-            {
-              'lib/core/local_services/{{file}}.dart': 'lib/core/local_services/generated/{{file}}.g.dart',
-              'lib/core/remote_services/{{file}}.dart': 'lib/core/remote_services/generated/{{file}}.g.dart',
-              'lib/core/services/{{file}}.dart': 'lib/core/services/generated/{{file}}.g.dart',
-              'lib/features/{{features}}/data/providers/{{file}}.dart': 'lib/features/{{features}}/data/providers/generated/{{file}}.g.dart',
-            }
-      riverpod_generator:
-        options:
-          provider_name_prefix: ""
-          provider_family_name_prefix: ""
-          provider_name_suffix: "Provider"
-          provider_family_name_suffix: "Provider"            

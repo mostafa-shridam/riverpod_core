@@ -1,6 +1,1 @@
-enum AlertType {
-  info,
-  error,
-  success,
-  warning,
-}
+enum AlertType { info, error, success, warning }

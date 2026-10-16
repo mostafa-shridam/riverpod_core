@@ -7,15 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:riverpod_core/core/constants.dart';
+import 'package:riverpod_core/core/local_services/local_storage.dart';
 import 'package:riverpod_core/core/notifications/local_notifications_service.dart';
+import 'package:riverpod_core/core/router/index.dart';
+import 'package:riverpod_core/core/services/helper.dart';
 import 'package:riverpod_core/core/services/life_cycle_manager.dart';
-
-import 'core/local_services/local_storage.dart';
-import 'core/router/index.dart';
-import 'core/services/helper.dart';
-import 'core/services/scroll_behavior.dart';
-import 'core/themes/style.dart';
-import 'generated/codegen_loader.g.dart';
+import 'package:riverpod_core/core/services/scroll_behavior.dart';
+import 'package:riverpod_core/core/themes/style.dart';
+import 'package:riverpod_core/generated/codegen_loader.g.dart';
 
 Future<void> firstInit() async {
   try {
@@ -63,9 +62,9 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return ResponsiveBreakpoints(
       breakpoints: [
-        Breakpoint(start: 0, end: 600, name: MOBILE),
-        Breakpoint(start: 601, end: 1200, name: TABLET),
-        Breakpoint(start: 1201, end: double.infinity, name: DESKTOP),
+        const Breakpoint(start: 0, end: 600, name: MOBILE),
+        const Breakpoint(start: 601, end: 1200, name: TABLET),
+        const Breakpoint(start: 1201, end: double.infinity, name: DESKTOP),
       ],
       child: LifeCycleManager(
         child: MaterialApp.router(
@@ -103,7 +102,9 @@ class MyApp extends ConsumerWidget {
                 ],
               ).value,
               child: MediaQuery(
-                data: mediaQueryData.copyWith(textScaler: TextScaler.linear(1)),
+                data: mediaQueryData.copyWith(
+                  textScaler: const TextScaler.linear(1),
+                ),
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surface,
@@ -120,4 +121,3 @@ class MyApp extends ConsumerWidget {
 }
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
-

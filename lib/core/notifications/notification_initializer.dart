@@ -2,8 +2,8 @@ import 'dart:developer';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'local_notifications_service.dart';
-import 'remote_notifications_service.dart';
+import 'package:riverpod_core/core/notifications/local_notifications_service.dart';
+import 'package:riverpod_core/core/notifications/remote_notifications_service.dart';
 
 class NotificationInitializer {
   static final NotificationInitializer instance = NotificationInitializer._();

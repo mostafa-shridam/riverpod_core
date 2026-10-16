@@ -6,7 +6,7 @@ import 'dart:ui';
 
 import 'package:easy_localization/easy_localization.dart' show AssetLoader;
 
-class CodegenLoader extends AssetLoader{
+class CodegenLoader extends AssetLoader {
   const CodegenLoader();
 
   @override
@@ -14,31 +14,34 @@ class CodegenLoader extends AssetLoader{
     return Future.value(mapLocales[locale.toString()]);
   }
 
-  static const Map<String,dynamic> _en = {
-  "hello": "Hello",
-  "arabic": "Arabic",
-  "english": "English",
-  "light": "Light",
-  "dark": "Dark",
-  "system": "System",
-  "confirmButton": "Confirm",
-  "cancelButton": "Cancel",
-  "selectLanguage": "Select Language",
-  "goodEvening": "Good Evening",
-  "goodMorning": "Good Morning"
-};
-static const Map<String,dynamic> _ar = {
-  "hello": "مرحبا",
-  "arabic": "العربية",
-  "english": "الإنجليزية",
-  "light": "فاتح",
-  "dark": "غامق",
-  "system": "النظام",
-  "confirmButton": "تأكيد",
-  "cancelButton": "إلغاء",
-  "selectLanguage": "اختر اللغة",
-  "goodEvening": "مساء الخير",
-  "goodMorning": "صباح الخير"
-};
-static const Map<String, Map<String,dynamic>> mapLocales = {"en": _en, "ar": _ar};
+  static const Map<String, dynamic> _en = {
+    "hello": "Hello",
+    "arabic": "Arabic",
+    "english": "English",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "confirmButton": "Confirm",
+    "cancelButton": "Cancel",
+    "selectLanguage": "Select Language",
+    "goodEvening": "Good Evening",
+    "goodMorning": "Good Morning",
+  };
+  static const Map<String, dynamic> _ar = {
+    "hello": "مرحبا",
+    "arabic": "العربية",
+    "english": "الإنجليزية",
+    "light": "فاتح",
+    "dark": "غامق",
+    "system": "النظام",
+    "confirmButton": "تأكيد",
+    "cancelButton": "إلغاء",
+    "selectLanguage": "اختر اللغة",
+    "goodEvening": "مساء الخير",
+    "goodMorning": "صباح الخير",
+  };
+  static const Map<String, Map<String, dynamic>> mapLocales = {
+    "en": _en,
+    "ar": _ar,
+  };
 }
