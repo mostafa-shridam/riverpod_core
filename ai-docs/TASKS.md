@@ -205,7 +205,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-39 — Reference feature: videos (complete feature with mock data)
 | status | owner | blocked by |
 |---|---|---|
-| REVIEW | worker-o | — |
+| DONE | worker-o | — |
 - Goal: D-028. A complete feature following ARCHITECTURE.md end to end, runnable without a backend.
 - Files: `lib/features/videos/**` (`data/models/video.dart`, `data/sources/videos_remote_source.dart` + `videos_mock_source.dart` + `sample_videos.dart`, `data/videos_repository.dart`, `providers/videos_controller.dart`, `providers/video_player_page_controller.dart` if needed, `presentation/pages/videos_page.dart`, `presentation/pages/video_detail_page.dart`, `presentation/widgets/**`), `lib/core/router/routes.dart` (add the two routes only), `assets/translations/*.json` + generated (`videos.*`), `test/features/videos/**`
 - Done when: list page with `AsyncValueView` (all 8 states reachable through a "simulate" menu that switches the mock source: success, empty, error, offline, slow, partial), pull-to-refresh, search field filtering, item cards (thumbnail `AppImage`, title, duration badge); detail page with `AppVideoPlayer`, description, related list, favorite toggle persisted in prefs; repository returns models or throws `AppException`; mock source is selected by a provider override flag so it can be replaced by the real Dio source in one place; typed routes; registered only in dev/staging; sample videos come from D-029 (the vetted list, in `data/sources/sample_videos.dart`: 2 Flutter MP4s, 3 test-videos.co.uk MP4s, 2 Apple HLS streams); include a custom-URL input in the list page app bar so the owner can paste any MP4/HLS link and play it; no hard-coded text, tokens only.
