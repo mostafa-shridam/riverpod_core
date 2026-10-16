@@ -171,5 +171,51 @@
     "home": "الرئيسية",
     "more": "المزيد",
     "continue": "متابعة"
+  },
+  "videos": {
+    "title": "الفيديوهات",
+    "searchHint": "ابحث في الفيديوهات",
+    "emptyTitle": "لا توجد فيديوهات بعد",
+    "emptyMessage": "لا توجد فيديوهات لعرضها حاليًا.",
+    "noResultsTitle": "لا توجد فيديوهات مطابقة",
+    "noResultsMessage": "جرّب بحثًا مختلفًا.",
+    "partialError": "تعذّر تحميل بعض الفيديوهات.",
+    "simulate": {
+      "tooltip": "محاكاة حالة بيانات",
+      "title": "محاكاة حالة بيانات",
+      "success": "نجاح",
+      "empty": "فارغ",
+      "error": "خطأ في الخادم",
+      "offline": "بدون اتصال",
+      "slow": "شبكة بطيئة",
+      "partial": "فشل جزئي"
+    },
+    "customUrl": {
+      "tooltip": "تشغيل رابط",
+      "title": "تشغيل رابط",
+      "message": "الصق رابط MP4 أو HLS (.m3u8) مباشرًا.",
+      "label": "رابط الفيديو",
+      "hint": "https://example.com/video.mp4",
+      "play": "تشغيل",
+      "invalid": "أدخل رابط http أو https صحيحًا."
+    },
+    "favorite": {
+      "add": "إضافة إلى المفضلة",
+      "remove": "إزالة من المفضلة",
+      "added": "تمت الإضافة إلى المفضلة",
+      "removed": "تمت الإزالة من المفضلة"
+    },
+    "detail": {
+      "title": "فيديو",
+      "description": "عن هذا الفيديو",
+      "related": "فيديوهات ذات صلة",
+      "relatedError": "تعذّر تحميل الفيديوهات ذات الصلة.",
+      "customTitle": "رابط مخصص",
+      "customDescription": "تشغيل رابط أدخلته."
+    },
+    "home": {
+      "title": "الفيديوهات",
+      "subtitle": "ميزة مرجعية ببيانات تجريبية (للتطوير والتجربة فقط)"
+    }
   }
 }

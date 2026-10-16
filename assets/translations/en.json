@@ -171,5 +171,51 @@
     "home": "Home",
     "more": "More",
     "continue": "Continue"
+  },
+  "videos": {
+    "title": "Videos",
+    "searchHint": "Search videos",
+    "emptyTitle": "No videos yet",
+    "emptyMessage": "There are no videos to show right now.",
+    "noResultsTitle": "No matching videos",
+    "noResultsMessage": "Try a different search.",
+    "partialError": "Some videos could not be loaded.",
+    "simulate": {
+      "tooltip": "Simulate a data state",
+      "title": "Simulate a data state",
+      "success": "Success",
+      "empty": "Empty",
+      "error": "Server error",
+      "offline": "Offline",
+      "slow": "Slow network",
+      "partial": "Partial failure"
+    },
+    "customUrl": {
+      "tooltip": "Play a link",
+      "title": "Play a link",
+      "message": "Paste a direct MP4 or HLS (.m3u8) link.",
+      "label": "Video link",
+      "hint": "https://example.com/video.mp4",
+      "play": "Play",
+      "invalid": "Enter a valid http or https link."
+    },
+    "favorite": {
+      "add": "Add to favorites",
+      "remove": "Remove from favorites",
+      "added": "Added to favorites",
+      "removed": "Removed from favorites"
+    },
+    "detail": {
+      "title": "Video",
+      "description": "About this video",
+      "related": "Related videos",
+      "relatedError": "Related videos could not be loaded.",
+      "customTitle": "Custom link",
+      "customDescription": "Playing a link you entered."
+    },
+    "home": {
+      "title": "Videos",
+      "subtitle": "Reference feature with mock data (dev and staging only)"
+    }
   }
 }
