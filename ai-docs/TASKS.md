@@ -336,14 +336,31 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
   - Strings via `LocaleKeys` only (D-037).
 - Tests: payload parsing, router mapping + queueing until ready, token registration/refresh/logout unregister with fakes, foreground message → local notification, permission flow branches, channel table, scheduling logic (exact vs inexact fallback) with fake clock/backend, settings persistence, Firebase-unavailable path, background handler entry point does not throw without Riverpod.
 
+## C-36 — Legacy cleanup
+| status | owner | blocked by |
+|---|---|---|
+| READY | — | — |
+- Goal: remove pre-template leftovers so only the documented tree remains.
+- Files (delete or move ONLY after `grep -rn` proves nothing imports them; otherwise leave and report): `lib/core/constants.dart`, `lib/core/enum/**`, `lib/core/extension/**` (incl. `theme_extenison.dart` hard-coded swatch, `font_family.dart`, `font_size.dart`, `language.dart`, `theme_mode.dart`), `lib/core/local_services/**`, `lib/core/mixins/**` (`url_launcher.dart` is C-22's: keep), `lib/core/services/scroll_behavior.dart` (move into `lib/core/app/` if used by app.dart, else delete), `lib/gen/**` + `flutter_gen` config in pubspec (decide: keep only if assets are actually used via `Assets.`; otherwise delete and remove from pubspec/build.sh), stale assets under `assets/` that nothing references, unused packages in pubspec (verify each with grep; removing a package is allowed, adding is not), `pubspec.yaml`, `pubspec.lock`, tests that covered deleted code
+- Done when: nothing under `lib/core/` is outside the folders listed in ARCHITECTURE.md (apart from the files the architecture names); `flutter pub get`, build_runner and the full gate pass; the report lists every removed file and package with the grep proof; no behaviour test deleted without a note on which behaviour stopped existing.
+- Tests: existing suite stays green.
+
+## C-25 — Feature scaffold: `.fttemplates/feature` + `tool/new_feature.dart`
+| status | owner | blocked by |
+|---|---|---|
+| READY | — | — |
+- Goal: HOW_TO_START step 7. One command creates a feature skeleton in the documented shape, based on the videos feature (C-39).
+- Files: `tool/new_feature.dart`, `tool/lib/new_feature_logic.dart`, `.fttemplates/feature/**` (template files with placeholders), `.claude/skills/new-feature/SKILL.md` (update to the command), `ai-docs/HOW_TO_START_A_NEW_APP.md` (step 7 only), `test/tool/new_feature_test.dart`
+- Done when: `dart run tool/new_feature.dart --name product_orders` creates `lib/features/product_orders/{data/{models,sources,product_orders_repository.dart},providers,presentation/{pages,widgets}}` + matching `test/features/product_orders/` skeleton: freezed model, remote source (Dio), repository that reads through ONE `fetch*` method (D-038: cache-first helper plugged in by C-44), AsyncNotifier controller, one page with `static const routeName`, `AsyncValueView`, `LocaleKeys` keys added to BOTH translation JSON files (+ prints the two generation commands), a typed route snippet printed (never edits routes.dart automatically), analyzer-clean when generated into a temp copy; `--dry-run`; refuses existing feature, invalid names; name casing helpers unit-tested; no new package.
+- Tests: logic unit tests (name conversion, file plan, refusal) and one test that generates into a temp dir and checks the tree.
+
 ---
 
 ## Backlog (full tasks written when dependencies near DONE)
 C-31 Native flavors (Android flavors / iOS schemes) + launcher icons + native splash ·
 C-19 Biometric lock, screenshot blocking, root check ·
 C-21 Remote config: force update, maintenance · C-22 Share, external links, in-app review, version page ·
-C-25 `.fttemplates/feature` + `tool/new_feature` ·
-C-26 Integration tests (auth flow + one feature flow) · C-29 README + HOW_TO_START_A_NEW_APP · C-30 Crash/analytics vendor · C-36 Legacy cleanup (remove `lib/core/extension/theme_extenison.dart` hardcoded swatch, `lib/core/themes` leftovers, `responsive_framework` if unused, old `core/services` singletons).
+C-26 Integration tests (auth flow + one feature flow) · C-29 README + HOW_TO_START_A_NEW_APP · C-30 Crash/analytics vendor.
 
 ## C-44 — Cache-first policy, retention and pruning (D-038)
 | status | owner | blocked by |
