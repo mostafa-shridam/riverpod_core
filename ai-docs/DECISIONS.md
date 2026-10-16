@@ -176,3 +176,9 @@ at implementation time and record them in its report.
 - Decision: add `image_cropper` (BSD-3, active, native UCrop/TOCropViewController, themed from the design system) and `file_picker` (MIT) behind `MediaService` (C-23); features never import them. Latest stable versions resolved and recorded in the C-23 report. `image_picker`, `flutter_image_compress`, `permission_handler` are already dependencies. QR scanning (`mobile_scanner`) stays optional/backlog.
 - Why: crop and file picking are checklist items and need native UIs; each is a small, standard plugin.
 - Rejected: `crop_your_image` (pure Dart, heavy on the UI thread), own file picking.
+
+## D-034 — hive_ce is the only local store (owner instruction; supersedes D-004)
+- Decision: `hive_ce` + `hive_ce_flutter` (maintained community fork of Hive, MIT; latest stable resolved in C-41) replaces BOTH `shared_preferences` and Drift: settings (theme, locale-independent flags, onboarding), the stale-while-revalidate cache and any structured offline data live in Hive boxes. `flutter_secure_storage` stays for tokens/secrets only. `shared_preferences`, `drift`, `drift_flutter`, `drift_dev` are removed from pubspec. The locale is NOT stored by us: `easy_localization` already persists and switches it.
+- Why: owner wants one simple store already familiar to the team; no SQL layer or codegen for a key-value/cache workload.
+- Trade-offs recorded: no relational queries or migrations framework (acceptable for settings and cache; revisit with a new DECISION if an app needs SQL).
+- Rejected: keeping Drift for the cache (second store), shared_preferences (second store).

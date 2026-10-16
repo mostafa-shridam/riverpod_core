@@ -274,6 +274,15 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 - Done when: `build_android.sh [--flavor staging|prod]` runs the `release-check` skill pre-gate (`dart format`, `analyze`, `test`), then `flutter build appbundle --release --obfuscate --split-debug-info=build-symbols/android` (entrypoint `lib/main.dart` for prod, `lib/main_staging.dart` for staging), verifies `env/<flavor>.env` exists, and prints the artifact path; `build_ios.sh` does the same with `flutter build ipa --release --export-options-plist=ios/ExportOptions.plist`; scripts are `set -euo pipefail`, executable, never echo secrets; the README documents creating the keystore (`keytool` command), `key.properties` fields, where to keep the files, and the iOS export options; no secrets committed (only `*.example`).
 - Tests: `bash -n` on both scripts, `shellcheck` if available, and `./gradlew` is NOT run; show in the report that `flutter build apk --release` without key.properties fails with the clear message (run it once if the Android toolchain is installed, otherwise say it was not run).
 
+## C-41 — Storage on hive_ce (remove shared_preferences and Drift)
+| status | owner | blocked by |
+|---|---|---|
+| BLOCKED | — | C-16 |
+- Goal: D-034. One local store.
+- Files: `lib/core/storage/**` (`prefs_storage.dart` re-implemented on a Hive box with the SAME public API and typed keys minus the locale and digits fields; `database/` replaced by `cache_store.dart` over a Hive box with the same operations the C-16 helper uses: read, write(key, payload, savedAt, etag), delete, deleteSavedBefore, clear), `lib/core/storage/cache/**` (adapt the C-16 helper to `CacheStore`), `lib/core/storage/clear_user_data.dart`, `lib/bootstrap.dart` (Hive.initFlutter + open boxes before runApp), `pubspec.yaml`, `pubspec.lock` (add `hive_ce`, `hive_ce_flutter`; remove `shared_preferences`, `drift`, `drift_flutter`, `drift_dev`), `test/core/storage/**`, `test/helpers/fake_prefs_storage.dart`, `test/helpers/pump_app.dart` (drop shared_preferences mock), `test/bootstrap_test.dart`
+- Done when: no import of shared_preferences or drift remains (grep); boxes are opened once in bootstrap and exposed through keepAlive providers; tests use a temp-dir Hive (`Hive.init(tempDir)`), no platform channel; cache expiry/etag/user-scoping behave exactly as in C-16 tests; `clearUserData` wipes secure storage, cache box and user-scoped prefs; the old Drift generated files are deleted.
+- Tests: ports of all existing prefs, cache and clear tests (none dropped); box reopened after restart keeps data; bootstrap still starts.
+
 ---
 
 ## Backlog (full tasks written when dependencies near DONE)
