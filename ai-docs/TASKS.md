@@ -159,7 +159,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-11 — Router: typed routes, guards, shell
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | Worker A | — |
 - Goal: D-016. Single `appRouterProvider`, typed routes (go_router_builder), guards, bottom-nav shell with separate stacks, error page.
 - Files: `lib/app/router/app_router.dart`, `lib/app/router/routes.dart`, `lib/app/router/guards/**`, `lib/app/startup/**` (splash), `lib/app/app.dart`, delete `lib/core/router/**`, delete `lib/core/services/app_router.dart`, `lib/core/helper/deep_link_helper.dart` (adapt to the provider only), `lib/features/home/presentation/pages/home_page.dart` (moved), `pubspec.yaml`/`pubspec.lock` (add `go_router_builder`), `test/app/router/**`
 - Done when: splash → onboarding → auth → home skeleton with guards driven by a stub `SessionController` (`lib/core/auth/`); no `Routes.instance`/`MobileRouting.instance`; deep link resolves through typed routes.

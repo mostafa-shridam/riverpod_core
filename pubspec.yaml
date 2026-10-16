@@ -59,7 +59,6 @@ dependencies:
   json_annotation: ^4.12.0
   path_provider: ^2.1.2
   permission_handler: ^13.0.2
-  responsive_framework: ^1.5.1
   riverpod_annotation: ^4.0.1
   shared_preferences: ^2.5.6
   skeletonizer: ^3.0.0
@@ -77,6 +76,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   freezed: ^4.0.2
+  go_router_builder: ^4.5.0
   json_serializable: ^6.14.1
   mocktail: ^1.0.5
   rename_app: ^1.6.6
