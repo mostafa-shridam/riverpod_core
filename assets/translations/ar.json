@@ -72,5 +72,19 @@
     "selectDate": "اختر التاريخ",
     "selectTime": "اختر الوقت",
     "ratingValue": "{} من {}"
+  },
+  "ds_async": {
+    "emptyTitle": "لا يوجد شيء هنا بعد",
+    "emptyMessage": "عندما يتوفر محتوى للعرض سيظهر هنا.",
+    "errorTitle": "حدث خطأ ما",
+    "offlineTitle": "أنت غير متصل بالإنترنت",
+    "offlineMessage": "تحقق من اتصالك بالإنترنت وحاول مرة أخرى.",
+    "retry": "حاول مرة أخرى",
+    "loading": "جارٍ التحميل",
+    "bannerOffline": "أنت غير متصل",
+    "bannerOfflineSaved": "أنت غير متصل. يتم عرض البيانات المحفوظة.",
+    "bannerStale": "يتم عرض البيانات المحفوظة",
+    "bannerLastUpdated": "آخر تحديث {}",
+    "partialError": "تعذّر تحميل بعض المحتوى."
   }
 }

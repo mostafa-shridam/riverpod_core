@@ -150,7 +150,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-10 — AsyncValueView, 8 data states, connectivity, offline banner
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | worker-j | — |
 - Goal: `AsyncValueView`, `EmptyState`, `ErrorState`, `Skeleton`, `OfflineBanner`; `core/connectivity/` provider replacing `network_service.dart`.
 - Files: `lib/core/design_system/widgets/async/**`, `lib/core/connectivity/**`, delete `lib/core/services/network_service.dart`, `test/core/design_system/widgets/async/**`, `test/core/connectivity/**`, `test/helpers/fake_connectivity.dart`
 - Done when: all 8 states per DESIGN_SYSTEM.md; connectivity from plugin events (no DNS lookup of third-party hosts) with a `backOnline` event.

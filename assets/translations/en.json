@@ -72,5 +72,19 @@
     "selectDate": "Select date",
     "selectTime": "Select time",
     "ratingValue": "{} of {}"
+  },
+  "ds_async": {
+    "emptyTitle": "Nothing here yet",
+    "emptyMessage": "When there is something to show, it will appear here.",
+    "errorTitle": "Something went wrong",
+    "offlineTitle": "You're offline",
+    "offlineMessage": "Check your connection and try again.",
+    "retry": "Try again",
+    "loading": "Loading",
+    "bannerOffline": "You're offline",
+    "bannerOfflineSaved": "You're offline. Showing saved data.",
+    "bannerStale": "Showing saved data",
+    "bannerLastUpdated": "Last updated {}",
+    "partialError": "Some content couldn't be loaded."
   }
 }
