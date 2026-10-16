@@ -55,7 +55,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-05 — design_system: tokens, theme, responsive
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | Worker A | — |
 - Goal: D-019. Replace the app-specific black/green theme with generic tokens; fix text scaling and the fixed 450 px scaled box.
 - Files: `lib/design_system/tokens/**` (`brand_config.dart`, `app_colors.dart`, `app_typography.dart`, `app_spacing.dart`, `app_radius.dart`, `app_elevation.dart`, `app_durations.dart`, `app_tokens.dart`), `lib/design_system/theme/**` (`app_theme.dart`, `theme_context.dart`), `lib/design_system/responsive/**` (`breakpoints.dart`, `responsive_layout.dart`), delete `lib/core/themes/**`, `lib/main.dart`, `lib/core/widgets/custom_button.dart`, `lib/core/widgets/my_text_filed.dart`, `lib/core/mixins/scaffold_messeneger.dart`, `lib/core/helper/help_functions.dart` (import updates only), `ai-docs/DESIGN_SYSTEM.md` (only to add exact class names), `test/design_system/**`
 - Done when:
