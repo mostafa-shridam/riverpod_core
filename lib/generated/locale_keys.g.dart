@@ -451,4 +451,19 @@ abstract class LocaleKeys {
   static const security_settings_lockedOut = 'security.settings.lockedOut';
   static const security_settings = 'security.settings';
   static const security = 'security';
+  static const more_entry_about = 'more.entry.about';
+  static const more_entry_aboutHint = 'more.entry.aboutHint';
+  static const more_entry = 'more.entry';
+  static const more_about_title = 'more.about.title';
+  static const more_about_version = 'more.about.version';
+  static const more_about_build = 'more.about.build';
+  static const more_about_flavor = 'more.about.flavor';
+  static const more_about_licenses = 'more.about.licenses';
+  static const more_about_share = 'more.about.share';
+  static const more_about_shareMessage = 'more.about.shareMessage';
+  static const more_about_rate = 'more.about.rate';
+  static const more_about_actionFailed = 'more.about.actionFailed';
+  static const more_about_loadFailed = 'more.about.loadFailed';
+  static const more_about = 'more.about';
+  static const more = 'more';
 }
