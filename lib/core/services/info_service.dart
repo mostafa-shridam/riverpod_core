@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:riverpod_core/core/enum/constants.dart' show Constants;
 
 class DeviceInfoService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -38,7 +37,7 @@ class DeviceInfoService {
       };
 
       await _db
-          .collection(Constants.deviceInfo.name)
+          .collection('deviceInfo')
           .doc(deviceId)
           .set(userData, SetOptions(merge: true));
 

@@ -8,7 +8,6 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'package:riverpod_core/core/constants.dart';
 import 'package:riverpod_core/core/design_system/responsive/text_scale.dart';
 import 'package:riverpod_core/core/design_system/theme/app_theme.dart';
-import 'package:riverpod_core/core/local_services/local_storage.dart';
 import 'package:riverpod_core/core/notifications/local_notifications_service.dart';
 import 'package:riverpod_core/core/router/index.dart';
 import 'package:riverpod_core/core/services/helper.dart';
@@ -17,12 +16,6 @@ import 'package:riverpod_core/core/services/scroll_behavior.dart';
 import 'package:riverpod_core/generated/codegen_loader.g.dart';
 
 Future<void> firstInit() async {
-  try {
-    await LocalStorage.instance.init();
-  } catch (e) {
-    log('Error when init LocalStorage: $e');
-  }
-
   try {
     await LocalNotificationsService.instance.init();
   } catch (e) {

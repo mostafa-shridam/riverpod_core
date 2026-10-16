@@ -68,7 +68,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-06 — Storage: prefs, secure storage, Drift DB; remove Hive
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | Worker A | — |
 - Goal: D-004 per ARCHITECTURE.md `core/storage/`.
 - Files: `lib/core/storage/prefs_storage.dart`, `lib/core/storage/secure_storage.dart`, `lib/core/storage/database/**` (`app_database.dart`, `cache_entries` table), delete `lib/core/local_services/**`, `lib/core/enum/constants.dart`, `lib/main.dart` (init calls only), `lib/core/helper/help_functions.dart` (language read/write via prefs), `pubspec.yaml`, `pubspec.lock` (remove `hive_flutter`), `test/core/storage/**`, `test/helpers/fake_secure_storage.dart`, `test/helpers/fake_prefs_storage.dart`
 - Done when: keepAlive providers for each; typed pref keys in one file; `clearUserData()` wipes secure storage, cache table, user-scoped prefs; no Hive import left; fakes exist.
