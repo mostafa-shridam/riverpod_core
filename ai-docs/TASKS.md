@@ -57,10 +57,10 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 |---|---|---|
 | DONE | worker-a | — |
 - Goal: D-019. Replace the app-specific black/green theme with generic tokens; fix text scaling and the fixed 450 px scaled box.
-- Files: `lib/design_system/tokens/**` (`brand_config.dart`, `app_colors.dart`, `app_typography.dart`, `app_spacing.dart`, `app_radius.dart`, `app_elevation.dart`, `app_durations.dart`, `app_tokens.dart`), `lib/design_system/theme/**` (`app_theme.dart`, `theme_context.dart`), `lib/design_system/responsive/**` (`breakpoints.dart`, `responsive_layout.dart`), delete `lib/core/themes/**`, `lib/main.dart`, `lib/core/widgets/custom_button.dart`, `lib/core/widgets/my_text_filed.dart`, `lib/core/mixins/scaffold_messeneger.dart`, `lib/core/helper/help_functions.dart` (import updates only), `ai-docs/DESIGN_SYSTEM.md` (only to add exact class names), `test/design_system/**`
+- Files: `lib/core/design_system/tokens/**` (`brand_config.dart`, `app_colors.dart`, `app_typography.dart`, `app_spacing.dart`, `app_radius.dart`, `app_elevation.dart`, `app_durations.dart`, `app_tokens.dart`), `lib/core/design_system/theme/**` (`app_theme.dart`, `theme_context.dart`), `lib/core/design_system/responsive/**` (`breakpoints.dart`, `responsive_layout.dart`), delete `lib/core/themes/**`, `lib/main.dart`, `lib/core/widgets/custom_button.dart`, `lib/core/widgets/my_text_filed.dart`, `lib/core/mixins/scaffold_messeneger.dart`, `lib/core/helper/help_functions.dart` (import updates only), `ai-docs/DESIGN_SYSTEM.md` (only to add exact class names), `test/core/design_system/**`
 - Done when:
   - Light/dark `ThemeData` (M3) from ONE seed in `brand_config.dart` (neutral default), tokens as a `ThemeExtension` (`context.tokens`: spacing, radius, elevation, durations, semantic colors), `context.breakpoint`; theme registry for `ThemeMode` unchanged (extension files keep working).
-  - No hex colors/numeric font sizes/durations outside `lib/design_system/tokens/`.
+  - No hex colors/numeric font sizes/durations outside `lib/core/design_system/tokens/`.
   - `main.dart`: remove `TextScaler.linear(1)` (clamp system scale 0.8–2.0) and the fixed-width `ResponsiveScaledBox`; layout adapts via breakpoints (`responsive_framework` may stay only if still imported elsewhere).
   - If a file outside the list imports `core/themes/`, STOP and ask the Lead.
 - Tests: contrast ≥ 4.5 (`onSurface`/`surface`, `onPrimary`/`primary`) in both themes; tokens present in both; breakpoint resolution at 599/600/1023/1024; text scale 2.0 honored by a widget test.
@@ -98,7 +98,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 |---|---|---|
 | DONE | worker-a | — |
 - Goal: the most-used primitives, beautiful by default (D-020). Replace `app_button.dart`, `custom_button.dart`, `my_text_filed.dart`.
-- Files: `lib/design_system/widgets/buttons/**`, `lib/design_system/widgets/inputs/**`, `lib/core/widgets/**` (deleted), `lib/core/utils/validators.dart`, `test/design_system/widgets/buttons/**`, `test/design_system/widgets/inputs/**`, `test/goldens/buttons/**`, `test/goldens/inputs/**`
+- Files: `lib/core/design_system/widgets/buttons/**`, `lib/core/design_system/widgets/inputs/**`, `lib/core/widgets/**` (deleted), `lib/core/utils/validators.dart`, `test/core/design_system/widgets/buttons/**`, `test/core/design_system/widgets/inputs/**`, `test/goldens/buttons/**`, `test/goldens/inputs/**`
 - Done when:
   - `AppButton` (variants: primary, secondary, tonal, outlined, text, destructive; sizes sm/md/lg; `isLoading` keeps width; leading/trailing icon; `fullWidth`; disabled; haptic-free), `AppIconButton` (filled/tonal/outlined/standard, badge-ready), `AppFab`.
   - `AppTextField` (label, hint, helper, error, counter, prefix/suffix, validator, multiline, focus/disabled/read-only states), `AppPasswordField` (visibility toggle), `AppSearchField` (clear button, debounced `onChanged`), `AppOtpField` (N boxes, paste, auto-advance, LTR digits even in RTL), `AppPhoneField` (digits-only formatter, no country-picker package).
@@ -111,7 +111,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 |---|---|---|
 | READY | — | — |
 - Goal: `AppCheckbox`, `AppRadioGroup`, `AppSwitch`, `AppDropdown` (single, searchable via bottom sheet), `AppSegmentedControl`, `AppSlider` (+range), `AppDateField`, `AppTimeField` (use platform pickers, locale-aware formatting), `AppRating`, `AppChipGroup` (single/multi select), `AppFormField` wrapper that shows label + error consistently.
-- Files: `lib/design_system/widgets/selection/**`, `test/design_system/widgets/selection/**`, `test/goldens/selection/**`
+- Files: `lib/core/design_system/widgets/selection/**`, `test/core/design_system/widgets/selection/**`, `test/goldens/selection/**`
 - Done when: same quality bar as C-09 (tokens, directional, l10n, 48 dp, Semantics, disabled/error states); controlled API (value + onChanged), works inside `Form` validators.
 - Tests: per widget variants/states, interaction (tap/select/validate), goldens light/dark × ar/en, text scale 2.0.
 
@@ -120,7 +120,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 |---|---|---|
 | DONE | worker-c | — |
 - Goal: everything that appears on top of a page. Replace `alert_utils.dart` and `scaffold_messeneger.dart`.
-- Files: `lib/design_system/widgets/bottom_sheets/**`, `lib/design_system/widgets/dialogs/**`, `lib/design_system/widgets/feedback/**` (subfolders `snackbar/`, `progress/`, `banner/`, `tooltip/`), `lib/core/mixins/alert_utils.dart` (deleted), `lib/core/mixins/scaffold_messeneger.dart` (deleted), `test/design_system/widgets/bottom_sheets/**`, `test/design_system/widgets/dialogs/**`, `test/design_system/widgets/feedback/**`, `test/goldens/bottom_sheets/**`, `test/goldens/dialogs/**`
+- Files: `lib/core/design_system/widgets/bottom_sheets/**`, `lib/core/design_system/widgets/dialogs/**`, `lib/core/design_system/widgets/feedback/**` (subfolders `snackbar/`, `progress/`, `banner/`, `tooltip/`), `lib/core/mixins/alert_utils.dart` (deleted), `lib/core/mixins/scaffold_messeneger.dart` (deleted), `test/core/design_system/widgets/bottom_sheets/**`, `test/core/design_system/widgets/dialogs/**`, `test/core/design_system/widgets/feedback/**`, `test/goldens/bottom_sheets/**`, `test/goldens/dialogs/**`
 - Done when:
   - `showAppBottomSheet<T>` modal sheet: drag handle, rounded top (radius token xl), safe-area + keyboard aware, `isScrollControlled`, draggable/scrollable variant, max width 560 on tablets, optional title/close, barrier dismiss rules, themed scrim; presets: `AppActionSheet` (list of actions with icons, destructive item, cancel), `AppSelectionSheet<T>` (single/multi choice with search), `AppFormSheet` (title + content + primary/secondary buttons, sticky footer above keyboard).
   - `showAppDialog` + presets: `AppAlertDialog` (info/success/warning/error icon variants), `AppConfirmDialog` (destructive option, returns bool), `AppInputDialog` (text + validation), `AppLoadingDialog`/`AppLoadingOverlay` (blocking, optional message).
@@ -134,7 +134,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 |---|---|---|
 | DONE | worker-d | — |
 - Goal: content and structure primitives.
-- Files: `lib/design_system/widgets/display/**`, `lib/design_system/widgets/layout/**`, `pubspec.yaml`, `pubspec.lock` (add `cached_network_image`, D-021), `test/design_system/widgets/display/**`, `test/design_system/widgets/layout/**`, `test/goldens/display/**`
+- Files: `lib/core/design_system/widgets/display/**`, `lib/core/design_system/widgets/layout/**`, `pubspec.yaml`, `pubspec.lock` (add `cached_network_image`, D-021), `test/core/design_system/widgets/display/**`, `test/core/design_system/widgets/layout/**`, `test/goldens/display/**`
 - Done when: `AppCard` (filled/outlined/elevated, tappable), `AppListTile`, `AppSectionHeader`, `AppDivider`, `AppAvatar` (image/initials/icon, status dot, sizes), `AppBadge` (count/dot, overflow 99+), `AppChip`, `AppImage` (cached, placeholder shimmer, error widget, fade, `fit`, rounded), `AppAccordion`, `AppTabBar`, `AppBottomNavBar` (adaptive to rail on tablet), `AppAppBar` (large/collapsing optional), `AppScaffold` (adaptive padding, max width, safe area, optional offline banner slot), `AppStepper`, `AppEmptyPlaceholder` is NOT here (C-10 owns empty/error/skeleton).
 - Tests: per widget variants/states, goldens light/dark × ar/en, text scale 2.0; `AppImage` tested with a fake image provider.
 
@@ -143,7 +143,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 |---|---|---|
 | BLOCKED | — | C-09, C-10, C-11, C-32, C-33, C-34 |
 - Goal: one page where anyone can see and try every design_system widget fast (D-020). Registered only in `dev` and `staging` flavors at the typed route `/showcase`; reachable from a dev-only entry on the home page.
-- Files: `lib/features/showcase/presentation/pages/showcase_page.dart`, `lib/features/showcase/presentation/widgets/**` (section widgets), `lib/design_system/widgets/widgets.dart` (the barrel export of every widget), `lib/app/router/routes.dart` (add the route only), `assets/translations/*.json` + generated (`showcase.*` keys), `test/features/showcase/**`
+- Files: `lib/features/showcase/presentation/pages/showcase_page.dart`, `lib/features/showcase/presentation/widgets/**` (section widgets), `lib/core/design_system/widgets/widgets.dart` (the barrel export of every widget), `lib/app/router/routes.dart` (add the route only), `assets/translations/*.json` + generated (`showcase.*` keys), `test/features/showcase/**`
 - Done when: sections with headers — Buttons (all variants/sizes/loading/disabled), Inputs, Selection, Overlays (one button each: modal bottom sheet, action sheet, selection sheet, form sheet, alert, confirm, input dialog, loading overlay, snackbar ×4 types, toast, banner), Display (card, avatar, badge, chip, image, accordion, tabs), Feedback/States (skeleton, empty, error, offline banner, progress), Tokens (color swatches with names, type scale, spacing, radius, elevation). App bar actions: toggle light/dark, toggle ar/en, text scale slider, so every widget can be checked in all modes live. Works on phone and tablet.
 - Tests: page builds in light/dark × ar/en; each overlay button opens its overlay; mode toggles work; no overflow at text scale 2.0.
 
@@ -152,7 +152,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 |---|---|---|
 | BLOCKED | — | C-03, C-09 |
 - Goal: `AsyncValueView`, `EmptyState`, `ErrorState`, `Skeleton`, `OfflineBanner`; `core/connectivity/` provider replacing `network_service.dart`.
-- Files: `lib/design_system/widgets/async/**`, `lib/core/connectivity/**`, delete `lib/core/services/network_service.dart`, `test/design_system/widgets/async/**`, `test/core/connectivity/**`, `test/helpers/fake_connectivity.dart`
+- Files: `lib/core/design_system/widgets/async/**`, `lib/core/connectivity/**`, delete `lib/core/services/network_service.dart`, `test/core/design_system/widgets/async/**`, `test/core/connectivity/**`, `test/helpers/fake_connectivity.dart`
 - Done when: all 8 states per DESIGN_SYSTEM.md; connectivity from plugin events (no DNS lookup of third-party hosts) with a `backOnline` event.
 - Tests: widget test per state; goldens; connectivity transitions with the fake.
 

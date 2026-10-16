@@ -44,7 +44,7 @@
 
 ## UI composition
 - One shared primitive per UI element (button, field, card, dialog, sheet, snackbar, avatar, badge, chip, skeleton, image).
-  Primitives live only in `lib/design_system/widgets/`. Features compose them; never re-implement or restyle locally. Missing variant → ask the Lead for a task to extend the primitive.
+  Primitives live only in `lib/core/design_system/widgets/`. Features compose them; never re-implement or restyle locally. Missing variant → ask the Lead for a task to extend the primitive.
 - No hard-coded colors, font sizes, spacing, radii, durations in features: use tokens (DESIGN_SYSTEM.md) via `Theme.of(context)` / `context.tokens`. Never use raw `ElevatedButton`/`TextField` etc. in features.
 - Never set `textScaler` to a fixed value. Layouts must survive 2.0× text scale.
 - Touch targets ≥ 48×48 dp. Add `Semantics` labels to icon-only buttons.

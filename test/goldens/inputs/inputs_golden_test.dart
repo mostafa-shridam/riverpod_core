@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:riverpod_core/design_system/widgets/inputs/app_otp_field.dart';
-import 'package:riverpod_core/design_system/widgets/inputs/app_password_field.dart';
-import 'package:riverpod_core/design_system/widgets/inputs/app_search_field.dart';
-import 'package:riverpod_core/design_system/widgets/inputs/app_text_field.dart';
+import 'package:riverpod_core/core/design_system/widgets/inputs/app_otp_field.dart';
+import 'package:riverpod_core/core/design_system/widgets/inputs/app_password_field.dart';
+import 'package:riverpod_core/core/design_system/widgets/inputs/app_search_field.dart';
+import 'package:riverpod_core/core/design_system/widgets/inputs/app_text_field.dart';
 
 import '../../helpers/helpers.dart';
 

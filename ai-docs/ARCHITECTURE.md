@@ -3,7 +3,7 @@
 Style: feature-first, pragmatic layering, Riverpod (codegen) for DI + state.
 **No domain layer**: no entities, no use cases, no abstract repository interfaces (D-015).
 Flow: `page → provider → repository → data source`. A feature never imports another feature's internals.
-Shared things live in `core/`, `design_system/` or `shared/`. Current code differs in places; CHECKLIST.md/TASKS.md name the task that closes each gap.
+Shared things live in `core/`, `core/design_system/` or `shared/`. Current code differs in places; CHECKLIST.md/TASKS.md name the task that closes each gap.
 
 ## Folder tree
 ```
@@ -17,7 +17,7 @@ lib/
 │   │   ├── routes.dart         # typed routes (go_router_builder): all paths in one place
 │   │   └── guards/             # auth, onboarding, maintenance/force-update
 │   └── startup/                # splash + startup sequence (config, session restore, remote flags)
-├── core/                       # no UI; app-agnostic infrastructure
+├── core/                       # app-agnostic infrastructure + the design system (UI primitives live ONLY in core/design_system)
 │   ├── config/                 # AppConfig (from env/<flavor>.env via flutter_dotenv), Flavor.current (kReleaseMode ? prod : dev), validation
 │   ├── network/
 │   │   ├── dio_client.dart     # one Dio provider
@@ -42,16 +42,16 @@ lib/
 │   ├── logger/                 # leveled, silent in prod, never logs secrets
 │   ├── permissions/            # request + rationale + open settings
 │   ├── media/                  # image/file picking, crop, compress
+│   ├── design_system/              # the ONLY place UI primitives are implemented (D-026)
+│   │   ├── tokens/                 # colors, typography, spacing, radius, elevation, durations
+│   │   ├── theme/                  # light/dark ThemeData from tokens, ThemeExtensions
+│   │   ├── responsive/             # breakpoints, ResponsiveLayout, adaptive padding
+│   │   └── widgets/                # AppButton, AppTextField, AppCard, AppDialog, AppBottomSheet,
+│   │                               # AppSnackbar, AppImage, AppAvatar, AppBadge, AppChip, Skeleton,
+│   │                               # EmptyState, ErrorState, OfflineBanner,
+│   │                               # AsyncValueView (renders the 8 data states)
 │   └── utils/                  # pure helpers (dates, formatters, validators, debouncer)
 ├── l10n/                       # locale controller + formatters (JSON lives in assets/translations)
-├── design_system/              # the ONLY place UI primitives are implemented
-│   ├── tokens/                 # colors, typography, spacing, radius, elevation, durations
-│   ├── theme/                  # light/dark ThemeData from tokens, ThemeExtensions
-│   ├── responsive/             # breakpoints, ResponsiveLayout, adaptive padding
-│   └── widgets/                # AppButton, AppTextField, AppCard, AppDialog, AppBottomSheet,
-│                               # AppSnackbar, AppImage, AppAvatar, AppBadge, AppChip, Skeleton,
-│                               # EmptyState, ErrorState, OfflineBanner,
-│                               # AsyncValueView (renders the 8 data states)
 ├── shared/                     # cross-feature models (e.g. User) and shared DTOs
 └── features/
     └── <feature>/              # scaffolded by .fttemplates/feature
@@ -73,9 +73,9 @@ env/               *.env.example (real *.env files git-ignored)
 
 ## Dependency direction
 - `features/x/presentation` → `features/x/providers` → `features/x/data` → `core/`, `shared/`.
-- `design_system/` imports only Flutter, `core/utils`, and `l10n/`. It never imports `features/`, `app/` or providers of a feature.
-- `core/` never imports `features/`, `app/`, or `design_system/` (no UI). Exception: none.
-- A feature never imports another feature's `data/`, `providers/` or `presentation/`. Shared need → `core/`, `shared/` or `design_system/`.
+- `core/design_system/` imports only Flutter, `core/utils`, `core/errors`, and `l10n/`. It never imports `features/`, `app/` or providers of a feature.
+- `core/` never imports `features/` or `app/`. Non-UI core folders (network, storage, errors…) never import `core/design_system/`.
+- A feature never imports another feature's `data/`, `providers/` or `presentation/`. Shared need → `core/`, `shared/` or `core/design_system/`.
 - `app/` may import everything.
 
 ## Architecture rules
@@ -84,7 +84,7 @@ env/               *.env.example (real *.env files git-ignored)
 - Business logic lives in the feature's providers (notifiers). Logic shared by two features goes to a repository method or a `core/` service, never to a "use case" class.
 - Errors are mapped ONCE (`core/errors/error_mapper.dart`). The UI never inspects HTTP codes.
 - Every async page uses `AsyncValueView` (loading/empty/error/offline/stale/partial/refreshing/success).
-- Features use `design_system` widgets only, never raw `ElevatedButton`/`TextField`.
+- Features use `core/design_system` widgets only, never raw `ElevatedButton`/`TextField`.
 - No hard-coded user text, colors, sizes or durations in features: l10n keys + tokens only.
 - Directional (RTL-safe) APIs only: `EdgeInsetsDirectional`, `AlignmentDirectional`, start/end.
 - Navigation only through typed routes; deep links and notification taps resolve to the same routes.

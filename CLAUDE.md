@@ -26,7 +26,7 @@ Example: `Worker A · C-03 · lib/core/error/**, test/core/error/**, assets/tran
 5. Never commit secrets: no API keys, real google-services.json / GoogleService-Info.plist, keystores, .env. Commit *.example files only; real ones are git-ignored.
 6. Never delete or weaken a test without writing which behaviour stopped being true.
 7. Every page: light/dark, ar (RTL) + en (LTR), text scaling, phone + tablet, the 8 data states (loading, empty, error, offline, stale, partial, refreshing, success). No hard-coded user text.
-8. One shared implementation per UI primitive (in design_system/); features compose it, never re-implement it.
+8. One shared implementation per UI primitive (in core/design_system/); features compose it, never re-implement it.
 9. Heavy commands (full flutter test, build_runner, builds) run one session at a time: `mkdir /tmp/riverpod_core.lock` before, `rmdir` after; wait if it exists.
 10. The template stays generic: no app-specific names, colors, endpoints or logic. Everything app-specific comes from config/flavors/theme in one place.
 11. New package = a DECISION (why, alternatives, latest stable version, license). Prefer 30 lines of our own code over a heavy dependency.

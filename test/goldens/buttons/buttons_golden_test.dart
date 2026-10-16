@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:riverpod_core/design_system/widgets/buttons/app_button.dart';
-import 'package:riverpod_core/design_system/widgets/buttons/app_icon_button.dart';
+import 'package:riverpod_core/core/design_system/widgets/buttons/app_button.dart';
+import 'package:riverpod_core/core/design_system/widgets/buttons/app_icon_button.dart';
 
 import '../../helpers/helpers.dart';
 

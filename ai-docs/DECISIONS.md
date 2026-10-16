@@ -137,3 +137,8 @@ at implementation time and record them in its report.
 ## D-025 — Component size tokens and OTP direction exception
 - Decision: component sizes (button heights 40/48/56, icon sizes, min target 48 dp, OTP box size) live in `design_system/tokens/app_sizes.dart` (`AppSizes`, a field of `AppTokens`); `searchDebounce` (300 ms) lives in `AppDurations`. Validators in `core/utils` return a `ValidationError` enum; the design_system maps it to localized text. `AppOtpField` is the ONLY place allowed a hard-coded `TextDirection.ltr` (digit order must stay left-to-right in RTL), with an explanatory comment.
 - Why: no numeric sizes outside tokens; `core/` must not depend on UI or localization of widgets.
+
+## D-026 — design_system lives inside core (supersedes the top-level folder of D-019/D-015)
+- Decision (owner instruction): everything is under `lib/core/`; `design_system/` moved to `lib/core/design_system/` (tokens, theme, responsive, widgets). Import path `package:riverpod_core/core/design_system/...`. Rule: non-UI core folders never import `core/design_system/`.
+- Why: owner wants one `core` root and no extra top-level folders.
+- Rejected: top-level `lib/design_system/`.

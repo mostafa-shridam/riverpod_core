@@ -6,14 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:riverpod_core/core/constants.dart';
+import 'package:riverpod_core/core/design_system/responsive/text_scale.dart';
+import 'package:riverpod_core/core/design_system/theme/app_theme.dart';
 import 'package:riverpod_core/core/local_services/local_storage.dart';
 import 'package:riverpod_core/core/notifications/local_notifications_service.dart';
 import 'package:riverpod_core/core/router/index.dart';
 import 'package:riverpod_core/core/services/helper.dart';
 import 'package:riverpod_core/core/services/life_cycle_manager.dart';
 import 'package:riverpod_core/core/services/scroll_behavior.dart';
-import 'package:riverpod_core/design_system/responsive/text_scale.dart';
-import 'package:riverpod_core/design_system/theme/app_theme.dart';
 import 'package:riverpod_core/generated/codegen_loader.g.dart';
 
 Future<void> firstInit() async {
