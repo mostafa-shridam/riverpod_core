@@ -46,3 +46,4 @@ app.*.map.json
 # Environment files: real values are git-ignored, *.example.json are committed (D-006)
 env/*.json
 !env/*.example.json
+.claude/worktrees/
