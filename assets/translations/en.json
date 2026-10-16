@@ -9,5 +9,15 @@
   "cancelButton": "Cancel",
   "selectLanguage": "Select Language",
   "goodEvening":"Good Evening",
-  "goodMorning":"Good Morning"
+  "goodMorning":"Good Morning",
+  "ds_display": {
+    "imageError": "Image could not be loaded",
+    "expand": "Expand",
+    "collapse": "Collapse"
+  },
+  "ds_layout": {
+    "stepOf": "Step {} of {}",
+    "stepCompleted": "Completed",
+    "stepCurrent": "Current step"
+  }
 }

@@ -132,7 +132,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-34 — design_system widgets: display and layout
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — (D-021) |
+| REVIEW | worker-d | — (D-021) |
 - Goal: content and structure primitives.
 - Files: `lib/design_system/widgets/display/**`, `lib/design_system/widgets/layout/**`, `pubspec.yaml`, `pubspec.lock` (add `cached_network_image`, D-021), `test/design_system/widgets/display/**`, `test/design_system/widgets/layout/**`, `test/goldens/display/**`
 - Done when: `AppCard` (filled/outlined/elevated, tappable), `AppListTile`, `AppSectionHeader`, `AppDivider`, `AppAvatar` (image/initials/icon, status dot, sizes), `AppBadge` (count/dot, overflow 99+), `AppChip`, `AppImage` (cached, placeholder shimmer, error widget, fade, `fit`, rounded), `AppAccordion`, `AppTabBar`, `AppBottomNavBar` (adaptive to rail on tablet), `AppAppBar` (large/collapsing optional), `AppScaffold` (adaptive padding, max width, safe area, optional offline banner slot), `AppStepper`, `AppEmptyPlaceholder` is NOT here (C-10 owns empty/error/skeleton).
