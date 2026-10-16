@@ -206,3 +206,12 @@ at implementation time and record them in its report.
 ## D-039 — Notifications: accepted deviations of C-20
 - Decision: (1) `firebase_push_backend.dart` may keep the deprecated `getToken`/`onTokenRefresh`/`deleteToken` of firebase_messaging 17, because the replacement `register()` returns an installation id, not the FCM token servers need; revisit when Firebase offers a token-returning replacement. (2) Channel switches stay stored as the string list `user.notifications.disabledChannels`. (3) The notification permission flow uses its own presenter provider for now; unifying it with `PermissionService` (adding `AppPermission.notifications` + the shared rationale dialog) is a follow-up inside C-42. (4) The auth feature (C-17) must call and await `notificationLogoutProvider` before `clearUserData`.
 - Why: documented limits of the platform API and files outside the task list.
+
+## D-040 — Remote config is our own endpoint, not firebase_remote_config
+- Decision: force update / maintenance / feature flags come from ONE JSON endpoint (`AppConfig.remoteConfigPath`, default `/app/config`) read through Dio with the cache-first helper (D-038, `static` preset fallback so the app still starts offline). No `firebase_remote_config` package.
+- Why: vendor neutral (the template must work without Firebase), no new dependency, same networking/cache/error stack as everything else.
+- Rejected: firebase_remote_config (ties every app to Firebase and fetch throttling).
+
+## D-041 — Packages for share, review, app info and biometrics; no root/jailbreak check
+- Decision: add `share_plus` (BSD-3), `in_app_review` (MIT), `package_info_plus` (BSD-3), `local_auth` (BSD-3), each behind one core service; latest stable versions resolved by the task and recorded in its report. Screenshot blocking is our own small MethodChannel (Android `FLAG_SECURE`; iOS cover view when the app resigns active), not a package. Root/jailbreak detection is NOT built: client-side checks are unreliable and give false confidence; apps needing it add a vetted attestation service through a new DECISION.
+- Why: each is the standard maintained plugin for a native capability; 30 lines of channel code beat a heavy dependency (rule 11).

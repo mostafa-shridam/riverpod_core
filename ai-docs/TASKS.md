@@ -363,13 +363,38 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 - Done when: no second rationale mechanism remains (grep); Android 13+ and iOS prompts go through the service; existing notification tests keep their meaning; gate green.
 - Tests: service maps notifications status; flow shows the shared rationale, handles denied/permanently denied/granted.
 
+## C-21 — Remote config: force update, maintenance mode, feature flags (D-040)
+| status | owner | blocked by |
+|---|---|---|
+| READY | — | — |
+- Goal: checklist "remote config". The app can be forced to update or put in maintenance from the server, and feature flags can be read anywhere.
+- Files: `lib/core/remote_config/**` (`remote_config.dart` freezed model: `minVersion`, `latestVersion`, `storeUrl`, `maintenance` {enabled, message?}, `flags` map; `remote_config_source.dart` Dio; `remote_config_repository.dart` with ONE fetch method through the cache-first helper if C-44 is merged, otherwise through the existing cache helper with a TODO-free seam; `remote_config_provider.dart` keepAlive; `app_gate.dart` pure function: version compare → `AppGateStatus {ok, updateAvailable, updateRequired, maintenance}`; `feature_flags.dart` `flagProvider(name)`), `lib/core/config/app_config.dart` + `.env.example` files (`REMOTE_CONFIG_PATH`, optional), `lib/core/router/guards/**` + `lib/core/router/app_router.dart` (route to the two gate pages when status is updateRequired/maintenance; pure redirect, tested), `lib/core/startup/**` (fetch with a short timeout, never block startup on failure: use cached or defaults), `lib/features/app_gate/presentation/pages/{force_update_page,maintenance_page}.dart` (one page per file, `static const routeName`, store button via `url_launcher`, retry button), `assets/translations/*.json` (+ generated, D-037), `test/core/remote_config/**`, `test/features/app_gate/**`, `test/goldens/app_gate/**`
+- Done when: version comparison is semver-correct (`1.10.0 > 1.9.0`, build numbers ignored); soft update shows a dismissible banner/dialog once per version (remembered in prefs); forced update and maintenance block navigation until resolved; failure to fetch keeps the app usable; mock/dev override via env; flags default to false and are typed; pages use design_system only, 8 states where applicable, ar/en, tablet.
+- Tests: semver compare table, gate status matrix, redirect with each status, repository cache/offline fallback, pages + goldens.
+
+## C-22 — Share, external links, in-app review, app version page (D-041)
+| status | owner | blocked by |
+|---|---|---|
+| READY | — | — |
+- Goal: the small native-capability services every app needs, behind core services.
+- Files: `lib/core/sharing/share_service.dart` (text, link, file via `share_plus`), `lib/core/links/external_links.dart` (replaces `lib/core/mixins/url_launcher.dart`, deleted: `openUrl`, `openMail`, `openPhone`, `openStore`, returns bool, never throws, validates scheme allow-list http/https/mailto/tel), `lib/core/review/review_service.dart` (`in_app_review`, asks at most once per N days via prefs, falls back to store listing), `lib/core/app_info/app_info.dart` + provider (`package_info_plus`: name, version, build; integrates with `core/device`), `lib/features/more/presentation/pages/about_page.dart` (version, build, flavor, licenses via `showLicensePage`, share/rate buttons) + route from the More page, platform setup (Android `<queries>` for url_launcher/mailto, iOS `LSApplicationQueriesSchemes`), `pubspec.yaml`, `pubspec.lock`, `assets/translations/*.json` (+ generated), `test/core/sharing/**`, `test/core/links/**`, `test/core/review/**`, `test/core/app_info/**`, `test/features/more/**`, `test/goldens/more/**`
+- Done when: each service is a keepAlive provider with an injectable backend (fakes in `test/helpers`), no plugin imported outside its service; new packages recorded with exact versions in the report (D-041); About page shows flavor only in non-prod.
+- Tests: scheme allow-list table, review throttling with fake clock, app info mapping, About page widget + goldens.
+
+## C-19 — Screen security: biometric lock and screenshot blocking (D-041)
+| status | owner | blocked by |
+|---|---|---|
+| READY | — | — |
+- Goal: optional app lock with biometrics and protection of sensitive screens; no root check (D-041).
+- Files: `lib/core/security/biometric_service.dart` (`local_auth` behind an injectable backend: `isAvailable`, `authenticate(reasonKey)`), `lib/core/security/app_lock_controller.dart` (keepAlive Notifier: enabled flag in prefs, locks after the app was in the background longer than a configurable timeout via lifecycle, unlock = biometric with device-credential fallback), `lib/core/security/secure_screen.dart` (`SecureScreen` widget/mixin that blocks screenshots while mounted, own MethodChannel `riverpod_core/secure_screen`), native: `android/app/src/main/kotlin/**/MainActivity.kt` (channel + `FLAG_SECURE`), `ios/Runner/AppDelegate.swift` (channel + cover view on `willResignActive`), `AndroidManifest.xml` (`USE_BIOMETRIC`), `Info.plist` (`NSFaceIDUsageDescription` text via a localizable key or neutral string), `lib/core/design_system/widgets/**` only if a lock overlay widget is needed (reuse AppButton/EmptyState), `lib/features/more/presentation/pages/security_settings_page.dart` (toggle app lock, explains biometric availability), `pubspec.yaml`, `pubspec.lock`, `assets/translations/*.json` (+ generated), `test/core/security/**`, `test/features/more/**`, `test/goldens/more/**`
+- Done when: lock screen overlays the app (not a route) and hides content in the app switcher; unavailable biometrics disable the toggle with an explanation; auth failures/cancel are typed results, never exceptions in the UI; the secure-screen channel has a no-op fallback on unsupported platforms and in tests; everything ar/en, tablet.
+- Tests: lock controller (timeout matrix with fake clock, enable/disable persistence), biometric result mapping, secure screen channel calls (mock channel), settings page + goldens.
+
 ---
 
 ## Backlog (full tasks written when dependencies near DONE)
 C-31 Native flavors (Android flavors / iOS schemes) + launcher icons + native splash ·
-C-19 Biometric lock, screenshot blocking, root check ·
 C-46 Wire `permissionRationalePresenterProvider` (override with `showPermissionRationale`) in the ProviderScope of bootstrap — after C-41 (same file) ·
-C-21 Remote config: force update, maintenance · C-22 Share, external links, in-app review, version page ·
 C-26 Integration tests (auth flow + one feature flow) · C-29 README + HOW_TO_START_A_NEW_APP · C-30 Crash/analytics vendor.
 
 ## C-44 — Cache-first policy, retention and pruning (D-038)
