@@ -12,17 +12,26 @@
 class $EnvGen {
   const $EnvGen();
 
+  /// File path: env/dev.env
+  String get dev => 'env/dev.env';
+
   /// File path: env/dev.env.example
   String get devEnv => 'env/dev.env.example';
 
+  /// File path: env/prod.env
+  String get prod => 'env/prod.env';
+
   /// File path: env/prod.env.example
   String get prodEnv => 'env/prod.env.example';
+
+  /// File path: env/staging.env
+  String get staging => 'env/staging.env';
 
   /// File path: env/staging.env.example
   String get stagingEnv => 'env/staging.env.example';
 
   /// List of all assets
-  List<String> get values => [devEnv, prodEnv, stagingEnv];
+  List<String> get values => [dev, devEnv, prod, prodEnv, staging, stagingEnv];
 }
 
 class Assets {
