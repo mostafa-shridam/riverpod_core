@@ -86,11 +86,11 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-08 — Bootstrap, flavor entrypoints, logger, crash/analytics interfaces
 | status | owner | blocked by |
 |---|---|---|
-| BLOCKED | — | C-02, C-05, C-06 |
+| BLOCKED | — | C-37, C-06 |
 - Goal: ARCHITECTURE.md startup; leveled logger; global error handlers; interfaces only (no vendor).
-- Files: `lib/main_dev.dart`, `lib/main_staging.dart`, `lib/main_prod.dart`, delete `lib/main.dart`, `lib/bootstrap.dart`, `lib/app/app.dart`, `lib/core/logger/**`, `lib/core/crash/**`, `lib/core/analytics/**`, `test/core/logger/**`, `test/core/crash/**`, `test/core/analytics/**`, `test/bootstrap_test.dart`, `test/helpers/fake_crash_reporter.dart`, `test/helpers/fake_analytics.dart`
-- Done when: entrypoints only call `bootstrap(flavor)`; invalid config → minimal error app with the problem list; `FlutterError.onError`, `PlatformDispatcher.onError`, zone errors → logger + `CrashReporter`; logger silent in prod; `CrashReporter`/`AnalyticsService` interfaces with `Noop` and `Console` implementations chosen from `AppConfig`; `dart:developer log` in `lib/core` replaced by the logger; `App` uses the temporary router until C-11.
-- Tests: handlers forward to fake reporter; logger level filtering; invalid config yields error app; flavor mismatch fails.
+- Files: `lib/main.dart` (rewritten: only `bootstrap(Flavor.current)`), `lib/main_staging.dart`, `lib/bootstrap.dart`, `lib/app/app.dart`, `lib/core/logger/**`, `lib/core/crash/**`, `lib/core/analytics/**`, `test/core/logger/**`, `test/core/crash/**`, `test/core/analytics/**`, `test/bootstrap_test.dart`, `test/helpers/fake_crash_reporter.dart`, `test/helpers/fake_analytics.dart`
+- Done when: entrypoints only call `bootstrap(flavor)` (D-024); invalid config → minimal error app with the problem list; `FlutterError.onError`, `PlatformDispatcher.onError`, zone errors → logger + `CrashReporter`; logger silent in prod; `CrashReporter`/`AnalyticsService` interfaces with `Noop` and `Console` implementations chosen from `AppConfig`; `dart:developer log` in `lib/core` replaced by the logger; `App` uses the temporary router until C-11.
+- Tests: handlers forward to fake reporter; logger level filtering; invalid config yields error app; staging entrypoint uses staging config.
 - Owner input needed later (not for this task): Sentry or Crashlytics vendor (C-30).
 
 ## C-09 — design_system widgets: buttons and text inputs
@@ -183,6 +183,15 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 - Done when: `dart run tool/rename_app.dart --name "My App" --id com.company.myapp [--package my_app] [--dry-run]` updates, only when the file exists: `pubspec.yaml` (`name`, `description`), every `package:riverpod_core/` import in `lib/`, `test/`, `integration_test/`, Android `namespace` + `applicationId` in `android/app/build.gradle.kts`, the Kotlin `MainActivity` package line AND its folder path, `android:label` in `AndroidManifest.xml`, iOS `CFBundleDisplayName`/`CFBundleName`/`PRODUCT_BUNDLE_IDENTIFIER`, web `index.html`/`manifest.json`, `env/*.example.json` `APP_NAME`, README title. Validates inputs (reverse-DNS id, snake_case package, non-empty name), is idempotent, prints a summary of changed files, `--dry-run` changes nothing, refuses to run when the new values equal the current ones, and never touches `.git`, `build/`, `.dart_tool/`. Pure Dart, no new package.
 - Tests: run the logic against a copy of the fixture tree in a temp dir: every file above changed correctly, Kotlin file moved, imports rewritten, dry-run leaves the tree identical, bad inputs rejected, second run is a no-op.
 - Also: update `HOW_TO_START_A_NEW_APP.md` step 2 with the exact command.
+
+## C-37 — Config from dotenv, automatic flavor (D-024)
+| status | owner | blocked by |
+|---|---|---|
+| READY | — | — |
+- Goal: replace the dart-define loading from C-02 with flutter_dotenv and `Flavor.current`.
+- Files: `lib/core/config/app_config.dart` (+ `.g.dart`), `lib/core/config/flavor.dart`, `lib/core/config/env_loader.dart` (new: loads `env/<flavor>.env` via dotenv and returns the map), `env/dev.env.example`, `env/staging.env.example`, `env/prod.env.example`, delete `env/*.example.json`, `.gitignore` (`env/*.env`, `!env/*.env.example`), `pubspec.yaml` (add `flutter_dotenv`; add the three `env/*.env` files under `flutter: assets:`), `pubspec.lock`, `test/core/config/**`
+- Done when: `Flavor.current` = `kReleaseMode ? prod : dev` (testable via an injectable `isRelease` parameter in a pure function); `AppConfig.fromEnvironment()` and `ensureFlavor` removed; `FLAVOR` key removed from env files and parsing (flavor is an input to `AppConfig.fromMap(flavor, map)`); `EnvLoader.load(Flavor)` throws `ConfigException` with a clear message when the file is missing or empty ("copy env/dev.env.example to env/dev.env"); example files contain placeholders only; asset declarations don't break `flutter pub get`/test when the real `.env` files are absent (use the strategy: tests inject maps; document in the report how a fresh clone runs: copy examples). No other file in `lib/` imports dotenv.
+- Tests: Flavor.current for debug/release; EnvLoader missing/empty file via an injected asset reader; all existing AppConfig validation tests ported to the new signature (none dropped).
 
 ---
 
