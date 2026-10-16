@@ -232,7 +232,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-40 — Wire locale, digit pref and provider retry policy into bootstrap
 | status | owner | blocked by |
 |---|---|---|
-| REVIEW | worker-q | — |
+| DONE | worker-q | — |
 - Goal: close loose ends of C-08/C-12/C-14 after D-035: bootstrap uses easy_localization's own persistence and plurals, Riverpod auto-retry policy is explicit.
 - Files: `lib/core/bootstrap/bootstrap.dart`, `lib/core/app/app.dart`, `test/core/bootstrap/bootstrap_test.dart`, `test/helpers/pump_app.dart` (pass `ignorePluralRules: false`), `ai-docs/STATE_AND_DATA.md` (copyWithPrevious note)
 - Done when: `EasyLocalization(saveLocale: true, ignorePluralRules: false, startLocale: null (device locale if supported, else fallback))` + `await initFormatting()` before `runApp`; no reference to the legacy `getLanguageCodeHelper` stubs; the root `ProviderContainer` is created with `retry: (retryCount, error) => null` (D-032); STATE_AND_DATA.md no longer shows the internal `copyWithPrevious` pattern (see D-031).
@@ -250,7 +250,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-23 — Permissions and media (picker, crop, compress, file picker)
 | status | owner | blocked by |
 |---|---|---|
-| REVIEW | worker-n | — (D-033) |
+| DONE | worker-n | — |
 - Goal: checklist "Media & device".
 - Files: `lib/core/permissions/**` (`app_permission.dart`, `permission_service.dart`, `permission_rationale.dart`), `lib/core/media/**` (`media_service.dart`, `image_processing.dart`, `picked_media.dart`), delete `lib/core/mixins/image_picker.dart` (grep importers first; migrate none: nothing should import it), `android/app/src/main/AndroidManifest.xml` (camera, storage-free photo picker permissions only), `ios/Runner/Info.plist` (NSCameraUsageDescription, NSPhotoLibraryUsageDescription, NSMicrophoneUsageDescription), `pubspec.yaml`, `pubspec.lock` (add `image_cropper`, `file_picker`), `assets/translations/*.json` (top-level `ds_permissions`, appended; strings for the rationale dialog), `lib/core/design_system/widgets/permissions/permission_rationale_dialog.dart`, `test/core/permissions/**`, `test/core/media/**`, `test/core/design_system/widgets/permissions/**`
 - Done when: `PermissionService` (keepAlive provider over `permission_handler` behind an injectable interface): `status/request`, rationale flow (`ensure(permission, context)` shows `PermissionRationaleDialog` before the system prompt when `shouldShowRationale`, and an "Open settings" action when permanently denied), result enum `granted/denied/permanentlyDenied/restricted/limited`; `MediaService`: `pickImage(source: camera|gallery, crop: bool, maxWidth/quality)`, `pickMultiImage`, `pickFile(types)`, `pickVideo`; compression via `flutter_image_compress` (already a dependency) with sane defaults (max 1920 px, quality 85), cropping via `image_cropper` themed from the design system; everything returns `PickedMedia(path, size, mimeType)`; cancellation returns null; errors mapped to `AppException`; platform plugins sit behind injectable interfaces so tests need no channel; QR scanner is NOT part of this task (optional, backlog).
@@ -259,7 +259,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-27 — GitHub Actions CI
 | status | owner | blocked by |
 |---|---|---|
-| REVIEW | worker-m | — |
+| DONE | worker-m | — |
 - Goal: every push/PR runs the gate.
 - Files: `.github/workflows/ci.yml`, `.github/workflows/README.md` (how it works, how to add secrets, nothing secret inside)
 - Done when: workflow on `push` and `pull_request` using the stable Flutter channel pinned through `subosito/flutter-action` with caching (`cache: true`), steps: checkout, `flutter pub get`, create `env/*.env` from the committed `*.env.example` files, `dart run easy_localization:generate` x2 (as in `build.sh`), `dart run build_runner build --delete-conflicting-outputs`, `git diff --exit-code` on tracked generated files (fails when generated code is stale), `dart format --set-exit-if-changed lib test tool`, `flutter analyze`, `flutter test --coverage`, upload `coverage/lcov.info` as an artifact, and a build job `flutter build apk --debug` (Android) plus `flutter build ios --no-codesign --debug` on macOS runner (separate job, `needs` the test job); concurrency group cancels superseded runs; least-privilege `permissions: contents: read`. No secrets required. Pin action versions to the latest stable major/sha you verify, record them in the README.
@@ -268,7 +268,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-28 — Release scripts and signing from untracked files
 | status | owner | blocked by |
 |---|---|---|
-| REVIEW | worker-m | — |
+| DONE | worker-m | — |
 - Goal: checklist "Android/iOS release scripts with signing from untracked files".
 - Files: `tool/release/build_android.sh`, `tool/release/build_ios.sh`, `tool/release/README.md`, `android/app/build.gradle.kts` (signing config reading `android/key.properties`, falls back to debug signing ONLY when the file is absent AND the build type is not release: a release build without `key.properties` must fail with a clear message), `android/key.properties.example`, `ios/ExportOptions.plist.example`, `.gitignore` (add `android/key.properties`, `*.jks`, `*.keystore`, `ios/ExportOptions.plist`, `*.mobileprovision`, `build-symbols/`)
 - Done when: `build_android.sh [--flavor staging|prod]` runs the `release-check` skill pre-gate (`dart format`, `analyze`, `test`), then `flutter build appbundle --release --obfuscate --split-debug-info=build-symbols/android` (entrypoint `lib/main.dart` for prod, `lib/main_staging.dart` for staging), verifies `env/<flavor>.env` exists, and prints the artifact path; `build_ios.sh` does the same with `flutter build ipa --release --export-options-plist=ios/ExportOptions.plist`; scripts are `set -euo pipefail`, executable, never echo secrets; the README documents creating the keystore (`keytool` command), `key.properties` fields, where to keep the files, and the iOS export options; no secrets committed (only `*.example`).
