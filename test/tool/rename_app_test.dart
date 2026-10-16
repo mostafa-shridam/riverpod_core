@@ -97,8 +97,13 @@ void main() {
         contains('PRODUCT_BUNDLE_IDENTIFIER = com.company.myapp.RunnerTests;'),
       );
       expect(pbxproj, isNot(contains('com.example.riverpodCore')));
-      expect(read('env/dev.example.json'), contains('"APP_NAME": "My App"'));
-      expect(read('env/prod.example.json'), contains('"APP_NAME": "My App"'));
+      expect(read('env/dev.env.example'), startsWith('APP_NAME=My App\n'));
+      expect(read('env/prod.env.example'), startsWith('APP_NAME=My App\n'));
+      expect(read('env/prod.env'), startsWith('APP_NAME=My App\n'));
+      expect(
+        read('env/prod.env'),
+        contains('API_BASE_URL=https://api.example.com'),
+      );
     });
 
     test(
@@ -407,33 +412,86 @@ void main() {
       expect(
         sortDirectives(input),
         "import 'dart:io';\n"
+        '\n'
         "import 'package:a/a.dart';\n"
         "import 'package:z/z.dart';\n"
+        '\n'
         "import 'local.dart';\n",
       );
     });
 
-    test('keeps export runs, part lines and blank-line groups in place', () {
+    test('keeps a comment with the directive it describes', () {
       const input =
-          "export 'b.dart';\n"
-          "export 'a.dart';\n"
-          "part 'x.g.dart';\n"
           "import 'package:z/z.dart';\n"
-          "import 'package:a/a.dart';\n"
-          '\n'
-          "import 'package:c/c.dart';\n"
-          "import 'package:b/b.dart';\n";
+          '// needed for the gradient\n'
+          "import 'package:a/a.dart'\n"
+          '    show A;\n';
 
       expect(
         sortDirectives(input),
-        "export 'a.dart';\n"
-        "export 'b.dart';\n"
-        "part 'x.g.dart';\n"
+        '// needed for the gradient\n'
+        "import 'package:a/a.dart'\n"
+        '    show A;\n'
+        "import 'package:z/z.dart';\n",
+      );
+    });
+
+    test('package imports form one alphabetical list across blank lines', () {
+      const input =
+          "import 'package:flutter/material.dart';\n"
+          '\n'
+          "import 'package:demo_app/main.dart';\n"
+          '\n'
+          "import 'helpers.dart';\n";
+
+      expect(
+        sortDirectives(input),
+        "import 'package:demo_app/main.dart';\n"
+        "import 'package:flutter/material.dart';\n"
+        '\n'
+        "import 'helpers.dart';\n",
+      );
+    });
+
+    test('a comment and multi-line show clause stay in the sorted list', () {
+      const input =
+          "import 'package:flutter/material.dart';\n"
+          '// show: keeps the name unambiguous\n'
+          "import 'package:cached/cached.dart'\n"
+          '    show Cached;\n'
+          "import 'package:demo_app/main.dart';\n";
+
+      expect(
+        sortDirectives(input),
+        '// show: keeps the name unambiguous\n'
+        "import 'package:cached/cached.dart'\n"
+        '    show Cached;\n'
+        "import 'package:demo_app/main.dart';\n"
+        "import 'package:flutter/material.dart';\n",
+      );
+    });
+
+    test('imports come before exports, and part lines end the block', () {
+      const input =
+          "export 'b.dart';\n"
+          "export 'a.dart';\n"
+          '\n'
+          "import 'package:z/z.dart';\n"
+          "import 'package:a/a.dart';\n"
+          '\n'
+          "part 'x.g.dart';\n"
+          "import 'package:q/q.dart';\n";
+
+      expect(
+        sortDirectives(input),
         "import 'package:a/a.dart';\n"
         "import 'package:z/z.dart';\n"
         '\n'
-        "import 'package:b/b.dart';\n"
-        "import 'package:c/c.dart';\n",
+        "export 'a.dart';\n"
+        "export 'b.dart';\n"
+        '\n'
+        "part 'x.g.dart';\n"
+        "import 'package:q/q.dart';\n",
       );
     });
 

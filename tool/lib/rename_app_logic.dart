@@ -216,11 +216,11 @@ String rewritePbxproj(String content, String id) => content.replaceAllMapped(
   },
 );
 
-String rewriteEnvExample(String content, String name) =>
-    content.replaceAllMapped(
-      RegExp(r'("APP_NAME"\s*:\s*")[^"]*(")'),
-      (m) => '${m[1]!}$name${m[2]!}',
-    );
+/// Dotenv file (`KEY=value`, see D-024): sets `APP_NAME` and leaves other lines alone.
+String rewriteEnvFile(String content, String name) => content.replaceFirst(
+  RegExp(r'^APP_NAME=.*$', multiLine: true),
+  'APP_NAME=$name',
+);
 
 /// Rewrites `package:<from>/` to `package:<to>/`, then re-sorts the directives.
 /// A new package name can change the alphabetical order of an import block,
@@ -234,57 +234,124 @@ String rewriteDartImports(
   return rewritten == content ? content : sortDirectives(rewritten);
 }
 
-final _directivePattern = RegExp(r"^(import|export) '([^']+)'.*;$");
+final _directiveStart = RegExp(r"^(import|export) '([^']+)'");
 
-/// Sorts each run of consecutive single-line `import` (or `export`) lines the way
-/// `directives_ordering` expects: `dart:` first, then `package:`, then relative,
-/// each group alphabetical by URI. Blank lines, comments, `part` and other lines
-/// end a run and stay where they are. Idempotent.
-String sortDirectives(String content) {
-  final out = <String>[];
-  var run = <String>[];
-  String? runKeyword;
+/// One import or export statement and the comment lines directly above it.
+class _Directive {
+  _Directive(this.keyword, this.uri, this.lines)
+    : kind = keyword == 'import' ? 0 : 1,
+      rank = uri.startsWith('dart:')
+          ? 0
+          : uri.startsWith('package:')
+          ? 1
+          : 2;
 
-  void flush() {
-    final entries =
-        [
-          for (var i = 0; i < run.length; i++)
-            (key: _directiveSortKey(run[i]), index: i, line: run[i]),
-        ]..sort((a, b) {
-          final byKey = a.key.compareTo(b.key);
-          return byKey != 0 ? byKey : a.index.compareTo(b.index);
-        });
-    out.addAll(entries.map((e) => e.line));
-    run = [];
-  }
+  final String keyword;
+  final String uri;
+  final List<String> lines;
 
-  for (final line in content.split('\n')) {
-    final match = _directivePattern.firstMatch(line);
-    if (match == null) {
-      flush();
-      runKeyword = null;
-      out.add(line);
-      continue;
+  /// Imports before exports; then `dart:`, `package:`, relative.
+  final int kind;
+  final int rank;
+
+  int compareTo(_Directive other) {
+    final byKind = kind.compareTo(other.kind);
+    if (byKind != 0) {
+      return byKind;
     }
-    if (match.group(1) != runKeyword) {
-      flush();
-      runKeyword = match.group(1);
-    }
-    run.add(line);
+    final byRank = rank.compareTo(other.rank);
+    return byRank != 0 ? byRank : uri.compareTo(other.uri);
   }
-  flush();
-  return out.join('\n');
 }
 
-/// Group rank first (dart, package, relative), then the URI, so a plain string sort works.
-String _directiveSortKey(String line) {
-  final uri = _directivePattern.firstMatch(line)!.group(2)!;
-  final rank = uri.startsWith('dart:')
-      ? 0
-      : uri.startsWith('package:')
-      ? 1
-      : 2;
-  return '$rank|$uri';
+/// Sorts the import and export block the way `directives_ordering` expects.
+///
+/// The directives are sorted by kind (imports, then exports), rank (`dart:`,
+/// `package:`, relative) and URI, with one blank line between kind/rank groups.
+/// Blank lines inside the block are dropped; comments above a directive move
+/// with it. Renaming `package:riverpod_core/...` to `package:demo_app/...` thus
+/// moves the project imports to their alphabetical place among the other packages.
+/// A block that is not plain directives and comments (for example a `part`
+/// line inside it) is returned unchanged. Idempotent.
+String sortDirectives(String content) {
+  final lines = content.split('\n');
+  final firstIndex = lines.indexWhere((l) => _directiveStart.hasMatch(l));
+  if (firstIndex == -1) {
+    return content;
+  }
+  var start = firstIndex;
+  while (start > 0 && lines[start - 1].trimLeft().startsWith('//')) {
+    start--;
+  }
+
+  final sections = <List<_Directive>>[];
+  var section = <_Directive>[];
+  var pending = <String>[];
+  var end = -1;
+  var i = start;
+  while (i < lines.length) {
+    final line = lines[i];
+    final match = _directiveStart.firstMatch(line);
+    if (match != null) {
+      final statement = [...pending, line];
+      pending = [];
+      var j = i;
+      while (!lines[j].trimRight().endsWith(';')) {
+        j++;
+        if (j >= lines.length) {
+          return content;
+        }
+        statement.add(lines[j]);
+      }
+      section.add(_Directive(match.group(1)!, match.group(2)!, statement));
+      end = j;
+      i = j + 1;
+      continue;
+    }
+    if (line.trim().isEmpty) {
+      if (pending.isNotEmpty) {
+        return content;
+      }
+      if (section.isNotEmpty) {
+        sections.add(section);
+        section = <_Directive>[];
+      }
+      i++;
+      continue;
+    }
+    if (line.trimLeft().startsWith('//')) {
+      pending.add(line);
+      i++;
+      continue;
+    }
+    break;
+  }
+  if (section.isNotEmpty) {
+    sections.add(section);
+  }
+  if (end == -1) {
+    return content;
+  }
+
+  // One alphabetical list for all directives. The lint reads every `package:`
+  // import as a single sequence, so a project section cannot sit between others.
+  final ordered = [for (final section in sections) ...section]
+    ..sort((a, b) => a.compareTo(b));
+  final rebuilt = <String>[];
+  _Directive? previous;
+  for (final directive in ordered) {
+    if (previous != null &&
+        (previous.kind != directive.kind || previous.rank != directive.rank)) {
+      rebuilt.add('');
+    }
+    rebuilt.addAll(directive.lines);
+    previous = directive;
+  }
+  return [
+    ...lines.sublist(0, start),
+    ...rebuilt,
+    ...lines.sublist(end + 1),
+  ].join('\n');
 }
 
 /// Renames the Flutter project at [root]. Returns the changes; with [dryRun] nothing is written.
@@ -386,8 +453,8 @@ Future<List<RenameChange>> renameApp({
   }
   for (final path in await _filesUnder(root, const [
     'env',
-  ], (p) => p.endsWith('.example.json'))) {
-    await rewrite(path, (c) => rewriteEnvExample(c, request.name), 'APP_NAME');
+  ], (p) => p.endsWith('.env') || p.endsWith('.env.example'))) {
+    await rewrite(path, (c) => rewriteEnvFile(c, request.name), 'APP_NAME');
   }
 
   // MainActivity moves to the folder that matches the new package.
