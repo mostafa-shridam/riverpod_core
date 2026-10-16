@@ -9,7 +9,7 @@ Audit date: 2026-10-16 (baseline commit cf7e43b). `flutter analyze`: 0 issues. `
 | Feature-first structure (data/providers/presentation) | PARTIAL | C-11, BL | only `features/home/presentation`; `core/` has per-device routers |
 | Riverpod with codegen | DONE | C-01 | riverpod_generator added, build_runner works |
 | freezed + json_serializable | DONE | C-01 | added |
-| Flavors dev/staging/prod (`--dart-define-from-file`) + startup validation | MISSING | C-02 | none; package id `com.example.riverpod_core` |
+| Flavors dev/staging/prod (`--dart-define-from-file`) + startup validation | PARTIAL | C-08 | AppConfig + validation DONE (C-02); entrypoints/bootstrap wiring in C-08 |
 | Strict analysis_options | DONE | C-01 | strict-* + 10 extra lints, 0 issues |
 | Feature scaffolding from `.fttemplates` | MISSING | BL | templates removed in cf7e43b (files were empty except one) |
 | App rename script, launcher icons, native splash | PARTIAL | BL | `rename_app` + `flutter_launcher_icons` present but configs commented out; no splash |
