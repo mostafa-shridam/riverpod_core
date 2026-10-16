@@ -1,0 +1,17 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part '{{name}}_item.freezed.dart';
+part '{{name}}_item.g.dart';
+
+/// One entry of the {{Title}} list. Replace the fields with the real ones.
+@freezed
+abstract class {{Name}}Item with _${{Name}}Item {
+  const factory {{Name}}Item({
+    required String id,
+    required String title,
+    String? description,
+  }) = _{{Name}}Item;
+
+  factory {{Name}}Item.fromJson(Map<String, dynamic> json) =>
+      _${{Name}}ItemFromJson(json);
+}

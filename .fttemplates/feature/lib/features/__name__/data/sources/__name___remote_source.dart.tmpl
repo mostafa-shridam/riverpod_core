@@ -1,0 +1,22 @@
+import 'package:dio/dio.dart';
+import 'package:{{package}}/features/{{name}}/data/models/{{name}}_item.dart';
+
+/// Path of the {{Title}} collection, relative to `AppConfig.apiBaseUrl`. The
+/// one place to change when the backend differs.
+const {{nameCamel}}Endpoint = '/{{nameKebab}}';
+
+/// Backend source on the shared `Dio` (NETWORKING.md). It throws
+/// `DioException`; the repository maps it to an `AppException`.
+class {{Name}}RemoteSource {
+  {{Name}}RemoteSource(this._dio);
+
+  final Dio _dio;
+
+  Future<List<{{Name}}Item>> fetchItems() async {
+    final response = await _dio.get<List<dynamic>>({{nameCamel}}Endpoint);
+    final rows = response.data ?? const <dynamic>[];
+    return [
+      for (final row in rows) {{Name}}Item.fromJson(row as Map<String, dynamic>),
+    ];
+  }
+}

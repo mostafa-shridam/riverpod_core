@@ -1,0 +1,49 @@
+import 'dart:async';
+
+import 'package:flutter_riverpod/misc.dart' show Override;
+import 'package:{{package}}/features/{{name}}/data/models/{{name}}_item.dart';
+import 'package:{{package}}/features/{{name}}/data/{{name}}_repository.dart';
+import 'package:{{package}}/features/{{name}}/data/sources/{{name}}_remote_source.dart';
+
+import '../../helpers/fake_connectivity.dart';
+
+const {{nameCamel}}Sample = [
+  {{Name}}Item(id: 'a', title: 'First', description: 'About the first'),
+  {{Name}}Item(id: 'b', title: 'Second'),
+];
+
+/// Remote source with scripted answers. Every call takes the next answer
+/// (the last one repeats); set [gate] to hold answers until it completes.
+class Fake{{Name}}Source implements {{Name}}RemoteSource {
+  Fake{{Name}}Source(this._answers);
+
+  final List<Future<List<{{Name}}Item>> Function()> _answers;
+  Completer<void>? gate;
+  int calls = 0;
+
+  /// A source that always answers with [items].
+  factory Fake{{Name}}Source.data(List<{{Name}}Item> items) =>
+      Fake{{Name}}Source([() async => items]);
+
+  /// A source that always fails with [error].
+  factory Fake{{Name}}Source.failing(Object error) =>
+      Fake{{Name}}Source([() => Future.error(error)]);
+
+  @override
+  Future<List<{{Name}}Item>> fetchItems() async {
+    final pending = gate;
+    if (pending != null) await pending.future;
+    final index = calls < _answers.length ? calls : _answers.length - 1;
+    calls++;
+    return _answers[index]();
+  }
+}
+
+/// Provider overrides every test of this feature needs.
+List<Override> {{nameCamel}}Overrides({
+  required Fake{{Name}}Source source,
+  FakeConnectivity? connectivity,
+}) => [
+  {{nameCamel}}RemoteSourceProvider.overrideWithValue(source),
+  (connectivity ?? FakeConnectivity()).providerOverride,
+];
