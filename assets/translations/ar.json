@@ -9,5 +9,15 @@
   "cancelButton": "إلغاء",
   "selectLanguage": "اختر اللغة",
   "goodEvening":"مساء الخير",
-  "goodMorning":"صباح الخير"
+  "goodMorning":"صباح الخير",
+  "ds_display": {
+    "imageError": "تعذر تحميل الصورة",
+    "expand": "توسيع",
+    "collapse": "طي"
+  },
+  "ds_layout": {
+    "stepOf": "الخطوة {} من {}",
+    "stepCompleted": "مكتملة",
+    "stepCurrent": "الخطوة الحالية"
+  }
 }
