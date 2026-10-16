@@ -133,3 +133,7 @@ at implementation time and record them in its report.
 - Why: simplest developer experience; debug builds can never accidentally use prod config and release builds can never use dev config.
 - Trade-off recorded: dotenv values are bundled in the app, so they must never be real secrets (a client app cannot keep secrets anyway: API keys that must stay private belong on the server). Real secrets are still never committed (hard rule 5: real env files are git-ignored).
 - Rejected: keeping dart-define (friction); committing real env files (rule 5).
+
+## D-025 — Component size tokens and OTP direction exception
+- Decision: component sizes (button heights 40/48/56, icon sizes, min target 48 dp, OTP box size) live in `design_system/tokens/app_sizes.dart` (`AppSizes`, a field of `AppTokens`); `searchDebounce` (300 ms) lives in `AppDurations`. Validators in `core/utils` return a `ValidationError` enum; the design_system maps it to localized text. `AppOtpField` is the ONLY place allowed a hard-coded `TextDirection.ltr` (digit order must stay left-to-right in RTL), with an explanatory comment.
+- Why: no numeric sizes outside tokens; `core/` must not depend on UI or localization of widgets.
