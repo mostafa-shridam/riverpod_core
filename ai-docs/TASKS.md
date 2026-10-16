@@ -277,8 +277,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ---
 
 ## Backlog (full tasks written when dependencies near DONE)
-C-31 Platform folders (ios/web) + native flavors + launcher icons + native splash ·
-C-15 Upload/download with progress/cancel ·
+C-31 Native flavors (Android flavors / iOS schemes) + launcher icons + native splash ·
 C-17 Auth (session controller, token handling, logout reset) ·
 C-18 Onboarding + splash pages · C-19 Biometric lock, screenshot blocking, root check ·
 C-20 FCM end-to-end + local notifications cleanup (singletons → providers) ·
