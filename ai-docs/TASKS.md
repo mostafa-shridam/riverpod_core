@@ -86,7 +86,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-08 — Bootstrap, flavor entrypoints, logger, crash/analytics interfaces
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | worker-i | — |
 - Goal: ARCHITECTURE.md startup; leveled logger; global error handlers; interfaces only (no vendor).
 - Files: `lib/main.dart` (rewritten: only `bootstrap(Flavor.current)`), `lib/main_staging.dart`, `lib/bootstrap.dart`, `lib/app/app.dart`, `lib/core/logger/**`, `lib/core/crash/**`, `lib/core/analytics/**`, `test/core/logger/**`, `test/core/crash/**`, `test/core/analytics/**`, `test/bootstrap_test.dart`, `test/helpers/fake_crash_reporter.dart`, `test/helpers/fake_analytics.dart`
 - Done when: entrypoints only call `bootstrap(flavor)` (D-024); invalid config → minimal error app with the problem list; `FlutterError.onError`, `PlatformDispatcher.onError`, zone errors → logger + `CrashReporter`; logger silent in prod; `CrashReporter`/`AnalyticsService` interfaces with `Noop` and `Console` implementations chosen from `AppConfig`; `dart:developer log` in `lib/core` replaced by the logger; `App` uses the temporary router until C-11.
