@@ -109,7 +109,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-32 — design_system widgets: selection and form controls
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | worker-f | — |
 - Goal: `AppCheckbox`, `AppRadioGroup`, `AppSwitch`, `AppDropdown` (single, searchable via bottom sheet), `AppSegmentedControl`, `AppSlider` (+range), `AppDateField`, `AppTimeField` (use platform pickers, locale-aware formatting), `AppRating`, `AppChipGroup` (single/multi select), `AppFormField` wrapper that shows label + error consistently.
 - Files: `lib/core/design_system/widgets/selection/**`, `test/core/design_system/widgets/selection/**`, `test/goldens/selection/**`
 - Done when: same quality bar as C-09 (tokens, directional, l10n, 48 dp, Semantics, disabled/error states); controlled API (value + onChanged), works inside `Form` validators.

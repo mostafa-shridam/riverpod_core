@@ -66,5 +66,11 @@
     "cancelled": "The request was cancelled.",
     "unknown": "Something went wrong. Please try again.",
     "retry": "Try again"
+  },
+  "ds_selection": {
+    "select": "Select",
+    "selectDate": "Select date",
+    "selectTime": "Select time",
+    "ratingValue": "{} of {}"
   }
 }

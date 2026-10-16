@@ -66,5 +66,11 @@
     "cancelled": "تم إلغاء الطلب.",
     "unknown": "حدث خطأ ما. حاول مرة أخرى.",
     "retry": "إعادة المحاولة"
+  },
+  "ds_selection": {
+    "select": "اختر",
+    "selectDate": "اختر التاريخ",
+    "selectTime": "اختر الوقت",
+    "ratingValue": "{} من {}"
   }
 }
