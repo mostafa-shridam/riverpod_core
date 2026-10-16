@@ -119,4 +119,17 @@ abstract class LocaleKeys {
   static const app_nav_more = 'app_nav.more';
   static const app_nav_continue = 'app_nav.continue';
   static const app_nav = 'app_nav';
+  static const ds_permissions_allow = 'ds_permissions.allow';
+  static const ds_permissions_openSettings = 'ds_permissions.openSettings';
+  static const ds_permissions_notNow = 'ds_permissions.notNow';
+  static const ds_permissions_settingsHint = 'ds_permissions.settingsHint';
+  static const ds_permissions_cameraTitle = 'ds_permissions.cameraTitle';
+  static const ds_permissions_cameraMessage = 'ds_permissions.cameraMessage';
+  static const ds_permissions_photosTitle = 'ds_permissions.photosTitle';
+  static const ds_permissions_photosMessage = 'ds_permissions.photosMessage';
+  static const ds_permissions_microphoneTitle =
+      'ds_permissions.microphoneTitle';
+  static const ds_permissions_microphoneMessage =
+      'ds_permissions.microphoneMessage';
+  static const ds_permissions = 'ds_permissions';
 }

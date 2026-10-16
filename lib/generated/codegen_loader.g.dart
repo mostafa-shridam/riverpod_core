@@ -179,6 +179,22 @@ class CodegenLoader extends AssetLoader {
       "retry": "Try again",
     },
     "app_nav": {"home": "Home", "more": "More", "continue": "Continue"},
+    "ds_permissions": {
+      "allow": "Allow",
+      "openSettings": "Open settings",
+      "notNow": "Not now",
+      "settingsHint":
+          "Permission was turned off. You can turn it on in the app settings.",
+      "cameraTitle": "Camera access",
+      "cameraMessage":
+          "Allow camera access to take photos and videos inside the app.",
+      "photosTitle": "Photos access",
+      "photosMessage":
+          "Allow access to your photos so you can choose pictures to use in the app.",
+      "microphoneTitle": "Microphone access",
+      "microphoneMessage":
+          "Allow microphone access to record audio inside the app.",
+    },
   };
   static const Map<String, dynamic> _ar = {
     "hello": "مرحبا",
@@ -345,6 +361,21 @@ class CodegenLoader extends AssetLoader {
       "retry": "إعادة المحاولة",
     },
     "app_nav": {"home": "الرئيسية", "more": "المزيد", "continue": "متابعة"},
+    "ds_permissions": {
+      "allow": "سماح",
+      "openSettings": "فتح الإعدادات",
+      "notNow": "ليس الآن",
+      "settingsHint": "تم إيقاف الإذن. يمكنك تفعيله من إعدادات التطبيق.",
+      "cameraTitle": "الوصول إلى الكاميرا",
+      "cameraMessage":
+          "اسمح بالوصول إلى الكاميرا لالتقاط الصور ومقاطع الفيديو داخل التطبيق.",
+      "photosTitle": "الوصول إلى الصور",
+      "photosMessage":
+          "اسمح بالوصول إلى صورك لتتمكن من اختيار الصور واستخدامها في التطبيق.",
+      "microphoneTitle": "الوصول إلى الميكروفون",
+      "microphoneMessage":
+          "اسمح بالوصول إلى الميكروفون لتسجيل الصوت داخل التطبيق.",
+    },
   };
   static const Map<String, Map<String, dynamic>> mapLocales = {
     "en": _en,
