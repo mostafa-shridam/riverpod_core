@@ -6,6 +6,7 @@ import 'package:riverpod_core/core/auth/session_controller.dart';
 import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
 import 'package:riverpod_core/core/design_system/widgets/buttons/app_button.dart';
 import 'package:riverpod_core/core/design_system/widgets/display/app_list_tile.dart';
+import 'package:riverpod_core/core/router/routes.dart';
 import 'package:riverpod_core/features/auth/data/auth_repository.dart';
 import 'package:riverpod_core/features/more/presentation/pages/about_page.dart';
 import 'package:riverpod_core/generated/locale_keys.g.dart';
@@ -33,6 +34,13 @@ class MorePage extends ConsumerWidget {
               subtitle: Text(LocaleKeys.more_entry_aboutHint.tr()),
               showChevron: true,
               onTap: () => context.push(AboutPage.routeName),
+            ),
+            AppListTile(
+              key: const ValueKey('more-security'),
+              leading: const Icon(Icons.lock_outline_rounded),
+              title: Text(LocaleKeys.security_settings_title.tr()),
+              showChevron: true,
+              onTap: () => const SecuritySettingsRoute().push<void>(context),
             ),
             SizedBox(height: spacing.xl),
             AppButton(

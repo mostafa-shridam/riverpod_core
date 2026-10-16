@@ -12,7 +12,9 @@ import 'package:riverpod_core/features/auth/presentation/pages/login_page.dart';
 import 'package:riverpod_core/features/auth/presentation/pages/register_page.dart';
 import 'package:riverpod_core/features/home/presentation/pages/home_page.dart';
 import 'package:riverpod_core/features/items/presentation/pages/item_detail_page.dart';
+import 'package:riverpod_core/features/more/presentation/pages/about_page.dart';
 import 'package:riverpod_core/features/more/presentation/pages/more_page.dart';
+import 'package:riverpod_core/features/more/presentation/pages/security_settings_page.dart';
 import 'package:riverpod_core/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:riverpod_core/features/showcase/presentation/pages/showcase_page.dart';
 import 'package:riverpod_core/features/videos/presentation/pages/video_detail_page.dart';
@@ -126,6 +128,15 @@ class MoreRoute extends GoRouteData with $MoreRoute {
   Widget build(BuildContext context, GoRouterState state) => const MorePage();
 }
 
+@TypedGoRoute<SecuritySettingsRoute>(path: SecuritySettingsPage.routeName)
+class SecuritySettingsRoute extends GoRouteData with $SecuritySettingsRoute {
+  const SecuritySettingsRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const SecuritySettingsPage();
+}
+
 @TypedGoRoute<ItemDetailRoute>(path: '${ItemDetailPage.routeName}/:id')
 class ItemDetailRoute extends GoRouteData with $ItemDetailRoute {
   const ItemDetailRoute({required this.id});
@@ -205,4 +216,12 @@ class ShowcaseRoute extends GoRouteData with $ShowcaseRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) =>
       const ShowcasePage();
+}
+
+@TypedGoRoute<AboutRoute>(path: AboutPage.routeName)
+class AboutRoute extends GoRouteData with $AboutRoute {
+  const AboutRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const AboutPage();
 }
