@@ -171,5 +171,29 @@
     "home": "Home",
     "more": "More",
     "continue": "Continue"
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "submit": "Sign in",
+      "forgot": "Forgot password?",
+      "register": "Create an account"
+    },
+    "register": {
+      "title": "Create account",
+      "submit": "Create account",
+      "login": "I already have an account"
+    },
+    "forgot": {
+      "title": "Reset password",
+      "submit": "Send reset link",
+      "done": "If the account exists, a reset link is on its way"
+    },
+    "fields": {
+      "email": "Email",
+      "password": "Password",
+      "name": "Full name"
+    },
+    "logout": "Log out"
   }
 }

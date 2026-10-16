@@ -9,13 +9,13 @@ part of 'token_refresher.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// The refresher bound by the app. [dioProvider] wraps it in a
-/// [SingleFlightRefresher]; C-17 overrides this provider.
+/// [SingleFlightRefresher]. The session controller renews the tokens.
 
 @ProviderFor(accessTokenRefresher)
 final accessTokenRefresherProvider = AccessTokenRefresherProvider._();
 
 /// The refresher bound by the app. [dioProvider] wraps it in a
-/// [SingleFlightRefresher]; C-17 overrides this provider.
+/// [SingleFlightRefresher]. The session controller renews the tokens.
 
 final class AccessTokenRefresherProvider
     extends
@@ -26,7 +26,7 @@ final class AccessTokenRefresherProvider
         >
     with $Provider<AccessTokenRefresher> {
   /// The refresher bound by the app. [dioProvider] wraps it in a
-  /// [SingleFlightRefresher]; C-17 overrides this provider.
+  /// [SingleFlightRefresher]. The session controller renews the tokens.
   AccessTokenRefresherProvider._()
     : super(
         from: null,
@@ -62,4 +62,4 @@ final class AccessTokenRefresherProvider
 }
 
 String _$accessTokenRefresherHash() =>
-    r'8a53fcbdeb3a36aa8a96b9b64ce735f809622a16';
+    r'ec966a02c403e398f5850b5216cb5f6352e5d688';
