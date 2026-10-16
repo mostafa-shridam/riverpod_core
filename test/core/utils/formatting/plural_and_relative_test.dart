@@ -9,10 +9,10 @@ import 'package:easy_localization/src/translations.dart';
 import 'package:flutter/widgets.dart' show Locale;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:riverpod_core/core/utils/formatting/app_formatters.dart';
+import 'package:riverpod_core/core/utils/formatting/localized_text.dart';
+import 'package:riverpod_core/core/utils/formatting/relative_time.dart';
 import 'package:riverpod_core/generated/locale_keys.g.dart';
-import 'package:riverpod_core/l10n/app_formatters.dart';
-import 'package:riverpod_core/l10n/localized_text.dart';
-import 'package:riverpod_core/l10n/relative_time.dart';
 
 void _load(String code) {
   final json =
@@ -31,7 +31,8 @@ void main() {
   group('Arabic plurals (zero/one/two/few/many/other)', () {
     setUp(() => _load('ar'));
     const f = AppFormatters('ar');
-    String t(num n) => pluralText(LocaleKeys.l10n_itemsCount, n, formatters: f);
+    String t(num n) =>
+        pluralText(LocaleKeys.common_itemsCount, n, formatters: f);
 
     test('each category picks its own form', () {
       expect(t(0), 'لا عناصر');
@@ -47,7 +48,7 @@ void main() {
     test('count follows the digit policy', () {
       const indic = AppFormatters('ar', useArabicIndicDigits: true);
       expect(
-        pluralText(LocaleKeys.l10n_itemsCount, 5, formatters: indic),
+        pluralText(LocaleKeys.common_itemsCount, 5, formatters: indic),
         '٥ عناصر',
       );
     });
@@ -56,7 +57,8 @@ void main() {
   group('English plurals', () {
     setUp(() => _load('en'));
     const f = AppFormatters('en');
-    String t(num n) => pluralText(LocaleKeys.l10n_itemsCount, n, formatters: f);
+    String t(num n) =>
+        pluralText(LocaleKeys.common_itemsCount, n, formatters: f);
 
     test('one and other', () {
       expect(t(1), 'One item');

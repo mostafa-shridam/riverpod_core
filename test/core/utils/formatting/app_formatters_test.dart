@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:riverpod_core/l10n/app_formatters.dart';
+import 'package:riverpod_core/core/utils/formatting/app_formatters.dart';
 
 void main() {
   setUpAll(initializeDateFormatting);

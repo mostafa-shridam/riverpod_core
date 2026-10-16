@@ -182,3 +182,8 @@ at implementation time and record them in its report.
 - Why: owner wants one simple store already familiar to the team; no SQL layer or codegen for a key-value/cache workload.
 - Trade-offs recorded: no relational queries or migrations framework (acceptable for settings and cache; revisit with a new DECISION if an app needs SQL).
 - Rejected: keeping Drift for the cache (second store), shared_preferences (second store).
+
+## D-035 — Localization is easy_localization only (supersedes the C-12 locale controller and D-030 persistence)
+- Context: C-12 added `lib/l10n/` with a `LocaleController` and prefs persistence that duplicated easy_localization (which already persists with `saveLocale: true`, switches with `context.setLocale` and supports plurals). Owner objected.
+- Decision: no `lib/l10n/` folder and no locale controller. Locale = `context.locale` / `context.setLocale` from easy_localization. Only pure formatting helpers remain, in `lib/core/utils/formatting/` (`AppFormatters` via `context.formatters`, `pluralText`, `relativeTime`); their translation keys live under the top-level `common` object. The digit flag stays a constructor parameter (Latin digits by default, D-030) with no persistence.
+- Why: one localization mechanism; less code.

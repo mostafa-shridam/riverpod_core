@@ -50,8 +50,7 @@ lib/
 │   │                               # AppSnackbar, AppImage, AppAvatar, AppBadge, AppChip, Skeleton,
 │   │                               # EmptyState, ErrorState, OfflineBanner,
 │   │                               # AsyncValueView (renders the 8 data states)
-│   └── utils/                  # pure helpers (dates, formatters, validators, debouncer)
-├── l10n/                       # locale controller + formatters (JSON lives in assets/translations)
+│   └── utils/                  # pure helpers (formatting/ = number/date/plural/relative-time helpers, validators, debouncer)
 ├── shared/                     # cross-feature models (e.g. User) and shared DTOs
 └── features/
     └── <feature>/              # scaffolded by .fttemplates/feature

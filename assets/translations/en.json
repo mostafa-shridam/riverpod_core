@@ -89,7 +89,7 @@
     "error": "This video could not be played",
     "retry": "Retry"
   },
-  "l10n": {
+  "common": {
     "nativeName": {
       "ar": "العربية",
       "en": "English"

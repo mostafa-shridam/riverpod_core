@@ -233,10 +233,10 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 | status | owner | blocked by |
 |---|---|---|
 | BLOCKED | — | C-11 |
-- Goal: close the loose ends of C-08/C-12/C-14: bootstrap uses the real locale resolver, digits preference is persisted, Riverpod auto-retry policy is explicit.
-- Files: `lib/bootstrap.dart`, `lib/app/app.dart`, `lib/core/storage/prefs_storage.dart` (+ `.g.dart`), `lib/l10n/**` (only the provider wiring for `appFormattersProvider`), `test/bootstrap_test.dart`, `test/core/storage/prefs_storage_test.dart`, `test/l10n/**`, `test/helpers/pump_app.dart` (pass `ignorePluralRules: false`), `test/helpers/fake_prefs_storage.dart`, `ai-docs/STATE_AND_DATA.md` (copyWithPrevious note)
-- Done when: bootstrap wires exactly as `ai-docs/reports/C-12.md` "wiring" says (`resolveStartLocale`, `saveLocale: false`, `ignorePluralRules: false`, `await initL10nFormatting()`); `useArabicIndicDigits` pref added and read by `appFormattersProvider`; the root `ProviderContainer` is created with `retry: (retryCount, error) => null` (no silent provider retries: network retry is the Dio interceptor's job, D-032); the legacy `getLanguageCodeHelper` stubs are no longer referenced by bootstrap; STATE_AND_DATA.md no longer shows `copyWithPrevious` (use `ref.state.copyWithPrevious` only where riverpod allows, otherwise `AsyncLoading<T>().copyWithPrevious`-free pattern recorded in D-031).
-- Tests: bootstrap starts with the saved locale; formatter flag persisted and applied; container retry disabled (a failing provider build is not retried).
+- Goal: close loose ends of C-08/C-12/C-14 after D-035: bootstrap uses easy_localization's own persistence and plurals, Riverpod auto-retry policy is explicit.
+- Files: `lib/bootstrap.dart`, `lib/app/app.dart`, `test/bootstrap_test.dart`, `test/helpers/pump_app.dart` (pass `ignorePluralRules: false`), `ai-docs/STATE_AND_DATA.md` (copyWithPrevious note)
+- Done when: `EasyLocalization(saveLocale: true, ignorePluralRules: false, startLocale: null (device locale if supported, else fallback))` + `await initFormatting()` before `runApp`; no reference to the legacy `getLanguageCodeHelper` stubs; the root `ProviderContainer` is created with `retry: (retryCount, error) => null` (D-032); STATE_AND_DATA.md no longer shows the internal `copyWithPrevious` pattern (see D-031).
+- Tests: bootstrap starts; a failing provider build is not retried; Arabic plurals work in `pumpApp`.
 
 ## C-15 — Upload and download with progress and cancel
 | status | owner | blocked by |

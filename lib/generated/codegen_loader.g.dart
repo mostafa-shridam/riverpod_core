@@ -103,7 +103,7 @@ class CodegenLoader extends AssetLoader {
       "error": "This video could not be played",
       "retry": "Retry",
     },
-    "l10n": {
+    "common": {
       "nativeName": {"ar": "العربية", "en": "English"},
       "itemsCount": {
         "zero": "No items",
@@ -268,7 +268,7 @@ class CodegenLoader extends AssetLoader {
       "error": "تعذر تشغيل هذا الفيديو",
       "retry": "إعادة المحاولة",
     },
-    "l10n": {
+    "common": {
       "nativeName": {"ar": "العربية", "en": "English"},
       "itemsCount": {
         "zero": "لا عناصر",
