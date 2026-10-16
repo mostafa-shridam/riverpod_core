@@ -166,5 +166,10 @@
     "loadingMore": "Loading more",
     "endOfList": "You've reached the end",
     "retry": "Try again"
+  },
+  "app_nav": {
+    "home": "Home",
+    "more": "More",
+    "continue": "Continue"
   }
 }

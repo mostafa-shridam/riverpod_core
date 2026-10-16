@@ -1,0 +1,99 @@
+import 'package:flutter/widgets.dart';
+import 'package:go_router/go_router.dart';
+import 'package:riverpod_core/app/router/app_shell.dart';
+import 'package:riverpod_core/app/router/paths.dart';
+import 'package:riverpod_core/app/router/placeholder_pages.dart';
+import 'package:riverpod_core/app/startup/splash_page.dart';
+import 'package:riverpod_core/features/home/presentation/pages/home_page.dart';
+
+part 'routes.g.dart';
+
+@TypedGoRoute<SplashRoute>(path: AppPaths.splash)
+class SplashRoute extends GoRouteData with $SplashRoute {
+  const SplashRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const SplashPage();
+}
+
+@TypedGoRoute<OnboardingRoute>(path: AppPaths.onboarding)
+class OnboardingRoute extends GoRouteData with $OnboardingRoute {
+  const OnboardingRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const OnboardingPage();
+}
+
+@TypedGoRoute<LoginRoute>(path: AppPaths.login)
+class LoginRoute extends GoRouteData with $LoginRoute {
+  const LoginRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const LoginPage();
+}
+
+@TypedStatefulShellRoute<AppShellRoute>(
+  branches: [
+    TypedStatefulShellBranch<HomeBranch>(
+      routes: [TypedGoRoute<HomeRoute>(path: AppPaths.home)],
+    ),
+    TypedStatefulShellBranch<MoreBranch>(
+      routes: [TypedGoRoute<MoreRoute>(path: AppPaths.more)],
+    ),
+  ],
+)
+class AppShellRoute extends StatefulShellRouteData {
+  const AppShellRoute();
+
+  @override
+  Widget builder(
+    BuildContext context,
+    GoRouterState state,
+    StatefulNavigationShell navigationShell,
+  ) {
+    return AppShell(navigationShell: navigationShell);
+  }
+}
+
+class HomeBranch extends StatefulShellBranchData {
+  const HomeBranch();
+}
+
+class MoreBranch extends StatefulShellBranchData {
+  const MoreBranch();
+}
+
+class HomeRoute extends GoRouteData with $HomeRoute {
+  const HomeRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const HomePage();
+}
+
+class MoreRoute extends GoRouteData with $MoreRoute {
+  const MoreRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const MorePage();
+}
+
+@TypedGoRoute<ItemDetailRoute>(path: '${AppPaths.itemPrefix}/:id')
+class ItemDetailRoute extends GoRouteData with $ItemDetailRoute {
+  const ItemDetailRoute({required this.id});
+
+  final String id;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      ItemDetailPage(id: id);
+}
+
+/// Maps a deep-link or notification request to a typed route. Null when the
+/// type is unknown, so the request is ignored instead of guessed.
+GoRouteData? routeForDeepLink({required String type, required String id}) {
+  return switch (type) {
+    'myEvents' => ItemDetailRoute(id: id),
+    _ => null,
+  };
+}
