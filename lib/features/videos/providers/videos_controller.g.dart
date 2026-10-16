@@ -36,7 +36,7 @@ final class VideosControllerProvider
   VideosController create() => VideosController();
 }
 
-String _$videosControllerHash() => r'45c83c5a80c158b1dae6cf01d7be78f5d8ad4a09';
+String _$videosControllerHash() => r'553ff5967b4f19267c4eab578717a80d4167aada';
 
 /// State and actions of the videos list page.
 

@@ -7,7 +7,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod_core/core/auth/session_controller.dart';
 import 'package:riverpod_core/core/config/app_config.dart';
 import 'package:riverpod_core/core/config/flavor.dart';
-import 'package:riverpod_core/core/config/log_level.dart';
 import 'package:riverpod_core/core/constants.dart';
 import 'package:riverpod_core/core/design_system/theme/app_theme.dart';
 import 'package:riverpod_core/core/helper/deep_link_helper.dart';
@@ -30,20 +29,16 @@ Future<ProviderContainer> _container(
   );
   return createContainer(
     overrides: [
-      prefsStorageProvider.overrideWith((ref) => Future.value(prefs)),
-      // The home page reads the flavor (dev-only entry points, C-39).
+      // The home page reads the flavor for the dev-only gallery entry.
       appConfigProvider.overrideWithValue(
-        const AppConfig(
-          flavor: Flavor.dev,
-          appName: 'Test',
-          apiBaseUrl: 'https://api.example.test',
-          connectTimeout: Duration(seconds: 15),
-          receiveTimeout: Duration(seconds: 30),
-          logLevel: LogLevel.error,
-          enableCrashReporting: false,
-          enableAnalytics: false,
-        ),
+        AppConfig.fromMap(Flavor.dev, const {
+          'APP_NAME': 'Test App',
+          'API_BASE_URL': 'https://api.example.com',
+          'CONNECT_TIMEOUT_MS': '15000',
+          'RECEIVE_TIMEOUT_MS': '20000',
+        }),
       ),
+      prefsStorageProvider.overrideWith((ref) => Future.value(prefs)),
     ],
   );
 }

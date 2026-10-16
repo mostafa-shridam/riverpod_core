@@ -49,3 +49,11 @@ env/*.env
 
 # Agent worktrees
 .claude/worktrees/
+
+# Release signing and symbols (never commit; see tool/release/README.md)
+android/key.properties
+*.jks
+*.keystore
+ios/ExportOptions.plist
+*.mobileprovision
+build-symbols/

@@ -14,6 +14,7 @@ List<RouteBase> get $appRoutes => [
   $itemDetailRoute,
   $videosRoute,
   $videoDetailRoute,
+  $showcaseRoute,
 ];
 
 RouteBase get $splashRoute => GoRouteData.$route(
@@ -238,6 +239,32 @@ mixin $VideoDetailRoute on GoRouteData {
     '/videos/${Uri.encodeComponent(_self.id)}',
     queryParams: {if (_self.url != null) 'url': _self.url},
   );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $showcaseRoute => GoRouteData.$route(
+  path: '/showcase',
+  hasOverriddenOnExit: false,
+  factory: $ShowcaseRoute._fromState,
+);
+
+mixin $ShowcaseRoute on GoRouteData {
+  static ShowcaseRoute _fromState(GoRouterState state) => const ShowcaseRoute();
+
+  @override
+  String get location => GoRouteData.$location('/showcase');
 
   @override
   void go(BuildContext context) => context.go(location);

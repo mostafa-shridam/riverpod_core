@@ -119,6 +119,215 @@ abstract class LocaleKeys {
   static const app_nav_more = 'app_nav.more';
   static const app_nav_continue = 'app_nav.continue';
   static const app_nav = 'app_nav';
+  static const ds_permissions_allow = 'ds_permissions.allow';
+  static const ds_permissions_openSettings = 'ds_permissions.openSettings';
+  static const ds_permissions_notNow = 'ds_permissions.notNow';
+  static const ds_permissions_settingsHint = 'ds_permissions.settingsHint';
+  static const ds_permissions_cameraTitle = 'ds_permissions.cameraTitle';
+  static const ds_permissions_cameraMessage = 'ds_permissions.cameraMessage';
+  static const ds_permissions_photosTitle = 'ds_permissions.photosTitle';
+  static const ds_permissions_photosMessage = 'ds_permissions.photosMessage';
+  static const ds_permissions_microphoneTitle =
+      'ds_permissions.microphoneTitle';
+  static const ds_permissions_microphoneMessage =
+      'ds_permissions.microphoneMessage';
+  static const ds_permissions = 'ds_permissions';
+  static const showcase_title = 'showcase.title';
+  static const showcase_entry = 'showcase.entry';
+  static const showcase_entryHint = 'showcase.entryHint';
+  static const showcase_toggleTheme = 'showcase.toggleTheme';
+  static const showcase_toggleLocale = 'showcase.toggleLocale';
+  static const showcase_textScale = 'showcase.textScale';
+  static const showcase_sections_buttons = 'showcase.sections.buttons';
+  static const showcase_sections_inputs = 'showcase.sections.inputs';
+  static const showcase_sections_selection = 'showcase.sections.selection';
+  static const showcase_sections_overlays = 'showcase.sections.overlays';
+  static const showcase_sections_display = 'showcase.sections.display';
+  static const showcase_sections_media = 'showcase.sections.media';
+  static const showcase_sections_states = 'showcase.sections.states';
+  static const showcase_sections_tokens = 'showcase.sections.tokens';
+  static const showcase_sections = 'showcase.sections';
+  static const showcase_buttons_variants = 'showcase.buttons.variants';
+  static const showcase_buttons_primary = 'showcase.buttons.primary';
+  static const showcase_buttons_secondary = 'showcase.buttons.secondary';
+  static const showcase_buttons_tonal = 'showcase.buttons.tonal';
+  static const showcase_buttons_outlined = 'showcase.buttons.outlined';
+  static const showcase_buttons_text = 'showcase.buttons.text';
+  static const showcase_buttons_destructive = 'showcase.buttons.destructive';
+  static const showcase_buttons_sizes = 'showcase.buttons.sizes';
+  static const showcase_buttons_small = 'showcase.buttons.small';
+  static const showcase_buttons_medium = 'showcase.buttons.medium';
+  static const showcase_buttons_large = 'showcase.buttons.large';
+  static const showcase_buttons_loading = 'showcase.buttons.loading';
+  static const showcase_buttons_tapToLoad = 'showcase.buttons.tapToLoad';
+  static const showcase_buttons_loadingLabel = 'showcase.buttons.loadingLabel';
+  static const showcase_buttons_disabled = 'showcase.buttons.disabled';
+  static const showcase_buttons_icons = 'showcase.buttons.icons';
+  static const showcase_buttons_leadingIcon = 'showcase.buttons.leadingIcon';
+  static const showcase_buttons_trailingIcon = 'showcase.buttons.trailingIcon';
+  static const showcase_buttons_fullWidth = 'showcase.buttons.fullWidth';
+  static const showcase_buttons_iconButtons = 'showcase.buttons.iconButtons';
+  static const showcase_buttons_iconButton = 'showcase.buttons.iconButton';
+  static const showcase_buttons_fabs = 'showcase.buttons.fabs';
+  static const showcase_buttons_fab = 'showcase.buttons.fab';
+  static const showcase_buttons_fabLabel = 'showcase.buttons.fabLabel';
+  static const showcase_buttons = 'showcase.buttons';
+  static const showcase_inputs_textLabel = 'showcase.inputs.textLabel';
+  static const showcase_inputs_textHint = 'showcase.inputs.textHint';
+  static const showcase_inputs_textHelper = 'showcase.inputs.textHelper';
+  static const showcase_inputs_errorLabel = 'showcase.inputs.errorLabel';
+  static const showcase_inputs_errorText = 'showcase.inputs.errorText';
+  static const showcase_inputs_disabledLabel = 'showcase.inputs.disabledLabel';
+  static const showcase_inputs_multilineLabel =
+      'showcase.inputs.multilineLabel';
+  static const showcase_inputs_passwordLabel = 'showcase.inputs.passwordLabel';
+  static const showcase_inputs_searchHint = 'showcase.inputs.searchHint';
+  static const showcase_inputs_phoneLabel = 'showcase.inputs.phoneLabel';
+  static const showcase_inputs = 'showcase.inputs';
+  static const showcase_selection_option = 'showcase.selection.option';
+  static const showcase_selection_checkbox = 'showcase.selection.checkbox';
+  static const showcase_selection_checkboxHint =
+      'showcase.selection.checkboxHint';
+  static const showcase_selection_disabled = 'showcase.selection.disabled';
+  static const showcase_selection_switch = 'showcase.selection.switch';
+  static const showcase_selection_radio = 'showcase.selection.radio';
+  static const showcase_selection_dropdown = 'showcase.selection.dropdown';
+  static const showcase_selection_dropdownHint =
+      'showcase.selection.dropdownHint';
+  static const showcase_selection_segmented = 'showcase.selection.segmented';
+  static const showcase_selection_slider = 'showcase.selection.slider';
+  static const showcase_selection_range = 'showcase.selection.range';
+  static const showcase_selection_date = 'showcase.selection.date';
+  static const showcase_selection_time = 'showcase.selection.time';
+  static const showcase_selection_rating = 'showcase.selection.rating';
+  static const showcase_selection_chips = 'showcase.selection.chips';
+  static const showcase_selection = 'showcase.selection';
+  static const showcase_overlays_sheets = 'showcase.overlays.sheets';
+  static const showcase_overlays_modalSheet = 'showcase.overlays.modalSheet';
+  static const showcase_overlays_actionSheet = 'showcase.overlays.actionSheet';
+  static const showcase_overlays_selectionSheet =
+      'showcase.overlays.selectionSheet';
+  static const showcase_overlays_formSheet = 'showcase.overlays.formSheet';
+  static const showcase_overlays_sheetTitle = 'showcase.overlays.sheetTitle';
+  static const showcase_overlays_sheetBody = 'showcase.overlays.sheetBody';
+  static const showcase_overlays_actionTitle = 'showcase.overlays.actionTitle';
+  static const showcase_overlays_actionMessage =
+      'showcase.overlays.actionMessage';
+  static const showcase_overlays_share = 'showcase.overlays.share';
+  static const showcase_overlays_edit = 'showcase.overlays.edit';
+  static const showcase_overlays_delete = 'showcase.overlays.delete';
+  static const showcase_overlays_selectionTitle =
+      'showcase.overlays.selectionTitle';
+  static const showcase_overlays_formTitle = 'showcase.overlays.formTitle';
+  static const showcase_overlays_formField = 'showcase.overlays.formField';
+  static const showcase_overlays_save = 'showcase.overlays.save';
+  static const showcase_overlays_dialogs = 'showcase.overlays.dialogs';
+  static const showcase_overlays_alertType = 'showcase.overlays.alertType';
+  static const showcase_overlays_alertMessage =
+      'showcase.overlays.alertMessage';
+  static const showcase_overlays_info = 'showcase.overlays.info';
+  static const showcase_overlays_success = 'showcase.overlays.success';
+  static const showcase_overlays_warning = 'showcase.overlays.warning';
+  static const showcase_overlays_error = 'showcase.overlays.error';
+  static const showcase_overlays_confirm = 'showcase.overlays.confirm';
+  static const showcase_overlays_confirmDestructive =
+      'showcase.overlays.confirmDestructive';
+  static const showcase_overlays_confirmTitle =
+      'showcase.overlays.confirmTitle';
+  static const showcase_overlays_confirmMessage =
+      'showcase.overlays.confirmMessage';
+  static const showcase_overlays_confirmed = 'showcase.overlays.confirmed';
+  static const showcase_overlays_inputDialog = 'showcase.overlays.inputDialog';
+  static const showcase_overlays_inputTitle = 'showcase.overlays.inputTitle';
+  static const showcase_overlays_inputMessage =
+      'showcase.overlays.inputMessage';
+  static const showcase_overlays_inputLabel = 'showcase.overlays.inputLabel';
+  static const showcase_overlays_loadingOverlay =
+      'showcase.overlays.loadingOverlay';
+  static const showcase_overlays_loadingMessage =
+      'showcase.overlays.loadingMessage';
+  static const showcase_overlays_snackbars = 'showcase.overlays.snackbars';
+  static const showcase_overlays_snackbarMessage =
+      'showcase.overlays.snackbarMessage';
+  static const showcase_overlays_toasts = 'showcase.overlays.toasts';
+  static const showcase_overlays_toastTop = 'showcase.overlays.toastTop';
+  static const showcase_overlays_toastBottom = 'showcase.overlays.toastBottom';
+  static const showcase_overlays_toastMessage =
+      'showcase.overlays.toastMessage';
+  static const showcase_overlays_banner = 'showcase.overlays.banner';
+  static const showcase_overlays_toggleBanner =
+      'showcase.overlays.toggleBanner';
+  static const showcase_overlays_bannerTitle = 'showcase.overlays.bannerTitle';
+  static const showcase_overlays_bannerMessage =
+      'showcase.overlays.bannerMessage';
+  static const showcase_overlays_bannerAction =
+      'showcase.overlays.bannerAction';
+  static const showcase_overlays_chose = 'showcase.overlays.chose';
+  static const showcase_overlays = 'showcase.overlays';
+  static const showcase_display_cardFilled = 'showcase.display.cardFilled';
+  static const showcase_display_cardOutlined = 'showcase.display.cardOutlined';
+  static const showcase_display_cardElevated = 'showcase.display.cardElevated';
+  static const showcase_display_avatars = 'showcase.display.avatars';
+  static const showcase_display_avatarName = 'showcase.display.avatarName';
+  static const showcase_display_badges = 'showcase.display.badges';
+  static const showcase_display_chips = 'showcase.display.chips';
+  static const showcase_display_neutral = 'showcase.display.neutral';
+  static const showcase_display_primary = 'showcase.display.primary';
+  static const showcase_display_selectable = 'showcase.display.selectable';
+  static const showcase_display_deletable = 'showcase.display.deletable';
+  static const showcase_display_delete = 'showcase.display.delete';
+  static const showcase_display_imageOk = 'showcase.display.imageOk';
+  static const showcase_display_imageBroken = 'showcase.display.imageBroken';
+  static const showcase_display_accordionTitle =
+      'showcase.display.accordionTitle';
+  static const showcase_display_accordionSubtitle =
+      'showcase.display.accordionSubtitle';
+  static const showcase_display_accordionBody =
+      'showcase.display.accordionBody';
+  static const showcase_display_tab = 'showcase.display.tab';
+  static const showcase_display_tabBody = 'showcase.display.tabBody';
+  static const showcase_display_step = 'showcase.display.step';
+  static const showcase_display_stepHint = 'showcase.display.stepHint';
+  static const showcase_display_back = 'showcase.display.back';
+  static const showcase_display_next = 'showcase.display.next';
+  static const showcase_display_tileTitle = 'showcase.display.tileTitle';
+  static const showcase_display_tileSubtitle = 'showcase.display.tileSubtitle';
+  static const showcase_display_tileSelected = 'showcase.display.tileSelected';
+  static const showcase_display_tileDisabled = 'showcase.display.tileDisabled';
+  static const showcase_display_divider = 'showcase.display.divider';
+  static const showcase_display = 'showcase.display';
+  static const showcase_media_mp4 = 'showcase.media.mp4';
+  static const showcase_media_hls = 'showcase.media.hls';
+  static const showcase_media_loadHls = 'showcase.media.loadHls';
+  static const showcase_media_note = 'showcase.media.note';
+  static const showcase_media = 'showcase.media';
+  static const showcase_states_pick = 'showcase.states.pick';
+  static const showcase_states_loading = 'showcase.states.loading';
+  static const showcase_states_empty = 'showcase.states.empty';
+  static const showcase_states_error = 'showcase.states.error';
+  static const showcase_states_offline = 'showcase.states.offline';
+  static const showcase_states_stale = 'showcase.states.stale';
+  static const showcase_states_partial = 'showcase.states.partial';
+  static const showcase_states_refreshing = 'showcase.states.refreshing';
+  static const showcase_states_success = 'showcase.states.success';
+  static const showcase_states_item = 'showcase.states.item';
+  static const showcase_states_skeleton = 'showcase.states.skeleton';
+  static const showcase_states_emptyTitle = 'showcase.states.emptyTitle';
+  static const showcase_states_emptyMessage = 'showcase.states.emptyMessage';
+  static const showcase_states_emptyAction = 'showcase.states.emptyAction';
+  static const showcase_states_progress = 'showcase.states.progress';
+  static const showcase_states_spinners = 'showcase.states.spinners';
+  static const showcase_states = 'showcase.states';
+  static const showcase_tokens_colorRoles = 'showcase.tokens.colorRoles';
+  static const showcase_tokens_semanticColors =
+      'showcase.tokens.semanticColors';
+  static const showcase_tokens_typeScale = 'showcase.tokens.typeScale';
+  static const showcase_tokens_sample = 'showcase.tokens.sample';
+  static const showcase_tokens_spacing = 'showcase.tokens.spacing';
+  static const showcase_tokens_radius = 'showcase.tokens.radius';
+  static const showcase_tokens_elevation = 'showcase.tokens.elevation';
+  static const showcase_tokens = 'showcase.tokens';
+  static const showcase = 'showcase';
   static const videos_title = 'videos.title';
   static const videos_searchHint = 'videos.searchHint';
   static const videos_emptyTitle = 'videos.emptyTitle';

@@ -141,7 +141,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-35 — Widget showcase page ("component gallery")
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| DONE | worker-p | — |
 - Goal: one page where anyone can see and try every design_system widget fast (D-020). Registered only in `dev` and `staging` flavors at the typed route `/showcase`; reachable from a dev-only entry on the home page.
 - Files: `lib/features/showcase/presentation/pages/showcase_page.dart`, `lib/features/showcase/presentation/widgets/**` (section widgets), `lib/core/design_system/widgets/widgets.dart` (the barrel export of every widget), `lib/core/router/routes.dart` (add the route only), `assets/translations/*.json` + generated (`showcase.*` keys), `test/features/showcase/**`
 - Done when: sections with headers — Buttons (all variants/sizes/loading/disabled), Inputs, Selection, Overlays (one button each: modal bottom sheet, action sheet, selection sheet, form sheet, alert, confirm, input dialog, loading overlay, snackbar ×4 types, toast, banner), Display (card, avatar, badge, chip, image, accordion, tabs), Media (`AppVideoPlayer` playing a public sample video, with a link to the `videos` feature), Feedback/States (skeleton, empty, error, offline banner, progress), Tokens (color swatches with names, type scale, spacing, radius, elevation). App bar actions: toggle light/dark, toggle ar/en, text scale slider, so every widget can be checked in all modes live. Works on phone and tablet.
@@ -232,7 +232,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-40 — Wire locale, digit pref and provider retry policy into bootstrap
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| DONE | worker-q | — |
 - Goal: close loose ends of C-08/C-12/C-14 after D-035: bootstrap uses easy_localization's own persistence and plurals, Riverpod auto-retry policy is explicit.
 - Files: `lib/core/bootstrap/bootstrap.dart`, `lib/core/app/app.dart`, `test/core/bootstrap/bootstrap_test.dart`, `test/helpers/pump_app.dart` (pass `ignorePluralRules: false`), `ai-docs/STATE_AND_DATA.md` (copyWithPrevious note)
 - Done when: `EasyLocalization(saveLocale: true, ignorePluralRules: false, startLocale: null (device locale if supported, else fallback))` + `await initFormatting()` before `runApp`; no reference to the legacy `getLanguageCodeHelper` stubs; the root `ProviderContainer` is created with `retry: (retryCount, error) => null` (D-032); STATE_AND_DATA.md no longer shows the internal `copyWithPrevious` pattern (see D-031).
@@ -250,7 +250,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-23 — Permissions and media (picker, crop, compress, file picker)
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — (D-033) |
+| DONE | worker-n | — |
 - Goal: checklist "Media & device".
 - Files: `lib/core/permissions/**` (`app_permission.dart`, `permission_service.dart`, `permission_rationale.dart`), `lib/core/media/**` (`media_service.dart`, `image_processing.dart`, `picked_media.dart`), delete `lib/core/mixins/image_picker.dart` (grep importers first; migrate none: nothing should import it), `android/app/src/main/AndroidManifest.xml` (camera, storage-free photo picker permissions only), `ios/Runner/Info.plist` (NSCameraUsageDescription, NSPhotoLibraryUsageDescription, NSMicrophoneUsageDescription), `pubspec.yaml`, `pubspec.lock` (add `image_cropper`, `file_picker`), `assets/translations/*.json` (top-level `ds_permissions`, appended; strings for the rationale dialog), `lib/core/design_system/widgets/permissions/permission_rationale_dialog.dart`, `test/core/permissions/**`, `test/core/media/**`, `test/core/design_system/widgets/permissions/**`
 - Done when: `PermissionService` (keepAlive provider over `permission_handler` behind an injectable interface): `status/request`, rationale flow (`ensure(permission, context)` shows `PermissionRationaleDialog` before the system prompt when `shouldShowRationale`, and an "Open settings" action when permanently denied), result enum `granted/denied/permanentlyDenied/restricted/limited`; `MediaService`: `pickImage(source: camera|gallery, crop: bool, maxWidth/quality)`, `pickMultiImage`, `pickFile(types)`, `pickVideo`; compression via `flutter_image_compress` (already a dependency) with sane defaults (max 1920 px, quality 85), cropping via `image_cropper` themed from the design system; everything returns `PickedMedia(path, size, mimeType)`; cancellation returns null; errors mapped to `AppException`; platform plugins sit behind injectable interfaces so tests need no channel; QR scanner is NOT part of this task (optional, backlog).
@@ -259,7 +259,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-27 — GitHub Actions CI
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| DONE | worker-m | — |
 - Goal: every push/PR runs the gate.
 - Files: `.github/workflows/ci.yml`, `.github/workflows/README.md` (how it works, how to add secrets, nothing secret inside)
 - Done when: workflow on `push` and `pull_request` using the stable Flutter channel pinned through `subosito/flutter-action` with caching (`cache: true`), steps: checkout, `flutter pub get`, create `env/*.env` from the committed `*.env.example` files, `dart run easy_localization:generate` x2 (as in `build.sh`), `dart run build_runner build --delete-conflicting-outputs`, `git diff --exit-code` on tracked generated files (fails when generated code is stale), `dart format --set-exit-if-changed lib test tool`, `flutter analyze`, `flutter test --coverage`, upload `coverage/lcov.info` as an artifact, and a build job `flutter build apk --debug` (Android) plus `flutter build ios --no-codesign --debug` on macOS runner (separate job, `needs` the test job); concurrency group cancels superseded runs; least-privilege `permissions: contents: read`. No secrets required. Pin action versions to the latest stable major/sha you verify, record them in the README.
@@ -268,7 +268,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-28 — Release scripts and signing from untracked files
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| DONE | worker-m | — |
 - Goal: checklist "Android/iOS release scripts with signing from untracked files".
 - Files: `tool/release/build_android.sh`, `tool/release/build_ios.sh`, `tool/release/README.md`, `android/app/build.gradle.kts` (signing config reading `android/key.properties`, falls back to debug signing ONLY when the file is absent AND the build type is not release: a release build without `key.properties` must fail with a clear message), `android/key.properties.example`, `ios/ExportOptions.plist.example`, `.gitignore` (add `android/key.properties`, `*.jks`, `*.keystore`, `ios/ExportOptions.plist`, `*.mobileprovision`, `build-symbols/`)
 - Done when: `build_android.sh [--flavor staging|prod]` runs the `release-check` skill pre-gate (`dart format`, `analyze`, `test`), then `flutter build appbundle --release --obfuscate --split-debug-info=build-symbols/android` (entrypoint `lib/main.dart` for prod, `lib/main_staging.dart` for staging), verifies `env/<flavor>.env` exists, and prints the artifact path; `build_ios.sh` does the same with `flutter build ipa --release --export-options-plist=ios/ExportOptions.plist`; scripts are `set -euo pipefail`, executable, never echo secrets; the README documents creating the keystore (`keytool` command), `key.properties` fields, where to keep the files, and the iOS export options; no secrets committed (only `*.example`).
@@ -310,12 +310,46 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 - Done when: the repo contains no `*_strings.dart` key-constant files; no `.tr()`/`.plural()` receives a string literal in `lib/` (override parameters of widgets still accept plain `String`); the guard test scans every `.dart` file under `lib/` (excluding generated) and fails on `'<literal>'.tr(` / `"<literal>".tr(` / `.plural('<literal>'`; widgets behave exactly as before (all existing widget and golden tests pass unchanged).
 - Tests: the guard test (with a self-test on an inline sample); full suite and goldens green.
 
+## C-43 — Native build health (Android + iOS must build and run)
+| status | owner | blocked by |
+|---|---|---|
+| READY | — | — |
+- Goal: `flutter run` works on Android and iOS after the dependency upgrades (D-013). Found in C-28: Gradle wrapper 8.13 but Flutter needs >= 8.14; Kotlin metadata 2.4.0 from `firebase_auth` vs the project's Kotlin plugin 2.2.x; `compileSdk` 36 but `permission_handler_android` wants 37.
+- Files: `android/build.gradle.kts`, `android/settings.gradle.kts`, `android/gradle/wrapper/gradle-wrapper.properties`, `android/gradle.properties`, `android/app/build.gradle.kts` (keep the C-28 signing logic intact), `android/app/src/main/AndroidManifest.xml` (only if a build error requires it), `ios/Podfile`, `ios/Podfile.lock` (generated, commit it), `ios/Runner/Info.plist` (only if required), `ai-docs/HOW_TO_START_A_NEW_APP.md` (a short "toolchain requirements" paragraph)
+- Done when: with the three `env/*.env` created from the examples, `flutter build apk --debug` succeeds; `flutter build apk --release` without `android/key.properties` fails with the C-28 message AND WITHOUT the `--android-skip-build-dependency-validation` flag; `flutter build ios --no-codesign --debug` succeeds (run `pod install` / `pod repo update` as needed; if Xcode or CocoaPods are missing in the environment say so explicitly and do not claim success); the iOS Podfile enables the permission_handler macros (`PERMISSION_CAMERA=1`, `PERMISSION_PHOTOS=1`, `PERMISSION_MICROPHONE=1`, `PERMISSION_NOTIFICATIONS=1`); minSdk and the Java/Kotlin targets are set deliberately (record the chosen versions of Gradle, AGP, Kotlin, compileSdk, minSdk, iOS deployment target in the report with why); if an emulator/simulator is available, `flutter run -d <id>` boots the app to the splash and the report says what was seen (if none is available say so). Do not downgrade any package to make it build.
+- Tests: the commands above, with their outputs summarized in the report; `flutter analyze` and `flutter test` unchanged green.
+
+## C-20 — Notifications: FCM + local, best practice, complete
+| status | owner | blocked by |
+|---|---|---|
+| READY | — | — |
+- Goal: replace the old singleton-based notification code with a complete, testable notification system (owner: best practice for everything, include everything that is commonly needed).
+- Files: `lib/core/notifications/**` (rewritten: `notification_service.dart` facade provider, `push/` (FCM), `local/` (flutter_local_notifications), `channels/notification_channels.dart`, `routing/notification_router.dart`, `registration/push_token_registrar.dart`, `settings/notification_settings.dart`, `models/`), `lib/core/device/**` (new: `device_info.dart` + provider, replacing `lib/core/services/info_service.dart`, deleted), delete `lib/core/helper/deep_link_helper.dart`, `lib/core/services/helper.dart` and `lib/core/helper/help_functions.dart` only if nothing else imports them after your change (grep; otherwise leave and report), `lib/core/bootstrap/bootstrap.dart` (init call only, keep the edit tiny: C-41 edits the same file), `lib/core/router/app_router.dart` (only to consume `NotificationRouter`'s stream/callback), `android/app/src/main/AndroidManifest.xml`, `android/app/src/main/res/drawable*/ic_notification*.xml` (a monochrome small icon), `ios/Runner/Info.plist`, `ios/Runner/Runner.entitlements` if absent (aps-environment, committed with the development value), `assets/translations/*.json` (+ generated, D-037; top-level `notifications`), `test/core/notifications/**`, `test/core/device/**`, `test/helpers/fake_notification_backends.dart`, `ai-docs/NOTIFICATIONS.md` (new doc: architecture, platform setup steps for Firebase/APNs, payload contract, testing from the console, troubleshooting)
+- Done when:
+  - Everything is provider-based, no `X.instance` singletons; all plugins (`firebase_messaging`, `flutter_local_notifications`, timezone, permissions) sit behind small injectable backend interfaces so tests need no platform channel.
+  - Firebase optional: if `Firebase.initializeApp` fails because the app has no Firebase config, push is disabled gracefully (logged once through the logger, `pushAvailableProvider` = false), the rest of the app and local notifications keep working. No Firestore writes anywhere in the template (the old `saveUserDeviceData` is gone); token registration goes through `PushTokenRegistrar` (interface; default no-op; a Dio-based example implementation with an endpoint constant in one file, disabled by default).
+  - FCM: permission request flow using the existing `PermissionService`/rationale dialog (Android 13 `POST_NOTIFICATIONS`, iOS alert/badge/sound, optional provisional), token + `onTokenRefresh` stream, register on sign-in and unregister + `deleteToken` on logout (hook into `clearUserData`/logout through a provider the auth feature can call; document it), topic subscribe/unsubscribe helpers, foreground messages (iOS presentation options; Android shown through a local notification on the right channel), background handler as a top-level `@pragma('vm:entry-point')` function that does not touch Riverpod state, terminated start via `getInitialMessage`, `onMessageOpenedApp`, data-only messages, notification+data messages, de-duplication by message id.
+  - Local: Android channels defined in ONE file (id, name, description, importance, sound, vibration, badge, group) with sensible defaults (`general`, `high_priority`, `silent`, `reminders`), small icon + accent color from tokens, iOS categories/actions, `show`, `schedule` (`zonedSchedule`, exact only when the exact-alarm permission is granted, otherwise inexact with a documented fallback), `scheduleDaily/Weekly`, `cancel`, `cancelAll`, `pending()`, payload handling, big text/big picture helpers, grouped/summary notifications, badge counter helpers (iOS), timezone initialisation through the timezone package + `flutter_native_timezone_latest` (already dependencies; keep unless broken on the latest versions, then report).
+  - Routing: one `NotificationRouter` turns any tap (FCM opened/initial, local tap, cold start) into a `(type, id)` request and resolves it through `routeForDeepLink` (lib/core/router/routes.dart) to a typed route; unknown types are ignored; taps received before the router/session is ready are queued and replayed after sign-in/splash.
+  - User settings: `NotificationSettings` (master enable flag from `PrefsStorage.notificationsEnabled`, per-channel enable flags in prefs under `user.notifications.*`) + a provider exposing the OS permission state; helper to open the OS settings page.
+  - Docs: `ai-docs/NOTIFICATIONS.md` as above, including the exact payload JSON contract (`data.type`, `data.id`, optional `data.url`), how to test from the Firebase console, and the iOS/Android setup checklist (APNs key, capabilities, google-services files stay untracked).
+  - Strings via `LocaleKeys` only (D-037).
+- Tests: payload parsing, router mapping + queueing until ready, token registration/refresh/logout unregister with fakes, foreground message → local notification, permission flow branches, channel table, scheduling logic (exact vs inexact fallback) with fake clock/backend, settings persistence, Firebase-unavailable path, background handler entry point does not throw without Riverpod.
+
 ---
 
 ## Backlog (full tasks written when dependencies near DONE)
 C-31 Native flavors (Android flavors / iOS schemes) + launcher icons + native splash ·
 C-19 Biometric lock, screenshot blocking, root check ·
-C-20 FCM end-to-end + local notifications cleanup (singletons → providers) ·
 C-21 Remote config: force update, maintenance · C-22 Share, external links, in-app review, version page ·
 C-25 `.fttemplates/feature` + `tool/new_feature` ·
 C-26 Integration tests (auth flow + one feature flow) · C-29 README + HOW_TO_START_A_NEW_APP · C-30 Crash/analytics vendor · C-36 Legacy cleanup (remove `lib/core/extension/theme_extenison.dart` hardcoded swatch, `lib/core/themes` leftovers, `responsive_framework` if unused, old `core/services` singletons).
+
+## C-44 — Cache-first policy, retention and pruning (D-038)
+| status | owner | blocked by |
+|---|---|---|
+| BLOCKED | — | C-41 |
+- Goal: D-038. Make cache-first the default for every read feature and keep the cache bounded.
+- Files: `lib/core/storage/cache/**` (`cache_policy.dart` presets, `cached_repository_helper.dart` revalidate-with-etag / payload-hash no-op, `cache_pruner.dart`), `lib/core/storage/cache_store.dart` (lastAccessedAt, maxAge, size cap), `lib/core/bootstrap/bootstrap.dart` (schedule prune after first frame; tiny edit), app lifecycle hook for prune on resume >24h, `lib/features/videos/data/videos_repository.dart` (switch to the helper if C-39 is merged), `ai-docs/STATE_AND_DATA.md`, `.fttemplates/**` is C-25's, `test/core/storage/cache/**`
+- Done when: cached value is emitted first; unchanged payload does not re-emit; changed payload emits once; failure with cache = stale value + error, without cache = error; ttl vs maxAge behave as D-038; pruning removes expired, then least-recently-used over the cap; user-scoped keys; logout clears; no feature hand-rolls expiry (grep).
+- Tests: all of the above with fake clock and temp-dir Hive.
