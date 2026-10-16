@@ -268,7 +268,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-28 — Release scripts and signing from untracked files
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | worker-m | — |
 - Goal: checklist "Android/iOS release scripts with signing from untracked files".
 - Files: `tool/release/build_android.sh`, `tool/release/build_ios.sh`, `tool/release/README.md`, `android/app/build.gradle.kts` (signing config reading `android/key.properties`, falls back to debug signing ONLY when the file is absent AND the build type is not release: a release build without `key.properties` must fail with a clear message), `android/key.properties.example`, `ios/ExportOptions.plist.example`, `.gitignore` (add `android/key.properties`, `*.jks`, `*.keystore`, `ios/ExportOptions.plist`, `*.mobileprovision`, `build-symbols/`)
 - Done when: `build_android.sh [--flavor staging|prod]` runs the `release-check` skill pre-gate (`dart format`, `analyze`, `test`), then `flutter build appbundle --release --obfuscate --split-debug-info=build-symbols/android` (entrypoint `lib/main.dart` for prod, `lib/main_staging.dart` for staging), verifies `env/<flavor>.env` exists, and prints the artifact path; `build_ios.sh` does the same with `flutter build ipa --release --export-options-plist=ios/ExportOptions.plist`; scripts are `set -euo pipefail`, executable, never echo secrets; the README documents creating the keystore (`keytool` command), `key.properties` fields, where to keep the files, and the iOS export options; no secrets committed (only `*.example`).
