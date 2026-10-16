@@ -20,25 +20,38 @@ abstract interface class PermissionBackend {
   Future<bool> openSettings();
 }
 
+/// The `permission_handler` permission of an [AppPermission].
+@visibleForTesting
+ph.Permission platformPermissionOf(AppPermission permission) =>
+    switch (permission) {
+      AppPermission.camera => ph.Permission.camera,
+      AppPermission.photos => ph.Permission.photos,
+      AppPermission.microphone => ph.Permission.microphone,
+      AppPermission.notifications => ph.Permission.notification,
+    };
+
+/// The [AppPermissionResult] of a `permission_handler` status.
+@visibleForTesting
+AppPermissionResult mapPermissionStatus(ph.PermissionStatus status) =>
+    switch (status) {
+      ph.PermissionStatus.granted => AppPermissionResult.granted,
+      ph.PermissionStatus.provisional => AppPermissionResult.provisional,
+      ph.PermissionStatus.denied => AppPermissionResult.denied,
+      ph.PermissionStatus.permanentlyDenied =>
+        AppPermissionResult.permanentlyDenied,
+      ph.PermissionStatus.restricted => AppPermissionResult.restricted,
+      ph.PermissionStatus.limited => AppPermissionResult.limited,
+    };
+
 /// [PermissionBackend] over `permission_handler`.
 class PermissionHandlerBackend implements PermissionBackend {
   const PermissionHandlerBackend();
 
-  ph.Permission _of(AppPermission permission) => switch (permission) {
-    AppPermission.camera => ph.Permission.camera,
-    AppPermission.photos => ph.Permission.photos,
-    AppPermission.microphone => ph.Permission.microphone,
-  };
+  ph.Permission _of(AppPermission permission) =>
+      platformPermissionOf(permission);
 
-  AppPermissionResult _map(ph.PermissionStatus status) => switch (status) {
-    ph.PermissionStatus.granted ||
-    ph.PermissionStatus.provisional => AppPermissionResult.granted,
-    ph.PermissionStatus.denied => AppPermissionResult.denied,
-    ph.PermissionStatus.permanentlyDenied =>
-      AppPermissionResult.permanentlyDenied,
-    ph.PermissionStatus.restricted => AppPermissionResult.restricted,
-    ph.PermissionStatus.limited => AppPermissionResult.limited,
-  };
+  AppPermissionResult _map(ph.PermissionStatus status) =>
+      mapPermissionStatus(status);
 
   @override
   Future<AppPermissionResult> status(AppPermission permission) async =>
@@ -72,6 +85,9 @@ class PermissionService {
   Future<AppPermissionResult> status(AppPermission permission) =>
       _backend.status(permission);
 
+  /// Opens this app's page in the system settings.
+  Future<bool> openSettings() => _backend.openSettings();
+
   /// System prompt, without any explanation.
   Future<AppPermissionResult> request(AppPermission permission) =>
       _backend.request(permission);
@@ -92,6 +108,7 @@ class PermissionService {
     switch (current) {
       case AppPermissionResult.granted ||
           AppPermissionResult.limited ||
+          AppPermissionResult.provisional ||
           AppPermissionResult.restricted:
         return current;
       case AppPermissionResult.permanentlyDenied:

@@ -14,6 +14,7 @@ import 'package:riverpod_core/core/notifications/push/push_token_manager.dart';
 import 'package:riverpod_core/core/notifications/routing/notification_router_provider.dart';
 import 'package:riverpod_core/core/notifications/settings/notification_settings.dart';
 import 'package:riverpod_core/core/notifications/settings/notification_settings_controller.dart';
+import 'package:riverpod_core/core/permissions/permission_service.dart';
 
 part 'notification_service_provider.g.dart';
 
@@ -59,7 +60,7 @@ NotificationService notificationService(Ref ref) {
     push: push,
     router: router,
     tokens: tokens,
-    permission: ref.watch(notificationPermissionFlowProvider),
+    permissions: ref.watch(permissionServiceProvider),
     localBackend: localBackend,
     timezone: ref.watch(timezoneBackendProvider),
     label: ref.watch(notificationLabelResolverProvider),

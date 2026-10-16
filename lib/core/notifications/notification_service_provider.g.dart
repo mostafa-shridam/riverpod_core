@@ -65,7 +65,7 @@ final class NotificationServiceProvider
 }
 
 String _$notificationServiceHash() =>
-    r'd2bf47fb52dc7863f894a0c998baa555b7f46ad4';
+    r'46c89f7aa4d21a79c12b0127d8dab4b3322faeca';
 
 /// The logout hook for the auth feature: call and await it BEFORE
 /// `clearUserData`, while the session can still authorize the server call that

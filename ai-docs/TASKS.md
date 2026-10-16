@@ -357,7 +357,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-45 — Notification permission through the shared PermissionService (D-039 item 3)
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | Worker A | — |
 - Goal: one permission flow. Add `AppPermission.notifications` (permission_handler maps to the platform notification permission), shared rationale copy in en/ar via LocaleKeys, and make `NotificationPermissionFlow` use `PermissionService` + the shared rationale dialog instead of its own presenter provider; delete `notificationRationalePresenterProvider`.
 - Files: `lib/core/permissions/**`, `lib/core/notifications/permission/**`, `lib/core/design_system/widgets/permissions/**` (copy switch only), `assets/translations/*.json` (+ generated), `test/core/permissions/**`, `test/core/notifications/**`, `test/helpers/**` fakes if needed
 - Done when: no second rationale mechanism remains (grep); Android 13+ and iOS prompts go through the service; existing notification tests keep their meaning; gate green.

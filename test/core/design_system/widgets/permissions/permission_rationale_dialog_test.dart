@@ -29,6 +29,15 @@ Widget _launcher(
   );
 }
 
+/// The English title each permission explains with (the copy is per
+/// permission, so each one is checked by its exact text).
+const _titles = {
+  AppPermission.camera: 'Camera access',
+  AppPermission.photos: 'Photos access',
+  AppPermission.microphone: 'Microphone access',
+  AppPermission.notifications: 'Turn on notifications',
+};
+
 void main() {
   for (final permission in AppPermission.values) {
     testWidgets('shows ${permission.name} texts and Allow in en', (
@@ -39,9 +48,9 @@ void main() {
         PermissionRationaleDialog(permission: permission),
         scaffold: false,
       );
+      expect(find.text(_titles[permission]!), findsOneWidget);
       expect(find.text('Allow'), findsOneWidget);
       expect(find.text('Not now'), findsOneWidget);
-      expect(find.textContaining('access'), findsWidgets);
       expect(tester.takeException(), isNull);
     });
   }

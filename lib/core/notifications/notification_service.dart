@@ -10,11 +10,13 @@ import 'package:riverpod_core/core/notifications/local/timezone_backend.dart';
 import 'package:riverpod_core/core/notifications/models/notification_permission_state.dart';
 import 'package:riverpod_core/core/notifications/models/notification_tap.dart';
 import 'package:riverpod_core/core/notifications/models/push_message.dart';
-import 'package:riverpod_core/core/notifications/permission/notification_permission_flow.dart';
+import 'package:riverpod_core/core/notifications/permission/notification_permission_state.dart';
 import 'package:riverpod_core/core/notifications/push/push_service.dart';
 import 'package:riverpod_core/core/notifications/push/push_token_manager.dart';
 import 'package:riverpod_core/core/notifications/routing/notification_router.dart';
 import 'package:riverpod_core/core/notifications/settings/notification_settings.dart';
+import 'package:riverpod_core/core/permissions/app_permission.dart';
+import 'package:riverpod_core/core/permissions/permission_service.dart';
 
 /// The one entry point of the notification system (see
 /// `ai-docs/NOTIFICATIONS.md`): local notifications, push, permission,
@@ -28,7 +30,7 @@ class NotificationService {
     required this.push,
     required this.router,
     required PushTokenManager tokens,
-    required NotificationPermissionFlow permission,
+    required PermissionService permissions,
     required LocalNotificationBackend localBackend,
     required TimezoneBackend timezone,
     required NotificationLabelResolver label,
@@ -40,7 +42,7 @@ class NotificationService {
     required void Function({required bool available}) onPushAvailable,
     required AppLogger logger,
   }) : _tokens = tokens,
-       _permission = permission,
+       _permissions = permissions,
        _localBackend = localBackend,
        _timezone = timezone,
        _label = label,
@@ -64,7 +66,7 @@ class NotificationService {
   final NotificationRouter router;
 
   final PushTokenManager _tokens;
-  final NotificationPermissionFlow _permission;
+  final PermissionService _permissions;
   final LocalNotificationBackend _localBackend;
   final TimezoneBackend _timezone;
   final NotificationLabelResolver _label;
@@ -145,15 +147,20 @@ class NotificationService {
   }
 
   /// The OS permission now, without prompting.
-  Future<NotificationPermissionState> permissionState() => _permission.status();
+  Future<NotificationPermissionState> permissionState() async =>
+      notificationStateOf(
+        await _permissions.status(AppPermission.notifications),
+      );
 
   /// Asks for the OS permission, explaining first when the system advises it
-  /// (see [NotificationPermissionFlow.ensure]). On success it also finishes
+  /// (see [PermissionService.ensure]). On success it also finishes
   /// the push setup and registers the token.
   Future<NotificationPermissionState> ensurePermission(
     BuildContext context,
   ) async {
-    final state = await _permission.ensure(context);
+    final state = notificationStateOf(
+      await _permissions.ensure(AppPermission.notifications, context),
+    );
     if (state.isAllowed) await _afterPermissionGranted();
     return state;
   }
@@ -175,7 +182,7 @@ class NotificationService {
   }
 
   /// Opens the system settings page of this app.
-  Future<bool> openSystemSettings() => _permission.openSettings();
+  Future<bool> openSystemSettings() => _permissions.openSettings();
 
   /// The app-level switch. Turning it on first makes sure the OS permission is
   /// granted when a [context] is given; false is returned (and the switch stays

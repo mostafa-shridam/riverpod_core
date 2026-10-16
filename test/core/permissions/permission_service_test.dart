@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:permission_handler/permission_handler.dart' as ph;
 import 'package:riverpod_core/core/permissions/app_permission.dart';
 import 'package:riverpod_core/core/permissions/permission_rationale.dart';
 import 'package:riverpod_core/core/permissions/permission_service.dart';
@@ -183,11 +184,57 @@ void main() {
     expect(backend.requests, 1);
   });
 
-  test('isUsable is true only for granted and limited', () {
+  test('isUsable is true for granted, limited and provisional only', () {
     expect(AppPermissionResult.granted.isUsable, isTrue);
     expect(AppPermissionResult.limited.isUsable, isTrue);
+    expect(AppPermissionResult.provisional.isUsable, isTrue);
     expect(AppPermissionResult.denied.isUsable, isFalse);
     expect(AppPermissionResult.restricted.isUsable, isFalse);
+  });
+
+  group('platform mapping', () {
+    test('notifications map to the platform notification permission', () {
+      expect(
+        platformPermissionOf(AppPermission.notifications),
+        ph.Permission.notification,
+      );
+    });
+
+    test('every permission has a platform permission', () {
+      for (final permission in AppPermission.values) {
+        expect(platformPermissionOf(permission), isNotNull);
+      }
+    });
+
+    test('a provisional status stays provisional (not plain granted)', () {
+      expect(
+        mapPermissionStatus(ph.PermissionStatus.provisional),
+        AppPermissionResult.provisional,
+      );
+    });
+
+    test('the other statuses keep their meaning', () {
+      expect(
+        mapPermissionStatus(ph.PermissionStatus.granted),
+        AppPermissionResult.granted,
+      );
+      expect(
+        mapPermissionStatus(ph.PermissionStatus.denied),
+        AppPermissionResult.denied,
+      );
+      expect(
+        mapPermissionStatus(ph.PermissionStatus.permanentlyDenied),
+        AppPermissionResult.permanentlyDenied,
+      );
+      expect(
+        mapPermissionStatus(ph.PermissionStatus.restricted),
+        AppPermissionResult.restricted,
+      );
+      expect(
+        mapPermissionStatus(ph.PermissionStatus.limited),
+        AppPermissionResult.limited,
+      );
+    });
   });
 
   test('provider wires the overridden backend', () async {
