@@ -55,11 +55,14 @@ dependencies:
   google_sign_in: ^7.2.0
   image_cropper: ^13.0.0
   image_picker: ^1.2.1
+  in_app_review: ^2.0.12
   intl: ^0.20.2
   json_annotation: ^4.12.0
+  package_info_plus: ^10.2.2
   path_provider: ^2.1.2
   permission_handler: ^13.0.2
   riverpod_annotation: ^4.0.1
+  share_plus: ^13.3.1
   shared_preferences: ^2.5.6
   skeletonizer: ^3.0.0
   timezone: ^0.11.2

@@ -506,6 +506,24 @@ class CodegenLoader extends AssetLoader {
         "later": "Later",
       },
     },
+    "more": {
+      "entry": {
+        "about": "About",
+        "aboutHint": "Version, licenses, share and rate",
+      },
+      "about": {
+        "title": "About",
+        "version": "Version",
+        "build": "Build",
+        "flavor": "Environment",
+        "licenses": "Open-source licenses",
+        "share": "Share the app",
+        "shareMessage": "Check out {}",
+        "rate": "Rate the app",
+        "actionFailed": "Could not complete that. Please try again.",
+        "loadFailed": "Could not load the app details.",
+      },
+    },
   };
   static const Map<String, dynamic> _ar = {
     "hello": "مرحبا",
@@ -990,6 +1008,24 @@ class CodegenLoader extends AssetLoader {
         "banner": "يتوفر إصدار جديد من التطبيق.",
         "action": "تحديث",
         "later": "لاحقًا",
+      },
+    },
+    "more": {
+      "entry": {
+        "about": "حول التطبيق",
+        "aboutHint": "الإصدار والتراخيص والمشاركة والتقييم",
+      },
+      "about": {
+        "title": "حول التطبيق",
+        "version": "الإصدار",
+        "build": "رقم البناء",
+        "flavor": "البيئة",
+        "licenses": "تراخيص المصادر المفتوحة",
+        "share": "شارك التطبيق",
+        "shareMessage": "جرّب {}",
+        "rate": "قيّم التطبيق",
+        "actionFailed": "تعذر إتمام ذلك. حاول مرة أخرى.",
+        "loadFailed": "تعذر تحميل تفاصيل التطبيق.",
       },
     },
   };
