@@ -168,7 +168,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-12 — Localization completion
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | worker-k | — |
 - Goal: runtime locale switch persisted in prefs, plural keys, locale-aware number/date/currency formatters.
 - Files: `lib/l10n/**`, `assets/translations/*.json`, `lib/generated/*.g.dart`, `lib/core/extension/language.dart`, `test/l10n/**`
 - Done when: switching ar↔en updates the UI without restart and survives restart; formatters tested in both locales; digit policy recorded as a DECISION; parity test green.
