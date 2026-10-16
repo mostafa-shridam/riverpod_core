@@ -68,7 +68,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-06 — Storage: prefs, secure storage, Drift DB; remove Hive
 | status | owner | blocked by |
 |---|---|---|
-| REVIEW | Worker A | — |
+| DONE | worker-a | — |
 - Goal: D-004 per ARCHITECTURE.md `core/storage/`.
 - Files: `lib/core/storage/prefs_storage.dart`, `lib/core/storage/secure_storage.dart`, `lib/core/storage/database/**` (`app_database.dart`, `cache_entries` table), delete `lib/core/local_services/**`, `lib/core/enum/constants.dart`, `lib/main.dart` (init calls only), `lib/core/helper/help_functions.dart` (language read/write via prefs), `pubspec.yaml`, `pubspec.lock` (remove `hive_flutter`), `test/core/storage/**`, `test/helpers/fake_secure_storage.dart`, `test/helpers/fake_prefs_storage.dart`
 - Done when: keepAlive providers for each; typed pref keys in one file; `clearUserData()` wipes secure storage, cache table, user-scoped prefs; no Hive import left; fakes exist.
@@ -77,7 +77,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-07 — Dio client, interceptors, wiring of error mapping
 | status | owner | blocked by |
 |---|---|---|
-| BLOCKED | — | C-02, C-03, C-04, C-06 |
+| READY | — | — |
 - Goal: NETWORKING.md "Client" and "Interceptors" (D-008).
 - Files: `lib/core/network/dio_client.dart`, `lib/core/network/interceptors/**` (`idempotency`, `auth`, `refresh_token`, `retry_backoff`, `logging`, `error_mapping`), delete `lib/core/remote_services/**` and `lib/core/error_handler/**`, `test/core/network/**`
 - Done when: `dioProvider`/`refreshDioProvider` (keepAlive) read `AppConfig`; interceptors in documented order; single-flight refresh with request queue; retry/backoff rules; idempotency key; redacted dev-only logging; error interceptor uses `mapError`; old `ApiResult/ApiService/ErrorHandler/FailureMessages` deleted, no references.
@@ -86,7 +86,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-08 — Bootstrap, flavor entrypoints, logger, crash/analytics interfaces
 | status | owner | blocked by |
 |---|---|---|
-| BLOCKED | — | C-06 |
+| READY | — | — |
 - Goal: ARCHITECTURE.md startup; leveled logger; global error handlers; interfaces only (no vendor).
 - Files: `lib/main.dart` (rewritten: only `bootstrap(Flavor.current)`), `lib/main_staging.dart`, `lib/bootstrap.dart`, `lib/app/app.dart`, `lib/core/logger/**`, `lib/core/crash/**`, `lib/core/analytics/**`, `test/core/logger/**`, `test/core/crash/**`, `test/core/analytics/**`, `test/bootstrap_test.dart`, `test/helpers/fake_crash_reporter.dart`, `test/helpers/fake_analytics.dart`
 - Done when: entrypoints only call `bootstrap(flavor)` (D-024); invalid config → minimal error app with the problem list; `FlutterError.onError`, `PlatformDispatcher.onError`, zone errors → logger + `CrashReporter`; logger silent in prod; `CrashReporter`/`AnalyticsService` interfaces with `Noop` and `Console` implementations chosen from `AppConfig`; `dart:developer log` in `lib/core` replaced by the logger; `App` uses the temporary router until C-11.
@@ -109,7 +109,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-32 — design_system widgets: selection and form controls
 | status | owner | blocked by |
 |---|---|---|
-| REVIEW | worker-f | — |
+| DONE | worker-f | — |
 - Goal: `AppCheckbox`, `AppRadioGroup`, `AppSwitch`, `AppDropdown` (single, searchable via bottom sheet), `AppSegmentedControl`, `AppSlider` (+range), `AppDateField`, `AppTimeField` (use platform pickers, locale-aware formatting), `AppRating`, `AppChipGroup` (single/multi select), `AppFormField` wrapper that shows label + error consistently.
 - Files: `lib/core/design_system/widgets/selection/**`, `test/core/design_system/widgets/selection/**`, `test/goldens/selection/**`
 - Done when: same quality bar as C-09 (tokens, directional, l10n, 48 dp, Semantics, disabled/error states); controlled API (value + onChanged), works inside `Form` validators.
@@ -150,7 +150,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-10 — AsyncValueView, 8 data states, connectivity, offline banner
 | status | owner | blocked by |
 |---|---|---|
-| BLOCKED | — | C-03, C-09 |
+| READY | — | — |
 - Goal: `AsyncValueView`, `EmptyState`, `ErrorState`, `Skeleton`, `OfflineBanner`; `core/connectivity/` provider replacing `network_service.dart`.
 - Files: `lib/core/design_system/widgets/async/**`, `lib/core/connectivity/**`, delete `lib/core/services/network_service.dart`, `test/core/design_system/widgets/async/**`, `test/core/connectivity/**`, `test/helpers/fake_connectivity.dart`
 - Done when: all 8 states per DESIGN_SYSTEM.md; connectivity from plugin events (no DNS lookup of third-party hosts) with a `backOnline` event.
@@ -159,7 +159,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-11 — Router: typed routes, guards, shell
 | status | owner | blocked by |
 |---|---|---|
-| BLOCKED | — | C-06, C-08 |
+| BLOCKED | — | C-08 |
 - Goal: D-016. Single `appRouterProvider`, typed routes (go_router_builder), guards, bottom-nav shell with separate stacks, error page.
 - Files: `lib/app/router/app_router.dart`, `lib/app/router/routes.dart`, `lib/app/router/guards/**`, `lib/app/startup/**` (splash), `lib/app/app.dart`, delete `lib/core/router/**`, delete `lib/core/services/app_router.dart`, `lib/core/helper/deep_link_helper.dart` (adapt to the provider only), `lib/features/home/presentation/pages/home_page.dart` (moved), `pubspec.yaml`/`pubspec.lock` (add `go_router_builder`), `test/app/router/**`
 - Done when: splash → onboarding → auth → home skeleton with guards driven by a stub `SessionController` (`lib/core/auth/`); no `Routes.instance`/`MobileRouting.instance`; deep link resolves through typed routes.
@@ -168,7 +168,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-12 — Localization completion
 | status | owner | blocked by |
 |---|---|---|
-| BLOCKED | — | C-03, C-04, C-06 |
+| READY | — | — |
 - Goal: runtime locale switch persisted in prefs, plural keys, locale-aware number/date/currency formatters.
 - Files: `lib/l10n/**`, `assets/translations/*.json`, `lib/generated/*.g.dart`, `lib/core/extension/language.dart`, `test/l10n/**`
 - Done when: switching ar↔en updates the UI without restart and survives restart; formatters tested in both locales; digit policy recorded as a DECISION; parity test green.

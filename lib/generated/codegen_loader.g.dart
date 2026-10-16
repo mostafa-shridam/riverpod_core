@@ -81,6 +81,12 @@ class CodegenLoader extends AssetLoader {
       "unknown": "Something went wrong. Please try again.",
       "retry": "Try again",
     },
+    "ds_selection": {
+      "select": "Select",
+      "selectDate": "Select date",
+      "selectTime": "Select time",
+      "ratingValue": "{} of {}",
+    },
   };
   static const Map<String, dynamic> _ar = {
     "hello": "مرحبا",
@@ -148,6 +154,12 @@ class CodegenLoader extends AssetLoader {
       "cancelled": "تم إلغاء الطلب.",
       "unknown": "حدث خطأ ما. حاول مرة أخرى.",
       "retry": "إعادة المحاولة",
+    },
+    "ds_selection": {
+      "select": "اختر",
+      "selectDate": "اختر التاريخ",
+      "selectTime": "اختر الوقت",
+      "ratingValue": "{} من {}",
     },
   };
   static const Map<String, Map<String, dynamic>> mapLocales = {

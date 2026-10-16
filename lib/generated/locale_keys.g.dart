@@ -65,4 +65,9 @@ abstract class LocaleKeys {
   static const errors_unknown = 'errors.unknown';
   static const errors_retry = 'errors.retry';
   static const errors = 'errors';
+  static const ds_selection_select = 'ds_selection.select';
+  static const ds_selection_selectDate = 'ds_selection.selectDate';
+  static const ds_selection_selectTime = 'ds_selection.selectTime';
+  static const ds_selection_ratingValue = 'ds_selection.ratingValue';
+  static const ds_selection = 'ds_selection';
 }
