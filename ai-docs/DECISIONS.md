@@ -115,3 +115,8 @@ at implementation time and record them in its report.
 - Decision: add `cached_network_image` (MIT; latest stable resolved in C-34) behind `AppImage`; features never use it directly.
 - Why: disk + memory cache, placeholders, error handling; writing our own disk cache is far more than 30 lines.
 - Rejected: `Image.network` (no disk cache), own implementation.
+
+## D-022 — Platforms: Android and iOS only
+- Decision: the template is a mobile app: `android/` and `ios/` are tracked (ios generated with `flutter create --platforms=ios`, org `com.example`, renamed by `tool/rename_app` / C-13). Web, macOS, Windows, Linux are not part of the template.
+- Why: every checklist item (FCM, permissions, biometrics, deep links, store releases) is mobile; fewer native folders to maintain.
+- Rejected: all six platforms.
