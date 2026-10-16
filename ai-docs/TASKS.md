@@ -93,14 +93,59 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 - Tests: handlers forward to fake reporter; logger level filtering; invalid config yields error app; flavor mismatch fails.
 - Owner input needed later (not for this task): Sentry or Crashlytics vendor (C-30).
 
-## C-09 — design_system widgets, pass 1
+## C-09 — design_system widgets: buttons and text inputs
 | status | owner | blocked by |
 |---|---|---|
 | BLOCKED | — | C-04, C-05 |
-- Goal: `AppButton`, `AppTextField`, `AppCard`, `AppDialog`, `AppBottomSheet`, `AppSnackbar` in `lib/design_system/widgets/`, replacing `app_button.dart`, `custom_button.dart`, `my_text_filed.dart`, `alert_utils.dart`, `scaffold_messeneger.dart`.
-- Files: `lib/design_system/widgets/**`, `lib/core/widgets/**` (deleted), `lib/core/mixins/alert_utils.dart` (deleted), `lib/core/mixins/scaffold_messeneger.dart` (deleted), `lib/core/utils/validators.dart`, `test/design_system/widgets/**`
-- Done when: one implementation per primitive, tokens only, directional properties only, no hard-coded text, old files deleted with no references left.
+- Goal: the most-used primitives, beautiful by default (D-020). Replace `app_button.dart`, `custom_button.dart`, `my_text_filed.dart`.
+- Files: `lib/design_system/widgets/buttons/**`, `lib/design_system/widgets/inputs/**`, `lib/core/widgets/**` (deleted), `lib/core/utils/validators.dart`, `test/design_system/widgets/buttons/**`, `test/design_system/widgets/inputs/**`, `test/goldens/buttons/**`, `test/goldens/inputs/**`
+- Done when:
+  - `AppButton` (variants: primary, secondary, tonal, outlined, text, destructive; sizes sm/md/lg; `isLoading` keeps width; leading/trailing icon; `fullWidth`; disabled; haptic-free), `AppIconButton` (filled/tonal/outlined/standard, badge-ready), `AppFab`.
+  - `AppTextField` (label, hint, helper, error, counter, prefix/suffix, validator, multiline, focus/disabled/read-only states), `AppPasswordField` (visibility toggle), `AppSearchField` (clear button, debounced `onChanged`), `AppOtpField` (N boxes, paste, auto-advance, LTR digits even in RTL), `AppPhoneField` (digits-only formatter, no country-picker package).
+  - Tokens only, directional properties only, no hard-coded text (accessibility labels via l10n keys added in both languages), 48 dp targets, `Semantics`.
+  - Old files deleted, no references left.
 - Tests: widget test per variant/state; goldens light/dark × ar/en; text scale 2.0 without overflow.
+
+## C-32 — design_system widgets: selection and form controls
+| status | owner | blocked by |
+|---|---|---|
+| BLOCKED | — | C-05 |
+- Goal: `AppCheckbox`, `AppRadioGroup`, `AppSwitch`, `AppDropdown` (single, searchable via bottom sheet), `AppSegmentedControl`, `AppSlider` (+range), `AppDateField`, `AppTimeField` (use platform pickers, locale-aware formatting), `AppRating`, `AppChipGroup` (single/multi select), `AppFormField` wrapper that shows label + error consistently.
+- Files: `lib/design_system/widgets/selection/**`, `test/design_system/widgets/selection/**`, `test/goldens/selection/**`
+- Done when: same quality bar as C-09 (tokens, directional, l10n, 48 dp, Semantics, disabled/error states); controlled API (value + onChanged), works inside `Form` validators.
+- Tests: per widget variants/states, interaction (tap/select/validate), goldens light/dark × ar/en, text scale 2.0.
+
+## C-33 — design_system widgets: overlays and feedback
+| status | owner | blocked by |
+|---|---|---|
+| BLOCKED | — | C-05 |
+- Goal: everything that appears on top of a page. Replace `alert_utils.dart` and `scaffold_messeneger.dart`.
+- Files: `lib/design_system/widgets/overlays/**`, `lib/design_system/widgets/feedback/**`, `lib/core/mixins/alert_utils.dart` (deleted), `lib/core/mixins/scaffold_messeneger.dart` (deleted), `test/design_system/widgets/overlays/**`, `test/design_system/widgets/feedback/**`, `test/goldens/overlays/**`
+- Done when:
+  - `showAppBottomSheet<T>` modal sheet: drag handle, rounded top (radius token xl), safe-area + keyboard aware, `isScrollControlled`, draggable/scrollable variant, max width 560 on tablets, optional title/close, barrier dismiss rules, themed scrim; presets: `AppActionSheet` (list of actions with icons, destructive item, cancel), `AppSelectionSheet<T>` (single/multi choice with search), `AppFormSheet` (title + content + primary/secondary buttons, sticky footer above keyboard).
+  - `showAppDialog` + presets: `AppAlertDialog` (info/success/warning/error icon variants), `AppConfirmDialog` (destructive option, returns bool), `AppInputDialog` (text + validation), `AppLoadingDialog`/`AppLoadingOverlay` (blocking, optional message).
+  - `AppSnackbar`/toast: `showAppSnackbar` / `showAppToast` types success/info/warning/error, optional action + icon, top or bottom, swipe dismiss, queueing (one visible at a time), `AppMessenger` root key provider so non-widget code can show messages.
+  - `AppTooltip`, `AppProgressBar` (linear), `AppProgressIndicator` (circular, determinate/indeterminate), `AppBanner` (inline info/warn/error with action).
+  - Tokens only, directional, l10n (close/cancel/confirm labels), Semantics (dialog/sheet announce).
+- Tests: widget test per component (open, dismiss, return values, keyboard inset, RTL), queueing behavior, goldens light/dark × ar/en, text scale 2.0.
+
+## C-34 — design_system widgets: display and layout
+| status | owner | blocked by |
+|---|---|---|
+| BLOCKED | — | C-05 (+ D-021 package) |
+- Goal: content and structure primitives.
+- Files: `lib/design_system/widgets/display/**`, `lib/design_system/widgets/layout/**`, `pubspec.yaml`, `pubspec.lock` (add `cached_network_image`, D-021), `test/design_system/widgets/display/**`, `test/design_system/widgets/layout/**`, `test/goldens/display/**`
+- Done when: `AppCard` (filled/outlined/elevated, tappable), `AppListTile`, `AppSectionHeader`, `AppDivider`, `AppAvatar` (image/initials/icon, status dot, sizes), `AppBadge` (count/dot, overflow 99+), `AppChip`, `AppImage` (cached, placeholder shimmer, error widget, fade, `fit`, rounded), `AppAccordion`, `AppTabBar`, `AppBottomNavBar` (adaptive to rail on tablet), `AppAppBar` (large/collapsing optional), `AppScaffold` (adaptive padding, max width, safe area, optional offline banner slot), `AppStepper`, `AppEmptyPlaceholder` is NOT here (C-10 owns empty/error/skeleton).
+- Tests: per widget variants/states, goldens light/dark × ar/en, text scale 2.0; `AppImage` tested with a fake image provider.
+
+## C-35 — Widget showcase page ("component gallery")
+| status | owner | blocked by |
+|---|---|---|
+| BLOCKED | — | C-09, C-10, C-11, C-32, C-33, C-34 |
+- Goal: one page where anyone can see and try every design_system widget fast (D-020). Registered only in `dev` and `staging` flavors at the typed route `/showcase`; reachable from a dev-only entry on the home page.
+- Files: `lib/features/showcase/presentation/pages/showcase_page.dart`, `lib/features/showcase/presentation/widgets/**` (section widgets), `lib/design_system/widgets/widgets.dart` (the barrel export of every widget), `lib/app/router/routes.dart` (add the route only), `assets/translations/*.json` + generated (`showcase.*` keys), `test/features/showcase/**`
+- Done when: sections with headers — Buttons (all variants/sizes/loading/disabled), Inputs, Selection, Overlays (one button each: modal bottom sheet, action sheet, selection sheet, form sheet, alert, confirm, input dialog, loading overlay, snackbar ×4 types, toast, banner), Display (card, avatar, badge, chip, image, accordion, tabs), Feedback/States (skeleton, empty, error, offline banner, progress), Tokens (color swatches with names, type scale, spacing, radius, elevation). App bar actions: toggle light/dark, toggle ar/en, text scale slider, so every widget can be checked in all modes live. Works on phone and tablet.
+- Tests: page builds in light/dark × ar/en; each overlay button opens its overlay; mode toggles work; no overflow at text scale 2.0.
 
 ## C-10 — AsyncValueView, 8 data states, connectivity, offline banner
 | status | owner | blocked by |
@@ -149,6 +194,6 @@ C-18 Onboarding + splash pages · C-19 Biometric lock, screenshot blocking, root
 C-20 FCM end-to-end + local notifications cleanup (singletons → providers) ·
 C-21 Remote config: force update, maintenance · C-22 Share, external links, in-app review, version page ·
 C-23 Media: picker + crop + compression, file picker, permissions flow, optional QR ·
-C-24 design_system widgets pass 2 (image, avatar, badge, chip) · C-25 `.fttemplates/feature` + `tool/new_feature` ·
+C-25 `.fttemplates/feature` + `tool/new_feature` ·
 C-26 Integration tests (auth flow + one feature flow) · C-27 GitHub Actions CI · C-28 Release scripts + signing ·
 C-29 README + HOW_TO_START_A_NEW_APP · C-30 Crash/analytics vendor.

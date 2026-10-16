@@ -22,22 +22,25 @@ Light, dark, system. Persisted in prefs, switchable at runtime. Every widget mus
 Use layout builders/adaptive widgets — never fork a whole router per device. Content max width on large screens: 720 dp for forms/lists.
 
 ## Shared widgets catalog (`design_system/widgets/`)
-| Widget | Use for | Notes |
+Each primitive has ONE implementation here. A feature that needs something missing asks the Lead for a task.
+| Folder | Widgets | Task |
 |---|---|---|
-| `AppButton` | every button | variants: primary, secondary, tonal, text, destructive; sizes; `isLoading`; icon slot |
-| `AppTextField` | every input | label, hint, helper, error, validator, obscure toggle, prefix/suffix, directional-safe |
-| `AppCard` | grouped content | tappable variant |
-| `AppDialog` / `showAppDialog` | confirm/alert | title, body, primary/secondary actions |
-| `AppBottomSheet` | secondary flows, pickers | drag handle, safe-area aware |
-| `AppSnackbar` (`showAppSnackbar`) | transient feedback | types: success/info/warning/error; uses root messenger key |
-| `AppSkeleton` | loading placeholders | wraps Skeletonizer config |
-| `AppCachedImage` | any network image | placeholder + error widget + fade |
-| `AppAvatar`, `AppBadge`, `AppChip` | identity, counts, filters | |
-| `AsyncValueView` | every `AsyncValue` in UI | renders the 8 data states (below) |
-| `EmptyState`, `ErrorState` | inside the above | icon, title, message, action |
-| `OfflineBanner` | connectivity | auto from connectivity provider |
-| `PaginatedListView` | infinite scroll | cursor/offset, footer loader/error/end |
-Rule: a feature that needs something not in this list asks the Lead for a task; it does not build it locally.
+| `buttons/` | `AppButton` (primary, secondary, tonal, outlined, text, destructive; sizes; loading; icons; full width), `AppIconButton`, `AppFab` | C-09 |
+| `inputs/` | `AppTextField`, `AppPasswordField`, `AppSearchField`, `AppOtpField`, `AppPhoneField` | C-09 |
+| `selection/` | `AppCheckbox`, `AppRadioGroup`, `AppSwitch`, `AppDropdown`, `AppSegmentedControl`, `AppSlider`, `AppDateField`, `AppTimeField`, `AppRating`, `AppChipGroup`, `AppFormField` | C-32 |
+| `overlays/` | `showAppBottomSheet` (+ `AppActionSheet`, `AppSelectionSheet`, `AppFormSheet`), `showAppDialog` (+ `AppAlertDialog`, `AppConfirmDialog`, `AppInputDialog`, `AppLoadingDialog`/`AppLoadingOverlay`) | C-33 |
+| `feedback/` | `showAppSnackbar`/`showAppToast`, `AppMessenger`, `AppTooltip`, `AppProgressBar`, `AppProgressIndicator`, `AppBanner` | C-33 |
+| `display/` | `AppCard`, `AppListTile`, `AppSectionHeader`, `AppDivider`, `AppAvatar`, `AppBadge`, `AppChip`, `AppImage`, `AppAccordion` | C-34 |
+| `layout/` | `AppScaffold`, `AppAppBar`, `AppTabBar`, `AppBottomNavBar`, `AppStepper` | C-34 |
+| `async/` | `AsyncValueView`, `EmptyState`, `ErrorState`, `Skeleton`, `OfflineBanner`, `PaginatedListView` | C-10, C-14 |
+The gallery page (`/showcase`, dev/staging only, C-35) shows every widget live in light/dark, ar/en and any text scale.
+
+### Look and feel (why it looks like this)
+- Material 3 base, softened: radius `md 12` for controls, `lg 16` for cards, `xl 24` for sheets and dialogs; low elevation, surface-tint instead of heavy shadows.
+- Modal bottom sheet: drag handle, rounded top, scrim at 40% of `scrim`, content respects safe area and keyboard, max width 560 on tablets.
+- Dialogs: icon on top for status variants, title + body centered-start aligned (directional), buttons stacked on narrow widths.
+- Toast/snackbar: floating, rounded, colored by type with icon, one visible at a time.
+- Motion: `normal 250 ms` ease-out for enter, `fast 150 ms` for exit; no motion when the system disables animations.
 
 ## The 8 data states (every page that loads data)
 | State | Meaning | UI |

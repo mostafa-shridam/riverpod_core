@@ -104,3 +104,14 @@ at implementation time and record them in its report.
 ## D-019 — design_system/ replaces core/widgets and core/themes
 - Decision: tokens, theme, responsive helpers and all shared widgets move to `lib/design_system/` (C-05, C-09, C-10). `core/` has no UI.
 - Why: one obvious home for every UI primitive (hard rule 8).
+
+## D-020 — Broad widget library + live showcase page
+- Context: owner wants a rich set of custom widgets covering what apps typically need, good-looking by default, and one page to try them all quickly.
+- Decision: the design_system catalog is expanded and split into disjoint folders/tasks (C-09, C-32, C-33, C-34, C-10); `lib/features/showcase/` hosts the gallery (C-35), registered only in dev/staging. A barrel `design_system/widgets/widgets.dart` is owned by C-35 only (tasks never edit the barrel; they import by file path).
+- Why: parallelizable without file conflicts; features get one import and one look.
+- Rejected: one giant widgets task; third-party UI kits (inconsistent look, lock-in).
+
+## D-021 — cached_network_image for AppImage
+- Decision: add `cached_network_image` (MIT; latest stable resolved in C-34) behind `AppImage`; features never use it directly.
+- Why: disk + memory cache, placeholders, error handling; writing our own disk cache is far more than 30 lines.
+- Rejected: `Image.network` (no disk cache), own implementation.
