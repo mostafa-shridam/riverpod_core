@@ -46,7 +46,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-04 — Test infrastructure and translation parity test
 | status | owner | blocked by |
 |---|---|---|
-| BLOCKED | — | C-05 |
+| READY | — | — |
 - Goal: helpers from TESTING.md and the ar/en parity test.
 - Files: `test/helpers/pump_app.dart`, `test/helpers/create_container.dart`, `test/helpers/fake_http_adapter.dart`, `test/helpers/helpers.dart` (barrel), `test/helpers/helpers_test.dart`, `test/l10n/translation_parity_test.dart`
 - Done when: `pumpApp` wraps `ProviderScope(overrides)`, `EasyLocalization` with an in-memory loader, `MaterialApp` using the design_system themes, configurable locale/themeMode/textScale/size; `createContainer` disposes via `addTearDown`; `FakeHttpAdapter` queues responses/errors and records requests; parity test = same flattened keys in ar/en, no empty values, same `{}` placeholders. Fakes for later interfaces are added by the tasks that create them.
@@ -55,7 +55,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-05 — design_system: tokens, theme, responsive
 | status | owner | blocked by |
 |---|---|---|
-| REVIEW | Worker A | — |
+| DONE | worker-a | — |
 - Goal: D-019. Replace the app-specific black/green theme with generic tokens; fix text scaling and the fixed 450 px scaled box.
 - Files: `lib/design_system/tokens/**` (`brand_config.dart`, `app_colors.dart`, `app_typography.dart`, `app_spacing.dart`, `app_radius.dart`, `app_elevation.dart`, `app_durations.dart`, `app_tokens.dart`), `lib/design_system/theme/**` (`app_theme.dart`, `theme_context.dart`), `lib/design_system/responsive/**` (`breakpoints.dart`, `responsive_layout.dart`), delete `lib/core/themes/**`, `lib/main.dart`, `lib/core/widgets/custom_button.dart`, `lib/core/widgets/my_text_filed.dart`, `lib/core/mixins/scaffold_messeneger.dart`, `lib/core/helper/help_functions.dart` (import updates only), `ai-docs/DESIGN_SYSTEM.md` (only to add exact class names), `test/design_system/**`
 - Done when:
@@ -96,7 +96,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-09 — design_system widgets: buttons and text inputs
 | status | owner | blocked by |
 |---|---|---|
-| BLOCKED | — | C-04, C-05 |
+| BLOCKED | — | C-04 |
 - Goal: the most-used primitives, beautiful by default (D-020). Replace `app_button.dart`, `custom_button.dart`, `my_text_filed.dart`.
 - Files: `lib/design_system/widgets/buttons/**`, `lib/design_system/widgets/inputs/**`, `lib/core/widgets/**` (deleted), `lib/core/utils/validators.dart`, `test/design_system/widgets/buttons/**`, `test/design_system/widgets/inputs/**`, `test/goldens/buttons/**`, `test/goldens/inputs/**`
 - Done when:
@@ -109,7 +109,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-32 — design_system widgets: selection and form controls
 | status | owner | blocked by |
 |---|---|---|
-| BLOCKED | — | C-05 |
+| READY | — | — |
 - Goal: `AppCheckbox`, `AppRadioGroup`, `AppSwitch`, `AppDropdown` (single, searchable via bottom sheet), `AppSegmentedControl`, `AppSlider` (+range), `AppDateField`, `AppTimeField` (use platform pickers, locale-aware formatting), `AppRating`, `AppChipGroup` (single/multi select), `AppFormField` wrapper that shows label + error consistently.
 - Files: `lib/design_system/widgets/selection/**`, `test/design_system/widgets/selection/**`, `test/goldens/selection/**`
 - Done when: same quality bar as C-09 (tokens, directional, l10n, 48 dp, Semantics, disabled/error states); controlled API (value + onChanged), works inside `Form` validators.
@@ -118,7 +118,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-33 — design_system widgets: overlays and feedback
 | status | owner | blocked by |
 |---|---|---|
-| BLOCKED | — | C-05 |
+| READY | — | — |
 - Goal: everything that appears on top of a page. Replace `alert_utils.dart` and `scaffold_messeneger.dart`.
 - Files: `lib/design_system/widgets/bottom_sheets/**`, `lib/design_system/widgets/dialogs/**`, `lib/design_system/widgets/feedback/**` (subfolders `snackbar/`, `progress/`, `banner/`, `tooltip/`), `lib/core/mixins/alert_utils.dart` (deleted), `lib/core/mixins/scaffold_messeneger.dart` (deleted), `test/design_system/widgets/bottom_sheets/**`, `test/design_system/widgets/dialogs/**`, `test/design_system/widgets/feedback/**`, `test/goldens/bottom_sheets/**`, `test/goldens/dialogs/**`
 - Done when:
@@ -132,7 +132,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-34 — design_system widgets: display and layout
 | status | owner | blocked by |
 |---|---|---|
-| BLOCKED | — | C-05 (+ D-021 package) |
+| READY | — | — (D-021) |
 - Goal: content and structure primitives.
 - Files: `lib/design_system/widgets/display/**`, `lib/design_system/widgets/layout/**`, `pubspec.yaml`, `pubspec.lock` (add `cached_network_image`, D-021), `test/design_system/widgets/display/**`, `test/design_system/widgets/layout/**`, `test/goldens/display/**`
 - Done when: `AppCard` (filled/outlined/elevated, tappable), `AppListTile`, `AppSectionHeader`, `AppDivider`, `AppAvatar` (image/initials/icon, status dot, sizes), `AppBadge` (count/dot, overflow 99+), `AppChip`, `AppImage` (cached, placeholder shimmer, error widget, fade, `fit`, rounded), `AppAccordion`, `AppTabBar`, `AppBottomNavBar` (adaptive to rail on tablet), `AppAppBar` (large/collapsing optional), `AppScaffold` (adaptive padding, max width, safe area, optional offline banner slot), `AppStepper`, `AppEmptyPlaceholder` is NOT here (C-10 owns empty/error/skeleton).
@@ -196,4 +196,4 @@ C-21 Remote config: force update, maintenance · C-22 Share, external links, in-
 C-23 Media: picker + crop + compression, file picker, permissions flow, optional QR ·
 C-25 `.fttemplates/feature` + `tool/new_feature` ·
 C-26 Integration tests (auth flow + one feature flow) · C-27 GitHub Actions CI · C-28 Release scripts + signing ·
-C-29 README + HOW_TO_START_A_NEW_APP · C-30 Crash/analytics vendor.
+C-29 README + HOW_TO_START_A_NEW_APP · C-30 Crash/analytics vendor · C-36 Legacy cleanup (remove `lib/core/extension/theme_extenison.dart` hardcoded swatch, `lib/core/themes` leftovers, `responsive_framework` if unused, old `core/services` singletons).
