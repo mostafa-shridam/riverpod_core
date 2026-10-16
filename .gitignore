@@ -43,6 +43,6 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Environment files: real values are git-ignored, *.example.json are committed (D-006)
-env/*.json
-!env/*.example.json
+# Environment files: real values are ignored, *.env.example are committed (D-024)
+env/*.env
+!env/*.env.example

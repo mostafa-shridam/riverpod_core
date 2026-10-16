@@ -1,27 +1,27 @@
-import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod_core/core/config/app_config.dart';
 import 'package:riverpod_core/core/config/config_exception.dart';
+import 'package:riverpod_core/core/config/env_loader.dart';
 import 'package:riverpod_core/core/config/flavor.dart';
 import 'package:riverpod_core/core/config/log_level.dart';
 
-Map<String, String> _env({
-  String flavor = 'dev',
-  String apiBaseUrl = 'https://api.example.com',
-}) => {
-  'FLAVOR': flavor,
+Map<String, String> _env({String apiBaseUrl = 'https://api.example.com'}) => {
   'APP_NAME': 'Test App',
   'API_BASE_URL': apiBaseUrl,
   'CONNECT_TIMEOUT_MS': '15000',
   'RECEIVE_TIMEOUT_MS': '20000',
 };
 
-List<String> _problemsOf(Map<String, String> env) {
+List<String> _problemsOf(
+  Map<String, String> env, [
+  Flavor flavor = Flavor.dev,
+]) {
   try {
-    AppConfig.fromMap(env);
+    AppConfig.fromMap(flavor, env);
   } on ConfigException catch (e) {
     return e.problems;
   }
@@ -31,7 +31,7 @@ List<String> _problemsOf(Map<String, String> env) {
 void main() {
   group('valid configuration', () {
     test('dev loads with dev defaults', () {
-      final config = AppConfig.fromMap(_env());
+      final config = AppConfig.fromMap(Flavor.dev, _env());
 
       expect(config.flavor, Flavor.dev);
       expect(config.appName, 'Test App');
@@ -46,7 +46,8 @@ void main() {
 
     test('staging defaults: info log level, crash reporting on', () {
       final config = AppConfig.fromMap(
-        _env(flavor: 'staging', apiBaseUrl: 'https://staging.example.com'),
+        Flavor.staging,
+        _env(apiBaseUrl: 'https://staging.example.com'),
       );
 
       expect(config.flavor, Flavor.staging);
@@ -55,7 +56,7 @@ void main() {
     });
 
     test('prod defaults: warning log level, crash reporting on', () {
-      final config = AppConfig.fromMap(_env(flavor: 'prod'));
+      final config = AppConfig.fromMap(Flavor.prod, _env());
 
       expect(config.flavor, Flavor.prod);
       expect(config.logLevel, LogLevel.warning);
@@ -63,8 +64,8 @@ void main() {
     });
 
     test('explicit optional values override the flavor defaults', () {
-      final config = AppConfig.fromMap({
-        ..._env(flavor: 'prod'),
+      final config = AppConfig.fromMap(Flavor.prod, {
+        ..._env(),
         'LOG_LEVEL': 'off',
         'ENABLE_CRASH_REPORTING': 'false',
         'ENABLE_ANALYTICS': 'true',
@@ -78,13 +79,17 @@ void main() {
     });
 
     test('empty optional CRASH_DSN is treated as not configured', () {
-      final config = AppConfig.fromMap({..._env(), 'CRASH_DSN': ''});
+      final config = AppConfig.fromMap(Flavor.dev, {
+        ..._env(),
+        'CRASH_DSN': '',
+      });
 
       expect(config.crashDsn, isNull);
     });
 
     test('dev may use http for a local backend', () {
       final config = AppConfig.fromMap(
+        Flavor.dev,
         _env(apiBaseUrl: 'http://10.0.2.2:8080'),
       );
 
@@ -92,7 +97,10 @@ void main() {
     });
 
     test('surrounding whitespace is ignored', () {
-      final config = AppConfig.fromMap({..._env(), 'APP_NAME': '  Test App  '});
+      final config = AppConfig.fromMap(Flavor.dev, {
+        ..._env(),
+        'APP_NAME': '  Test App  ',
+      });
 
       expect(config.appName, 'Test App');
     });
@@ -100,7 +108,6 @@ void main() {
 
   group('missing required keys', () {
     for (final key in const [
-      'FLAVOR',
       'APP_NAME',
       'API_BASE_URL',
       'CONNECT_TIMEOUT_MS',
@@ -122,11 +129,10 @@ void main() {
     test('every problem is listed together, not just the first', () {
       final problems = _problemsOf({});
 
-      expect(problems, hasLength(5));
+      expect(problems, hasLength(4));
       expect(
         problems,
         containsAll([
-          contains('FLAVOR'),
           contains('APP_NAME'),
           contains('API_BASE_URL'),
           contains('CONNECT_TIMEOUT_MS'),
@@ -137,13 +143,6 @@ void main() {
   });
 
   group('invalid values', () {
-    test('unknown flavor is rejected', () {
-      expect(
-        _problemsOf(_env(flavor: 'production')),
-        anyElement(contains('FLAVOR must be one of')),
-      );
-    });
-
     test('bad API_BASE_URL values are rejected', () {
       for (final bad in const [
         'not a url',
@@ -159,13 +158,11 @@ void main() {
     });
 
     test('http API_BASE_URL is rejected in staging and prod', () {
-      for (final flavor in const ['staging', 'prod']) {
+      for (final flavor in const [Flavor.staging, Flavor.prod]) {
         expect(
-          _problemsOf(
-            _env(flavor: flavor, apiBaseUrl: 'http://api.example.com'),
-          ),
+          _problemsOf(_env(apiBaseUrl: 'http://api.example.com'), flavor),
           anyElement(contains('must use https')),
-          reason: flavor,
+          reason: flavor.name,
         );
       }
     });
@@ -212,68 +209,99 @@ void main() {
 
     test('several bad values are all reported in one exception', () {
       final problems = _problemsOf({
-        ..._env(flavor: 'prod', apiBaseUrl: 'http://api.example.com'),
+        ..._env(apiBaseUrl: 'http://api.example.com'),
         'CONNECT_TIMEOUT_MS': '0',
         'ENABLE_ANALYTICS': 'maybe',
-      });
+      }, Flavor.prod);
 
       expect(problems, hasLength(3));
     });
   });
 
   group('ConfigException', () {
-    test('message names the example run command', () {
-      const exception = ConfigException(['FLAVOR is required.']);
+    test('message lists every problem and names the env file fix', () {
+      const exception = ConfigException(['APP_NAME is required.']);
 
       expect(
         exception.toString(),
         allOf(
-          contains('- FLAVOR is required.'),
-          contains(
-            'flutter run -t lib/main_dev.dart '
-            '--dart-define-from-file=env/dev.json',
-          ),
+          contains('- APP_NAME is required.'),
+          contains('env/<flavor>.env.example'),
         ),
       );
     });
   });
 
-  group('ensureFlavor', () {
-    test('passes when the entrypoint flavor matches', () {
-      final config = AppConfig.fromMap(_env(flavor: 'staging'));
-
-      expect(() => config.ensureFlavor(Flavor.staging), returnsNormally);
+  group('Flavor.current', () {
+    test('release builds resolve to prod', () {
+      expect(Flavor.resolve(isRelease: true), Flavor.prod);
     });
 
-    test('throws when the file flavor differs from the entrypoint', () {
-      final config = AppConfig.fromMap(_env(flavor: 'prod'));
+    test('debug and profile builds resolve to dev', () {
+      expect(Flavor.resolve(isRelease: false), Flavor.dev);
+    });
 
+    test('current is dev under flutter test (not a release build)', () {
+      expect(Flavor.current, Flavor.dev);
+    });
+  });
+
+  group('EnvLoader', () {
+    test('asset path is env/<flavor>.env', () {
+      expect(EnvLoader.assetPath(Flavor.staging), 'env/staging.env');
+    });
+
+    test('parses the env file text into a map', () async {
+      final values = await EnvLoader.load(
+        Flavor.dev,
+        reader: (path) async {
+          expect(path, 'env/dev.env');
+          return '# comment\nAPP_NAME=Test App\nAPI_BASE_URL=https://a.example.com\n';
+        },
+      );
+
+      expect(values, {
+        'APP_NAME': 'Test App',
+        'API_BASE_URL': 'https://a.example.com',
+      });
+    });
+
+    test('missing file throws ConfigException with the copy hint', () {
       expect(
-        () => config.ensureFlavor(Flavor.dev),
+        EnvLoader.load(
+          Flavor.dev,
+          reader: (path) async => throw StateError('Unable to load asset'),
+        ),
         throwsA(
           isA<ConfigException>().having(
             (e) => e.problems.single,
             'problem',
-            allOf(contains('"prod"'), contains('"dev"')),
+            allOf(
+              contains('env/dev.env is missing'),
+              contains('Copy env/dev.env.example to env/dev.env'),
+            ),
           ),
         ),
       );
     });
-  });
 
-  group('fromEnvironment', () {
-    test('without --dart-define values it reports every required key', () {
-      // flutter test passes no defines, so every key is missing.
-      expect(
-        () => AppConfig.fromEnvironment(),
-        throwsA(
-          isA<ConfigException>().having(
-            (e) => e.problems,
-            'problems',
-            containsAll([contains('FLAVOR'), contains('API_BASE_URL')]),
+    test('empty file throws ConfigException with the copy hint', () {
+      for (final text in const ['', '  \n# only a comment\n']) {
+        expect(
+          EnvLoader.load(Flavor.prod, reader: (path) async => text),
+          throwsA(
+            isA<ConfigException>().having(
+              (e) => e.problems.single,
+              'problem',
+              allOf(
+                contains('env/prod.env is empty'),
+                contains('Copy env/prod.env.example to env/prod.env'),
+              ),
+            ),
           ),
-        ),
-      );
+          reason: text,
+        );
+      }
     });
   });
 
@@ -296,7 +324,7 @@ void main() {
     });
 
     test('returns the override when one is provided', () {
-      final config = AppConfig.fromMap(_env());
+      final config = AppConfig.fromMap(Flavor.dev, _env());
       final container = ProviderContainer(
         overrides: [appConfigProvider.overrideWithValue(config)],
       );
@@ -306,18 +334,16 @@ void main() {
     });
   });
 
-  group('env/*.example.json', () {
+  group('env/*.env.example', () {
     for (final flavor in Flavor.values) {
       test('${flavor.name} example is a valid config for its flavor', () {
-        final file = File('env/${flavor.name}.example.json');
-        final decoded =
-            jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
-        final env = decoded.map((key, value) => MapEntry(key, '$value'));
+        final file = File('env/${flavor.name}.env.example');
+        final env = DotEnv()
+          ..loadFromString(envString: file.readAsStringSync());
 
-        final config = AppConfig.fromMap(env);
+        final config = AppConfig.fromMap(flavor, env.env);
 
         expect(config.flavor, flavor);
-        expect(() => config.ensureFlavor(flavor), returnsNormally);
       });
     }
   });
