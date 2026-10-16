@@ -11,3 +11,6 @@ Status: skeleton. Steps marked (pending C-xx) depend on a task that is not DONE 
 7. **First feature**: follow `.claude/skills/new-feature/SKILL.md` (scaffold from `.fttemplates`, register the route, write tests).
 8. **Gate before every commit**: the Definition of Done commands in `CLAUDE.md`.
 9. **Release** (pending C-28): `.claude/skills/release-check/SKILL.md`, signing files stay untracked.
+
+## Toolchain requirements (C-43)
+Verified versions: Flutter 3.47 (Dart per `pubspec.yaml`), JDK 17+ (21 works), Gradle wrapper 8.14.3, Android Gradle Plugin 8.11.1, Kotlin Gradle plugin 2.4.0 (plugins ship Kotlin 2.4 metadata, so the project plugin must be >= 2.4), `compileSdk` 37 (required by `permission_handler_android`), `minSdk` 24, Java/Kotlin target 17, NDK from Flutter (28.2), iOS deployment target 15.0 with CocoaPods (`pod install` runs on the first iOS build). Create `env/{dev,staging,prod}.env` from the examples before the first build. Release builds need `android/key.properties` (see `tool/release/README.md`). Flutter warns that Gradle < 9.1 and AGP < 9.0.1 will be dropped soon; plan that upgrade as its own task once the Firebase and other plugins support AGP 9.
