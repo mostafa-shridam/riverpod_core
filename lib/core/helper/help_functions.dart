@@ -6,7 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod_core/core/constants.dart';
 import 'package:riverpod_core/core/extension/theme_extenison.dart';
-import 'package:riverpod_core/core/themes/app_colors.dart';
+import 'package:riverpod_core/design_system/tokens/app_colors.dart';
+import 'package:riverpod_core/design_system/tokens/brand_config.dart';
 import 'package:riverpod_core/generated/locale_keys.g.dart';
 import 'package:riverpod_core/main.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -91,15 +92,15 @@ void showSnackBar({
   switch (type) {
     case SnackBarType.info:
       icon = Icons.info;
-      color = AppColors.warning;
+      color = AppSemanticColors.light.warning;
       break;
     case SnackBarType.success:
       icon = Icons.check_circle;
-      color = AppColors.success;
+      color = AppSemanticColors.light.success;
       break;
     case SnackBarType.error:
       icon = Icons.error;
-      color = AppColors.danger;
+      color = ColorScheme.fromSeed(seedColor: brandSeedColor).error;
       break;
   }
   width ??= kIsWeb ? 400 : width;
