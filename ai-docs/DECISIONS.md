@@ -171,3 +171,8 @@ at implementation time and record them in its report.
 ## D-032 — No silent provider retries
 - Decision: the root container disables Riverpod's automatic retry of failing provider builds (`retry: (_, _) => null`). Network retries are done only by the Dio retry interceptor (idempotent requests, backoff); user-visible retry is an explicit action (ErrorState retry button / `ref.invalidate`).
 - Why: double retry layers hide errors, delay error states and repeat non-idempotent work.
+
+## D-033 — image_cropper and file_picker
+- Decision: add `image_cropper` (BSD-3, active, native UCrop/TOCropViewController, themed from the design system) and `file_picker` (MIT) behind `MediaService` (C-23); features never import them. Latest stable versions resolved and recorded in the C-23 report. `image_picker`, `flutter_image_compress`, `permission_handler` are already dependencies. QR scanning (`mobile_scanner`) stays optional/backlog.
+- Why: crop and file picking are checklist items and need native UIs; each is a small, standard plugin.
+- Rejected: `crop_your_image` (pure Dart, heavy on the UI thread), own file picking.

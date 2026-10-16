@@ -232,11 +232,47 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-40 — Wire locale, digit pref and provider retry policy into bootstrap
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| BLOCKED | — | C-11 |
 - Goal: close the loose ends of C-08/C-12/C-14: bootstrap uses the real locale resolver, digits preference is persisted, Riverpod auto-retry policy is explicit.
 - Files: `lib/bootstrap.dart`, `lib/app/app.dart`, `lib/core/storage/prefs_storage.dart` (+ `.g.dart`), `lib/l10n/**` (only the provider wiring for `appFormattersProvider`), `test/bootstrap_test.dart`, `test/core/storage/prefs_storage_test.dart`, `test/l10n/**`, `test/helpers/pump_app.dart` (pass `ignorePluralRules: false`), `test/helpers/fake_prefs_storage.dart`, `ai-docs/STATE_AND_DATA.md` (copyWithPrevious note)
 - Done when: bootstrap wires exactly as `ai-docs/reports/C-12.md` "wiring" says (`resolveStartLocale`, `saveLocale: false`, `ignorePluralRules: false`, `await initL10nFormatting()`); `useArabicIndicDigits` pref added and read by `appFormattersProvider`; the root `ProviderContainer` is created with `retry: (retryCount, error) => null` (no silent provider retries: network retry is the Dio interceptor's job, D-032); the legacy `getLanguageCodeHelper` stubs are no longer referenced by bootstrap; STATE_AND_DATA.md no longer shows `copyWithPrevious` (use `ref.state.copyWithPrevious` only where riverpod allows, otherwise `AsyncLoading<T>().copyWithPrevious`-free pattern recorded in D-031).
 - Tests: bootstrap starts with the saved locale; formatter flag persisted and applied; container retry disabled (a failing provider build is not retried).
+
+## C-15 — Upload and download with progress and cancel
+| status | owner | blocked by |
+|---|---|---|
+| READY | — | — |
+- Goal: NETWORKING.md "Upload / download".
+- Files: `lib/core/network/transfer/**` (`transfer_progress.dart`, `upload_service.dart`, `download_service.dart`, `transfer_controller.dart`), `test/core/network/transfer/**`
+- Done when: `UploadService.upload({path, file(s), fields, onProgress, cancelToken})` multipart through `dioProvider`; `DownloadService.download(url, fileName, onProgress, cancelToken)` into the app cache/documents dir (path_provider) writing to a `.part` file renamed on success and deleted on cancel/failure, resumes NOT required; progress as `Stream<double>` 0..1 and as a `@riverpod` `TransferController` (state: idle, running(progress), done(result), failed(AppException), cancelled) with `cancel()`; errors mapped with `mapError`; no file kept on failure; directory provider injectable for tests.
+- Tests: progress emission, cancel mid-transfer (partial file removed), failure maps to AppException, success renames file, multipart fields (FakeHttpAdapter + temp dir).
+
+## C-23 — Permissions and media (picker, crop, compress, file picker)
+| status | owner | blocked by |
+|---|---|---|
+| READY | — | — (D-033) |
+- Goal: checklist "Media & device".
+- Files: `lib/core/permissions/**` (`app_permission.dart`, `permission_service.dart`, `permission_rationale.dart`), `lib/core/media/**` (`media_service.dart`, `image_processing.dart`, `picked_media.dart`), delete `lib/core/mixins/image_picker.dart` (grep importers first; migrate none: nothing should import it), `android/app/src/main/AndroidManifest.xml` (camera, storage-free photo picker permissions only), `ios/Runner/Info.plist` (NSCameraUsageDescription, NSPhotoLibraryUsageDescription, NSMicrophoneUsageDescription), `pubspec.yaml`, `pubspec.lock` (add `image_cropper`, `file_picker`), `assets/translations/*.json` (top-level `ds_permissions`, appended; strings for the rationale dialog), `lib/core/design_system/widgets/permissions/permission_rationale_dialog.dart`, `test/core/permissions/**`, `test/core/media/**`, `test/core/design_system/widgets/permissions/**`
+- Done when: `PermissionService` (keepAlive provider over `permission_handler` behind an injectable interface): `status/request`, rationale flow (`ensure(permission, context)` shows `PermissionRationaleDialog` before the system prompt when `shouldShowRationale`, and an "Open settings" action when permanently denied), result enum `granted/denied/permanentlyDenied/restricted/limited`; `MediaService`: `pickImage(source: camera|gallery, crop: bool, maxWidth/quality)`, `pickMultiImage`, `pickFile(types)`, `pickVideo`; compression via `flutter_image_compress` (already a dependency) with sane defaults (max 1920 px, quality 85), cropping via `image_cropper` themed from the design system; everything returns `PickedMedia(path, size, mimeType)`; cancellation returns null; errors mapped to `AppException`; platform plugins sit behind injectable interfaces so tests need no channel; QR scanner is NOT part of this task (optional, backlog).
+- Tests: permission flow branches with a fake permission backend (granted, denied->request, permanently denied->settings), media pipeline with fake pickers (compression parameters, null on cancel), rationale dialog widget tests + goldens (light/dark x ar/en).
+
+## C-27 — GitHub Actions CI
+| status | owner | blocked by |
+|---|---|---|
+| READY | — | — |
+- Goal: every push/PR runs the gate.
+- Files: `.github/workflows/ci.yml`, `.github/workflows/README.md` (how it works, how to add secrets, nothing secret inside)
+- Done when: workflow on `push` and `pull_request` using the stable Flutter channel pinned through `subosito/flutter-action` with caching (`cache: true`), steps: checkout, `flutter pub get`, create `env/*.env` from the committed `*.env.example` files, `dart run easy_localization:generate` x2 (as in `build.sh`), `dart run build_runner build --delete-conflicting-outputs`, `git diff --exit-code` on tracked generated files (fails when generated code is stale), `dart format --set-exit-if-changed lib test tool`, `flutter analyze`, `flutter test --coverage`, upload `coverage/lcov.info` as an artifact, and a build job `flutter build apk --debug` (Android) plus `flutter build ios --no-codesign --debug` on macOS runner (separate job, `needs` the test job); concurrency group cancels superseded runs; least-privilege `permissions: contents: read`. No secrets required. Pin action versions to the latest stable major/sha you verify, record them in the README.
+- Tests: validate with `dart run` YAML parse (a small script in the report, not committed) and, if `actionlint` is available locally, run it; otherwise state it in the report.
+
+## C-28 — Release scripts and signing from untracked files
+| status | owner | blocked by |
+|---|---|---|
+| READY | — | — |
+- Goal: checklist "Android/iOS release scripts with signing from untracked files".
+- Files: `tool/release/build_android.sh`, `tool/release/build_ios.sh`, `tool/release/README.md`, `android/app/build.gradle.kts` (signing config reading `android/key.properties`, falls back to debug signing ONLY when the file is absent AND the build type is not release: a release build without `key.properties` must fail with a clear message), `android/key.properties.example`, `ios/ExportOptions.plist.example`, `.gitignore` (add `android/key.properties`, `*.jks`, `*.keystore`, `ios/ExportOptions.plist`, `*.mobileprovision`, `build-symbols/`)
+- Done when: `build_android.sh [--flavor staging|prod]` runs the `release-check` skill pre-gate (`dart format`, `analyze`, `test`), then `flutter build appbundle --release --obfuscate --split-debug-info=build-symbols/android` (entrypoint `lib/main.dart` for prod, `lib/main_staging.dart` for staging), verifies `env/<flavor>.env` exists, and prints the artifact path; `build_ios.sh` does the same with `flutter build ipa --release --export-options-plist=ios/ExportOptions.plist`; scripts are `set -euo pipefail`, executable, never echo secrets; the README documents creating the keystore (`keytool` command), `key.properties` fields, where to keep the files, and the iOS export options; no secrets committed (only `*.example`).
+- Tests: `bash -n` on both scripts, `shellcheck` if available, and `./gradlew` is NOT run; show in the report that `flutter build apk --release` without key.properties fails with the clear message (run it once if the Android toolchain is installed, otherwise say it was not run).
 
 ---
 
@@ -247,7 +283,5 @@ C-17 Auth (session controller, token handling, logout reset) ·
 C-18 Onboarding + splash pages · C-19 Biometric lock, screenshot blocking, root check ·
 C-20 FCM end-to-end + local notifications cleanup (singletons → providers) ·
 C-21 Remote config: force update, maintenance · C-22 Share, external links, in-app review, version page ·
-C-23 Media: picker + crop + compression, file picker, permissions flow, optional QR ·
 C-25 `.fttemplates/feature` + `tool/new_feature` ·
-C-26 Integration tests (auth flow + one feature flow) · C-27 GitHub Actions CI · C-28 Release scripts + signing ·
-C-29 README + HOW_TO_START_A_NEW_APP · C-30 Crash/analytics vendor · C-36 Legacy cleanup (remove `lib/core/extension/theme_extenison.dart` hardcoded swatch, `lib/core/themes` leftovers, `responsive_framework` if unused, old `core/services` singletons).
+C-26 Integration tests (auth flow + one feature flow) · C-29 README + HOW_TO_START_A_NEW_APP · C-30 Crash/analytics vendor · C-36 Legacy cleanup (remove `lib/core/extension/theme_extenison.dart` hardcoded swatch, `lib/core/themes` leftovers, `responsive_framework` if unused, old `core/services` singletons).
