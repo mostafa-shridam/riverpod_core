@@ -232,7 +232,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-40 — Wire locale, digit pref and provider retry policy into bootstrap
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | worker-q | — |
 - Goal: close loose ends of C-08/C-12/C-14 after D-035: bootstrap uses easy_localization's own persistence and plurals, Riverpod auto-retry policy is explicit.
 - Files: `lib/core/bootstrap/bootstrap.dart`, `lib/core/app/app.dart`, `test/core/bootstrap/bootstrap_test.dart`, `test/helpers/pump_app.dart` (pass `ignorePluralRules: false`), `ai-docs/STATE_AND_DATA.md` (copyWithPrevious note)
 - Done when: `EasyLocalization(saveLocale: true, ignorePluralRules: false, startLocale: null (device locale if supported, else fallback))` + `await initFormatting()` before `runApp`; no reference to the legacy `getLanguageCodeHelper` stubs; the root `ProviderContainer` is created with `retry: (retryCount, error) => null` (D-032); STATE_AND_DATA.md no longer shows the internal `copyWithPrevious` pattern (see D-031).
