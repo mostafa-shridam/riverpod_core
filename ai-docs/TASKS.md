@@ -77,7 +77,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-07 — Dio client, interceptors, wiring of error mapping
 | status | owner | blocked by |
 |---|---|---|
-| REVIEW | Worker A | — |
+| DONE | worker-a | — |
 - Goal: NETWORKING.md "Client" and "Interceptors" (D-008).
 - Files: `lib/core/network/dio_client.dart`, `lib/core/network/interceptors/**` (`idempotency`, `auth`, `refresh_token`, `retry_backoff`, `logging`, `error_mapping`), delete `lib/core/remote_services/**` and `lib/core/error_handler/**`, `test/core/network/**`
 - Done when: `dioProvider`/`refreshDioProvider` (keepAlive) read `AppConfig`; interceptors in documented order; single-flight refresh with request queue; retry/backoff rules; idempotency key; redacted dev-only logging; error interceptor uses `mapError`; old `ApiResult/ApiService/ErrorHandler/FailureMessages` deleted, no references.
@@ -214,7 +214,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-14 — Pagination helpers and PaginatedListView
 | status | owner | blocked by |
 |---|---|---|
-| REVIEW | — | — |
+| DONE | worker-b | — |
 - Goal: NETWORKING.md "Pagination" (cursor + offset) with infinite scroll.
 - Files: `lib/core/network/pagination/**` (`page.dart`, `page_request.dart`, `paginated_state.dart` freezed, `paginated_notifier.dart`), `lib/core/design_system/widgets/lists/**` (`paginated_list_view.dart`, `pagination_footer.dart`, `lists_strings.dart`), `assets/translations/ar.json` + `en.json` (top-level `ds_lists`, appended, D-023), `test/core/network/pagination/**`, `test/core/design_system/widgets/lists/**`, `test/goldens/lists/**`
 - Done when: `Page<T>(items, nextCursor/nextOffset, hasMore)`; `PageRequest` sealed (cursor | offset, pageSize); `PaginatedNotifier<T>` base for `@riverpod` notifiers: abstract `fetchPage(PageRequest)`, `build` loads the first page, `loadMore()` (ignores calls while loading or when `!hasMore`), `refresh()` keeps previous items while reloading, de-duplication by an overridable `idOf`, error on a next page keeps the loaded items and exposes a retryable page error (the `partial` state), cancels in-flight work on dispose; `PaginatedListView` (sliver-based, pull-to-refresh, triggers `loadMore` at 80% scroll, footer shows loader / retry row / end-of-list, empty and first-load states left to the caller via builders, RTL-safe, tokens only, Semantics).
@@ -228,6 +228,15 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 - Files: `lib/core/storage/cache/**` (`cache_result.dart`, `cached_repository_helper.dart`, `cache_policy.dart`), `test/core/storage/cache/**`
 - Done when: `CacheResult<T>(data, isStale, savedAt, error?)`; `CachedRepositoryHelper.watch<T>({key, fetch, decode, encode, ttl})` returns `Stream<CacheResult<T>>`: (1) emits the cached value immediately with `isStale = expired(ttl)` if present, (2) fetches in the background, on success writes the cache and emits the fresh value (`isStale=false`), (3) on failure emits the cached value flagged stale together with the `AppException` (mapped with `mapError`), or just errors when there is no cache; `read` (one-shot) and `invalidate(key)`/`clearAll` helpers; keys for user-scoped data take a `userId` parameter and are prefixed; `etag` stored when the fetch provides one; time source injectable (`Clock`-style function) so tests need no real time; `keepAlive` provider for the helper using `AppDatabase`.
 - Tests (in-memory Drift): cache miss, hit fresh, hit expired, fetch failure with and without cache, write on success, invalidate, user scoping, concurrent watchers share one fetch.
+
+## C-40 — Wire locale, digit pref and provider retry policy into bootstrap
+| status | owner | blocked by |
+|---|---|---|
+| READY | — | — |
+- Goal: close the loose ends of C-08/C-12/C-14: bootstrap uses the real locale resolver, digits preference is persisted, Riverpod auto-retry policy is explicit.
+- Files: `lib/bootstrap.dart`, `lib/app/app.dart`, `lib/core/storage/prefs_storage.dart` (+ `.g.dart`), `lib/l10n/**` (only the provider wiring for `appFormattersProvider`), `test/bootstrap_test.dart`, `test/core/storage/prefs_storage_test.dart`, `test/l10n/**`, `test/helpers/pump_app.dart` (pass `ignorePluralRules: false`), `test/helpers/fake_prefs_storage.dart`, `ai-docs/STATE_AND_DATA.md` (copyWithPrevious note)
+- Done when: bootstrap wires exactly as `ai-docs/reports/C-12.md` "wiring" says (`resolveStartLocale`, `saveLocale: false`, `ignorePluralRules: false`, `await initL10nFormatting()`); `useArabicIndicDigits` pref added and read by `appFormattersProvider`; the root `ProviderContainer` is created with `retry: (retryCount, error) => null` (no silent provider retries: network retry is the Dio interceptor's job, D-032); the legacy `getLanguageCodeHelper` stubs are no longer referenced by bootstrap; STATE_AND_DATA.md no longer shows `copyWithPrevious` (use `ref.state.copyWithPrevious` only where riverpod allows, otherwise `AsyncLoading<T>().copyWithPrevious`-free pattern recorded in D-031).
+- Tests: bootstrap starts with the saved locale; formatter flag persisted and applied; container retry disabled (a failing provider build is not retried).
 
 ---
 

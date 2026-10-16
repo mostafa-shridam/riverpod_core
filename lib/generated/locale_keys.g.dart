@@ -111,4 +111,8 @@ abstract class LocaleKeys {
   static const ds_async_bannerLastUpdated = 'ds_async.bannerLastUpdated';
   static const ds_async_partialError = 'ds_async.partialError';
   static const ds_async = 'ds_async';
+  static const ds_lists_loadingMore = 'ds_lists.loadingMore';
+  static const ds_lists_endOfList = 'ds_lists.endOfList';
+  static const ds_lists_retry = 'ds_lists.retry';
+  static const ds_lists = 'ds_lists';
 }

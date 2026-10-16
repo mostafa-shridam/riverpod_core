@@ -209,7 +209,7 @@ final class DioProvider extends $FunctionalProvider<Dio, Dio, Dio>
   }
 }
 
-String _$dioHash() => r'58af79af0640a1febdb58f8bf536b74c596fdaf7';
+String _$dioHash() => r'cf6ee286bdbeaf78fdc9516876228961e9f55f0e';
 
 /// Client for the refresh-token call only. It has no auth and no refresh
 /// interceptor, so a 401 on the refresh call cannot recurse.

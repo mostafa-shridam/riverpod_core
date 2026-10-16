@@ -36,7 +36,9 @@ Folder rule: one folder per widget family, one file per widget (`app_button.dart
 | `feedback/snackbar/`, `feedback/progress/`, `feedback/banner/`, `feedback/tooltip/` | `showAppSnackbar`/`showAppToast`, `AppMessenger`; `AppProgressBar`, `AppProgressIndicator`; `AppBanner`; `AppTooltip` | C-33 |
 | `display/` | `AppCard`, `AppListTile`, `AppSectionHeader`, `AppDivider`, `AppAvatar`, `AppBadge`, `AppChip`, `AppImage`, `AppAccordion` | C-34 |
 | `layout/` | `AppScaffold`, `AppAppBar`, `AppTabBar`, `AppBottomNavBar`, `AppStepper` | C-34 |
-| `async/` | `AsyncValueView`, `EmptyState`, `ErrorState`, `Skeleton`, `OfflineBanner`, `PaginatedListView` | C-10, C-14 |
+| `async/` | `AsyncValueView`, `EmptyState`, `ErrorState`, `Skeleton`, `OfflineBanner` | C-10 |
+| `lists/` | `PaginatedListView`, pagination footer | C-14 |
+| `media/` | `AppVideoPlayer` (+ controller, controls) | C-38 |
 The gallery page (`/showcase`, dev/staging only, C-35) shows every widget live in light/dark, ar/en and any text scale.
 
 ### Look and feel (why it looks like this)

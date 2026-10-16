@@ -173,6 +173,11 @@ class CodegenLoader extends AssetLoader {
       "bannerLastUpdated": "Last updated {}",
       "partialError": "Some content couldn't be loaded.",
     },
+    "ds_lists": {
+      "loadingMore": "Loading more",
+      "endOfList": "You've reached the end",
+      "retry": "Try again",
+    },
   };
   static const Map<String, dynamic> _ar = {
     "hello": "مرحبا",
@@ -332,6 +337,11 @@ class CodegenLoader extends AssetLoader {
       "bannerStale": "يتم عرض البيانات المحفوظة",
       "bannerLastUpdated": "آخر تحديث {}",
       "partialError": "تعذّر تحميل بعض المحتوى.",
+    },
+    "ds_lists": {
+      "loadingMore": "جارٍ تحميل المزيد",
+      "endOfList": "لقد وصلت إلى النهاية",
+      "retry": "إعادة المحاولة",
     },
   };
   static const Map<String, Map<String, dynamic>> mapLocales = {

@@ -167,3 +167,7 @@ at implementation time and record them in its report.
 ## D-031 — core/design_system may import core/connectivity and core/errors
 - Decision: `AsyncValueView`/`OfflineBanner` read `connectivityProvider`; error widgets read `AppException`. So `core/design_system` may import `core/connectivity`, `core/errors`, `core/utils` (supersedes the narrower rule in ARCHITECTURE.md). `copyWithPrevious` is internal in riverpod 3.4.x: STATE_AND_DATA.md examples use `AsyncLoading<T>().copyWithPrevious(state)` only through the helper in `core/utils` created when first needed, or the notifier keeps `state` and flags `isRefreshing` itself.
 - Why: the task requires them; keeps the data-state logic in one widget.
+
+## D-032 — No silent provider retries
+- Decision: the root container disables Riverpod's automatic retry of failing provider builds (`retry: (_, _) => null`). Network retries are done only by the Dio retry interceptor (idempotent requests, backoff); user-visible retry is an explicit action (ErrorState retry button / `ref.invalidate`).
+- Why: double retry layers hide errors, delay error states and repeat non-idempotent work.
