@@ -1,10 +1,15 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod_core/core/notifications/models/notification_permission_state.dart';
-import 'package:riverpod_core/core/notifications/permission/notification_permission_flow.dart';
+import 'package:riverpod_core/core/notifications/permission/notification_permission_state.dart';
+import 'package:riverpod_core/core/permissions/app_permission.dart';
+import 'package:riverpod_core/core/permissions/permission_rationale.dart';
+import 'package:riverpod_core/core/permissions/permission_service.dart';
 
 import '../../helpers/fake_notification_backends.dart';
 
+/// Notification permission goes through the shared [PermissionService]; these
+/// tests pin what the notification UI sees from it.
 void main() {
   late FakeNotificationPermissionBackend backend;
   late List<bool> rationaleCalls;
@@ -14,11 +19,11 @@ void main() {
     WidgetTester tester, {
     bool withPresenter = true,
   }) async {
-    final flow = NotificationPermissionFlow(
+    final service = PermissionService(
       backend: backend,
       presenter: withPresenter
-          ? (context, {required openSettings}) async {
-              rationaleCalls.add(openSettings);
+          ? (context, PermissionRationaleRequest request) async {
+              rationaleCalls.add(request.openSettings);
               return accept;
             }
           : null,
@@ -32,7 +37,10 @@ void main() {
         },
       ),
     );
-    return (await tester.runAsync(() => flow.ensure(context)))!;
+    final result = (await tester.runAsync(
+      () => service.ensure(AppPermission.notifications, context),
+    ))!;
+    return notificationStateOf(result);
   }
 
   setUp(() {
@@ -42,7 +50,7 @@ void main() {
   });
 
   testWidgets('granted: nothing shown, nothing requested', (tester) async {
-    backend.state = NotificationPermissionState.granted;
+    backend.state = AppPermissionResult.granted;
 
     final state = await run(tester);
 
@@ -51,11 +59,14 @@ void main() {
     expect(backend.requests, 0);
   });
 
-  testWidgets('provisional counts as allowed', (tester) async {
-    backend.state = NotificationPermissionState.provisional;
+  testWidgets('provisional counts as allowed and is not asked again', (
+    tester,
+  ) async {
+    backend.state = AppPermissionResult.provisional;
 
     final state = await run(tester);
 
+    expect(state, NotificationPermissionState.provisional);
     expect(state.isAllowed, isTrue);
     expect(backend.requests, 0);
   });
@@ -87,7 +98,7 @@ void main() {
   ) async {
     backend
       ..rationale = true
-      ..requestResult = NotificationPermissionState.granted;
+      ..requestResult = AppPermissionResult.granted;
     accept = false;
 
     final state = await run(tester);
@@ -106,10 +117,10 @@ void main() {
     expect(backend.requests, 1);
   });
 
-  testWidgets('the user refuses the prompt: denied is returned', (
+  testWidgets('the user refuses the prompt: permanently denied is returned', (
     tester,
   ) async {
-    backend.requestResult = NotificationPermissionState.permanentlyDenied;
+    backend.requestResult = AppPermissionResult.permanentlyDenied;
 
     final state = await run(tester);
 
@@ -119,7 +130,7 @@ void main() {
   testWidgets('permanently denied, accepted: settings open, no prompt', (
     tester,
   ) async {
-    backend.state = NotificationPermissionState.permanentlyDenied;
+    backend.state = AppPermissionResult.permanentlyDenied;
 
     final state = await run(tester);
 
@@ -130,7 +141,7 @@ void main() {
   });
 
   testWidgets('permanently denied, declined: nothing opens', (tester) async {
-    backend.state = NotificationPermissionState.permanentlyDenied;
+    backend.state = AppPermissionResult.permanentlyDenied;
     accept = false;
 
     await run(tester);
@@ -141,10 +152,30 @@ void main() {
   testWidgets('permanently denied without a presenter: nothing opens', (
     tester,
   ) async {
-    backend.state = NotificationPermissionState.permanentlyDenied;
+    backend.state = AppPermissionResult.permanentlyDenied;
 
     await run(tester, withPresenter: false);
 
     expect(backend.settingsOpened, 0);
+  });
+
+  group('state names for the notification UI', () {
+    test('limited is granted, restricted is permanently denied', () {
+      expect(
+        notificationStateOf(AppPermissionResult.limited),
+        NotificationPermissionState.granted,
+      );
+      expect(
+        notificationStateOf(AppPermissionResult.restricted),
+        NotificationPermissionState.permanentlyDenied,
+      );
+    });
+
+    test('provisional stays provisional', () {
+      expect(
+        notificationStateOf(AppPermissionResult.provisional),
+        NotificationPermissionState.provisional,
+      );
+    });
   });
 }

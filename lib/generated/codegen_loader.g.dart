@@ -214,6 +214,9 @@ class CodegenLoader extends AssetLoader {
       "microphoneTitle": "Microphone access",
       "microphoneMessage":
           "Allow microphone access to record audio inside the app.",
+      "notificationsTitle": "Turn on notifications",
+      "notificationsMessage":
+          "Get timely alerts and reminders from the app. You can change this any time in settings.",
     },
     "notifications": {
       "groupUpdates": "Updates",
@@ -690,6 +693,9 @@ class CodegenLoader extends AssetLoader {
       "microphoneTitle": "الوصول إلى الميكروفون",
       "microphoneMessage":
           "اسمح بالوصول إلى الميكروفون لتسجيل الصوت داخل التطبيق.",
+      "notificationsTitle": "تفعيل الإشعارات",
+      "notificationsMessage":
+          "احصل على تنبيهات وتذكيرات مهمة من التطبيق في وقتها. يمكنك تغيير ذلك في أي وقت من الإعدادات.",
     },
     "notifications": {
       "groupUpdates": "التحديثات",

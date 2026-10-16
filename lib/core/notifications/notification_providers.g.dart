@@ -262,175 +262,6 @@ final class PushBackendProvider
 
 String _$pushBackendHash() => r'06cf5c607f543c3373b8aa324d72799bfa0d1a38';
 
-/// Platform seam for the notification permission: override in tests.
-
-@ProviderFor(notificationPermissionBackend)
-final notificationPermissionBackendProvider =
-    NotificationPermissionBackendProvider._();
-
-/// Platform seam for the notification permission: override in tests.
-
-final class NotificationPermissionBackendProvider
-    extends
-        $FunctionalProvider<
-          NotificationPermissionBackend,
-          NotificationPermissionBackend,
-          NotificationPermissionBackend
-        >
-    with $Provider<NotificationPermissionBackend> {
-  /// Platform seam for the notification permission: override in tests.
-  NotificationPermissionBackendProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'notificationPermissionBackendProvider',
-        isAutoDispose: false,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$notificationPermissionBackendHash();
-
-  @$internal
-  @override
-  $ProviderElement<NotificationPermissionBackend> $createElement(
-    $ProviderPointer pointer,
-  ) => $ProviderElement(pointer);
-
-  @override
-  NotificationPermissionBackend create(Ref ref) {
-    return notificationPermissionBackend(ref);
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(NotificationPermissionBackend value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<NotificationPermissionBackend>(
-        value,
-      ),
-    );
-  }
-}
-
-String _$notificationPermissionBackendHash() =>
-    r'849d5a4f563bf3b3a20e4610ccf9c393f73b5ae2';
-
-/// The app wires the design-system rationale dialog here. Null means the flow
-/// skips the explanation and goes straight to the system prompt.
-
-@ProviderFor(notificationRationalePresenter)
-final notificationRationalePresenterProvider =
-    NotificationRationalePresenterProvider._();
-
-/// The app wires the design-system rationale dialog here. Null means the flow
-/// skips the explanation and goes straight to the system prompt.
-
-final class NotificationRationalePresenterProvider
-    extends
-        $FunctionalProvider<
-          NotificationRationalePresenter?,
-          NotificationRationalePresenter?,
-          NotificationRationalePresenter?
-        >
-    with $Provider<NotificationRationalePresenter?> {
-  /// The app wires the design-system rationale dialog here. Null means the flow
-  /// skips the explanation and goes straight to the system prompt.
-  NotificationRationalePresenterProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'notificationRationalePresenterProvider',
-        isAutoDispose: false,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$notificationRationalePresenterHash();
-
-  @$internal
-  @override
-  $ProviderElement<NotificationRationalePresenter?> $createElement(
-    $ProviderPointer pointer,
-  ) => $ProviderElement(pointer);
-
-  @override
-  NotificationRationalePresenter? create(Ref ref) {
-    return notificationRationalePresenter(ref);
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(NotificationRationalePresenter? value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<NotificationRationalePresenter?>(
-        value,
-      ),
-    );
-  }
-}
-
-String _$notificationRationalePresenterHash() =>
-    r'56857b2e8c3a6a30cb0ad9bca936f252e622dbd0';
-
-/// The permission flow (status, rationale, system prompt, settings).
-
-@ProviderFor(notificationPermissionFlow)
-final notificationPermissionFlowProvider =
-    NotificationPermissionFlowProvider._();
-
-/// The permission flow (status, rationale, system prompt, settings).
-
-final class NotificationPermissionFlowProvider
-    extends
-        $FunctionalProvider<
-          NotificationPermissionFlow,
-          NotificationPermissionFlow,
-          NotificationPermissionFlow
-        >
-    with $Provider<NotificationPermissionFlow> {
-  /// The permission flow (status, rationale, system prompt, settings).
-  NotificationPermissionFlowProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'notificationPermissionFlowProvider',
-        isAutoDispose: false,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$notificationPermissionFlowHash();
-
-  @$internal
-  @override
-  $ProviderElement<NotificationPermissionFlow> $createElement(
-    $ProviderPointer pointer,
-  ) => $ProviderElement(pointer);
-
-  @override
-  NotificationPermissionFlow create(Ref ref) {
-    return notificationPermissionFlow(ref);
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(NotificationPermissionFlow value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<NotificationPermissionFlow>(value),
-    );
-  }
-}
-
-String _$notificationPermissionFlowHash() =>
-    r'b7d93e6c4fb9196ecdc0bd04b72bcc632c69a057';
-
 /// How the app tells its backend about push tokens. The default does nothing;
 /// override it with a real registrar (see `DioPushTokenRegistrar`).
 
@@ -602,15 +433,17 @@ abstract class _$PushAvailable extends $Notifier<bool> {
   }
 }
 
-/// The OS permission to show notifications. `ref.invalidate` it after the user
-/// returns from the system settings.
+/// The OS permission to show notifications, read through the shared
+/// [PermissionService]. `ref.invalidate` it after the user returns from the
+/// system settings.
 
 @ProviderFor(notificationPermissionState)
 final notificationPermissionStateProvider =
     NotificationPermissionStateProvider._();
 
-/// The OS permission to show notifications. `ref.invalidate` it after the user
-/// returns from the system settings.
+/// The OS permission to show notifications, read through the shared
+/// [PermissionService]. `ref.invalidate` it after the user returns from the
+/// system settings.
 
 final class NotificationPermissionStateProvider
     extends
@@ -622,8 +455,9 @@ final class NotificationPermissionStateProvider
     with
         $FutureModifier<NotificationPermissionState>,
         $FutureProvider<NotificationPermissionState> {
-  /// The OS permission to show notifications. `ref.invalidate` it after the user
-  /// returns from the system settings.
+  /// The OS permission to show notifications, read through the shared
+  /// [PermissionService]. `ref.invalidate` it after the user returns from the
+  /// system settings.
   NotificationPermissionStateProvider._()
     : super(
         from: null,
@@ -651,4 +485,4 @@ final class NotificationPermissionStateProvider
 }
 
 String _$notificationPermissionStateHash() =>
-    r'bb50d475f170726ccd3d7131267c49abf5a6acc3';
+    r'ada6f6001b90925bad620391a8da1391ce7763a0';

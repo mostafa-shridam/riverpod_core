@@ -17,6 +17,8 @@ import 'package:riverpod_core/core/notifications/notification_service_provider.d
 import 'package:riverpod_core/core/notifications/registration/noop_push_token_registrar.dart';
 import 'package:riverpod_core/core/notifications/routing/notification_router_provider.dart';
 import 'package:riverpod_core/core/notifications/settings/notification_settings_controller.dart';
+import 'package:riverpod_core/core/permissions/app_permission.dart';
+import 'package:riverpod_core/core/permissions/permission_service.dart';
 import 'package:riverpod_core/core/router/routes.dart';
 import 'package:riverpod_core/core/storage/database/app_database.dart';
 import 'package:riverpod_core/core/storage/prefs_storage.dart';
@@ -40,7 +42,7 @@ class _Harness {
         loggerProvider.overrideWithValue(recordingLogger(logs)),
         localNotificationBackendProvider.overrideWithValue(local),
         pushBackendProvider.overrideWithValue(push),
-        notificationPermissionBackendProvider.overrideWithValue(permission),
+        permissionBackendProvider.overrideWithValue(permission),
         timezoneBackendProvider.overrideWithValue(FakeTimezoneBackend()),
         pushTokenRegistrarProvider.overrideWithValue(registrar),
         deviceInfoSourceProvider.overrideWithValue(FakeDeviceInfoSource()),
@@ -363,7 +365,7 @@ void main() {
       tester,
     ) async {
       final h = (await tester.runAsync(_Harness.create))!;
-      h.permission.requestResult = NotificationPermissionState.denied;
+      h.permission.requestResult = AppPermissionResult.denied;
       await tester.runAsync(() => h.service.setEnabled(enabled: false));
       late BuildContext context;
       await tester.pumpWidget(
@@ -385,7 +387,7 @@ void main() {
 
     test('permissionState reads the OS state without prompting', () async {
       final h = await _Harness.create();
-      h.permission.state = NotificationPermissionState.permanentlyDenied;
+      h.permission.state = AppPermissionResult.permanentlyDenied;
 
       expect(
         await h.container.read(notificationPermissionStateProvider.future),

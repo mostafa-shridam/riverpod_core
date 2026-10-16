@@ -34,6 +34,7 @@ class PermissionRationaleDialog extends StatelessWidget {
     AppPermission.camera => Icons.photo_camera_rounded,
     AppPermission.photos => Icons.photo_library_rounded,
     AppPermission.microphone => Icons.mic_rounded,
+    AppPermission.notifications => Icons.notifications_rounded,
   };
 
   @override
@@ -89,6 +90,7 @@ String _titleKey(AppPermission permission) => switch (permission) {
   AppPermission.camera => LocaleKeys.ds_permissions_cameraTitle,
   AppPermission.photos => LocaleKeys.ds_permissions_photosTitle,
   AppPermission.microphone => LocaleKeys.ds_permissions_microphoneTitle,
+  AppPermission.notifications => LocaleKeys.ds_permissions_notificationsTitle,
 };
 
 /// Message key per permission (see [_titleKey]).
@@ -96,4 +98,5 @@ String _messageKey(AppPermission permission) => switch (permission) {
   AppPermission.camera => LocaleKeys.ds_permissions_cameraMessage,
   AppPermission.photos => LocaleKeys.ds_permissions_photosMessage,
   AppPermission.microphone => LocaleKeys.ds_permissions_microphoneMessage,
+  AppPermission.notifications => LocaleKeys.ds_permissions_notificationsMessage,
 };

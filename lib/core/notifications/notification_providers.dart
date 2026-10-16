@@ -6,14 +6,14 @@ import 'package:riverpod_core/core/notifications/local/local_notification_backen
 import 'package:riverpod_core/core/notifications/local/native_timezone_backend.dart';
 import 'package:riverpod_core/core/notifications/local/timezone_backend.dart';
 import 'package:riverpod_core/core/notifications/models/notification_permission_state.dart';
-import 'package:riverpod_core/core/notifications/permission/notification_permission_backend.dart';
-import 'package:riverpod_core/core/notifications/permission/notification_permission_flow.dart';
-import 'package:riverpod_core/core/notifications/permission/platform_notification_permission_backend.dart';
+import 'package:riverpod_core/core/notifications/permission/notification_permission_state.dart';
 import 'package:riverpod_core/core/notifications/push/firebase_push_backend.dart';
 import 'package:riverpod_core/core/notifications/push/push_backend.dart';
 import 'package:riverpod_core/core/notifications/registration/noop_push_token_registrar.dart';
 import 'package:riverpod_core/core/notifications/registration/push_token_registrar.dart';
 import 'package:riverpod_core/core/notifications/routing/notification_router.dart';
+import 'package:riverpod_core/core/permissions/app_permission.dart';
+import 'package:riverpod_core/core/permissions/permission_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 part 'notification_providers.g.dart';
@@ -41,24 +41,6 @@ LocalNotificationBackend localNotificationBackend(Ref ref) =>
 @Riverpod(keepAlive: true)
 PushBackend pushBackend(Ref ref) => FirebasePushBackend();
 
-/// Platform seam for the notification permission: override in tests.
-@Riverpod(keepAlive: true)
-NotificationPermissionBackend notificationPermissionBackend(Ref ref) =>
-    const PlatformNotificationPermissionBackend();
-
-/// The app wires the design-system rationale dialog here. Null means the flow
-/// skips the explanation and goes straight to the system prompt.
-@Riverpod(keepAlive: true)
-NotificationRationalePresenter? notificationRationalePresenter(Ref ref) => null;
-
-/// The permission flow (status, rationale, system prompt, settings).
-@Riverpod(keepAlive: true)
-NotificationPermissionFlow notificationPermissionFlow(Ref ref) =>
-    NotificationPermissionFlow(
-      backend: ref.watch(notificationPermissionBackendProvider),
-      presenter: ref.watch(notificationRationalePresenterProvider),
-    );
-
 /// How the app tells its backend about push tokens. The default does nothing;
 /// override it with a real registrar (see `DioPushTokenRegistrar`).
 @Riverpod(keepAlive: true)
@@ -82,8 +64,14 @@ class PushAvailable extends _$PushAvailable {
   void report({required bool available}) => state = available;
 }
 
-/// The OS permission to show notifications. `ref.invalidate` it after the user
-/// returns from the system settings.
+/// The OS permission to show notifications, read through the shared
+/// [PermissionService]. `ref.invalidate` it after the user returns from the
+/// system settings.
 @riverpod
-Future<NotificationPermissionState> notificationPermissionState(Ref ref) =>
-    ref.watch(notificationPermissionFlowProvider).status();
+Future<NotificationPermissionState> notificationPermissionState(
+  Ref ref,
+) async => notificationStateOf(
+  await ref
+      .watch(permissionServiceProvider)
+      .status(AppPermission.notifications),
+);

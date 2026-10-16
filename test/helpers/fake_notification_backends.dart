@@ -14,10 +14,11 @@ import 'package:riverpod_core/core/notifications/models/notification_tap.dart';
 import 'package:riverpod_core/core/notifications/models/pending_notification.dart';
 import 'package:riverpod_core/core/notifications/models/push_message.dart';
 import 'package:riverpod_core/core/notifications/models/scheduled_notification.dart';
-import 'package:riverpod_core/core/notifications/permission/notification_permission_backend.dart';
 import 'package:riverpod_core/core/notifications/push/push_backend.dart';
 import 'package:riverpod_core/core/notifications/registration/push_token_registrar.dart';
 import 'package:riverpod_core/core/notifications/registration/push_token_registration.dart';
+import 'package:riverpod_core/core/permissions/app_permission.dart';
+import 'package:riverpod_core/core/permissions/permission_service.dart';
 
 /// In-memory [LocalNotificationBackend] that records every call.
 class FakeLocalNotificationBackend implements LocalNotificationBackend {
@@ -168,33 +169,30 @@ class FakePushBackend implements PushBackend {
       presentation.add(enabled);
 }
 
-/// Scriptable [NotificationPermissionBackend].
-class FakeNotificationPermissionBackend
-    implements NotificationPermissionBackend {
-  FakeNotificationPermissionBackend([
-    this.state = NotificationPermissionState.denied,
-  ]);
+/// Scriptable [PermissionBackend] for [AppPermission.notifications]: the state
+/// the notification service sees comes from the shared permission flow.
+class FakeNotificationPermissionBackend implements PermissionBackend {
+  FakeNotificationPermissionBackend([this.state = AppPermissionResult.denied]);
 
-  NotificationPermissionState state;
+  AppPermissionResult state;
 
   /// What `request()` leaves the state at.
-  NotificationPermissionState requestResult =
-      NotificationPermissionState.granted;
+  AppPermissionResult requestResult = AppPermissionResult.granted;
   bool rationale = false;
   int requests = 0;
   int settingsOpened = 0;
 
   @override
-  Future<NotificationPermissionState> status() async => state;
+  Future<AppPermissionResult> status(AppPermission permission) async => state;
 
   @override
-  Future<NotificationPermissionState> request() async {
+  Future<AppPermissionResult> request(AppPermission permission) async {
     requests++;
     return state = requestResult;
   }
 
   @override
-  Future<bool> shouldShowRationale() async => rationale;
+  Future<bool> shouldShowRationale(AppPermission permission) async => rationale;
 
   @override
   Future<bool> openSettings() async {

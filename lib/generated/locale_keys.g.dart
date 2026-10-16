@@ -149,6 +149,10 @@ abstract class LocaleKeys {
       'ds_permissions.microphoneTitle';
   static const ds_permissions_microphoneMessage =
       'ds_permissions.microphoneMessage';
+  static const ds_permissions_notificationsTitle =
+      'ds_permissions.notificationsTitle';
+  static const ds_permissions_notificationsMessage =
+      'ds_permissions.notificationsMessage';
   static const ds_permissions = 'ds_permissions';
   static const notifications_groupUpdates = 'notifications.groupUpdates';
   static const notifications_groupReminders = 'notifications.groupReminders';
