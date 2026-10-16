@@ -466,6 +466,26 @@ class CodegenLoader extends AssetLoader {
         "subtitle": "Reference feature with mock data (dev and staging only)",
       },
     },
+    "onboarding": {
+      "skip": "Skip",
+      "next": "Next",
+      "getStarted": "Get started",
+      "pageOf": "Page {} of {}",
+      "slides": {
+        "welcome": {
+          "title": "Welcome",
+          "body": "Everything you need, in one place.",
+        },
+        "progress": {
+          "title": "Keep track",
+          "body": "Your items and progress stay up to date.",
+        },
+        "secure": {
+          "title": "Your account is safe",
+          "body": "Sign in to keep your data protected.",
+        },
+      },
+    },
   };
   static const Map<String, dynamic> _ar = {
     "hello": "مرحبا",
@@ -916,6 +936,20 @@ class CodegenLoader extends AssetLoader {
       "home": {
         "title": "الفيديوهات",
         "subtitle": "ميزة مرجعية ببيانات تجريبية (للتطوير والتجربة فقط)",
+      },
+    },
+    "onboarding": {
+      "skip": "تخطي",
+      "next": "التالي",
+      "getStarted": "ابدأ",
+      "pageOf": "الصفحة {} من {}",
+      "slides": {
+        "welcome": {"title": "مرحبًا بك", "body": "كل ما تحتاجه في مكان واحد."},
+        "progress": {
+          "title": "تابع تقدمك",
+          "body": "عناصرك وتقدمك محدّثة دائمًا.",
+        },
+        "secure": {"title": "حسابك آمن", "body": "سجّل الدخول لحماية بياناتك."},
       },
     },
   };

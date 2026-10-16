@@ -7,6 +7,7 @@ import 'package:riverpod_core/core/router/app_error_page.dart';
 import 'package:riverpod_core/core/router/guards/app_redirect.dart';
 import 'package:riverpod_core/core/router/routes.dart';
 import 'package:riverpod_core/core/startup/splash_page.dart';
+import 'package:riverpod_core/core/startup/startup_controller.dart';
 import 'package:riverpod_core/core/storage/prefs_storage.dart';
 
 part 'app_router.g.dart';
@@ -25,7 +26,8 @@ GoRouter appRouter(Ref ref) {
   ref
     ..onDispose(refresh.dispose)
     ..listen(sessionControllerProvider, (previous, next) => refresh.value++)
-    ..listen(onboardingSeenProvider, (previous, next) => refresh.value++);
+    ..listen(onboardingSeenProvider, (previous, next) => refresh.value++)
+    ..listen(startupReadyProvider, (previous, next) => refresh.value++);
 
   final router = GoRouter(
     initialLocation: SplashPage.routeName,
@@ -34,6 +36,7 @@ GoRouter appRouter(Ref ref) {
       location: state.uri.path,
       session: ref.read(sessionControllerProvider),
       onboardingSeen: ref.read(onboardingSeenProvider),
+      startupReady: ref.read(startupReadyProvider),
     ),
     errorBuilder: (context, state) => const AppErrorPage(),
     routes: $appRoutes,

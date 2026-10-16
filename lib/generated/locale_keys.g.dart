@@ -412,4 +412,24 @@ abstract class LocaleKeys {
   static const videos_home_subtitle = 'videos.home.subtitle';
   static const videos_home = 'videos.home';
   static const videos = 'videos';
+  static const onboarding_skip = 'onboarding.skip';
+  static const onboarding_next = 'onboarding.next';
+  static const onboarding_getStarted = 'onboarding.getStarted';
+  static const onboarding_pageOf = 'onboarding.pageOf';
+  static const onboarding_slides_welcome_title =
+      'onboarding.slides.welcome.title';
+  static const onboarding_slides_welcome_body =
+      'onboarding.slides.welcome.body';
+  static const onboarding_slides_welcome = 'onboarding.slides.welcome';
+  static const onboarding_slides_progress_title =
+      'onboarding.slides.progress.title';
+  static const onboarding_slides_progress_body =
+      'onboarding.slides.progress.body';
+  static const onboarding_slides_progress = 'onboarding.slides.progress';
+  static const onboarding_slides_secure_title =
+      'onboarding.slides.secure.title';
+  static const onboarding_slides_secure_body = 'onboarding.slides.secure.body';
+  static const onboarding_slides_secure = 'onboarding.slides.secure';
+  static const onboarding_slides = 'onboarding.slides';
+  static const onboarding = 'onboarding';
 }

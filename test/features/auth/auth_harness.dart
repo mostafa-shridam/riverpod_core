@@ -37,6 +37,7 @@ Future<void> pumpAuthPage(
   Locale locale = const Locale('en'),
   ThemeMode themeMode = ThemeMode.light,
   Size size = const Size(400, 800),
+  bool settle = true,
 }) async {
   tester.view
     ..devicePixelRatio = 1
@@ -69,5 +70,10 @@ Future<void> pumpAuthPage(
       ),
     ),
   );
-  await tester.pumpAndSettle();
+  // A spinning indicator never settles; callers that show one pass false.
+  if (settle) {
+    await tester.pumpAndSettle();
+  } else {
+    await tester.pump();
+  }
 }

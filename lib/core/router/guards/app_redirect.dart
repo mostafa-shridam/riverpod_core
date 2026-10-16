@@ -8,17 +8,21 @@ import 'package:riverpod_core/features/onboarding/presentation/pages/onboarding_
 
 /// Redirect rules, pure so they can be tested without a router.
 ///
-/// Order: startup (splash) until the session and onboarding state are known;
-/// then onboarding until seen; then sign-in until signed in; then the app.
-/// Returns the location to go to instead, or null to stay.
+/// Order: startup (splash) until the startup sequence is done and the session
+/// and onboarding state are known; then onboarding until seen; then sign-in
+/// until signed in; then the app. Returns the location to go to instead, or
+/// null to stay.
 String? appRedirect({
   required String location,
   required SessionStatus session,
   required bool? onboardingSeen,
+  bool startupReady = true,
 }) {
   final target = location == '/' ? HomePage.routeName : location;
 
-  if (session == SessionStatus.unknown || onboardingSeen == null) {
+  if (!startupReady ||
+      session == SessionStatus.unknown ||
+      onboardingSeen == null) {
     return target == SplashPage.routeName ? null : SplashPage.routeName;
   }
 
