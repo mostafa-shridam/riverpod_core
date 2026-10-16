@@ -375,7 +375,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-22 — Share, external links, in-app review, app version page (D-041)
 | status | owner | blocked by |
 |---|---|---|
-| REVIEW | worker-v | — |
+| DONE | worker-v | — |
 - Goal: the small native-capability services every app needs, behind core services.
 - Files: `lib/core/sharing/share_service.dart` (text, link, file via `share_plus`), `lib/core/links/external_links.dart` (replaces `lib/core/mixins/url_launcher.dart`, deleted: `openUrl`, `openMail`, `openPhone`, `openStore`, returns bool, never throws, validates scheme allow-list http/https/mailto/tel), `lib/core/review/review_service.dart` (`in_app_review`, asks at most once per N days via prefs, falls back to store listing), `lib/core/app_info/app_info.dart` + provider (`package_info_plus`: name, version, build; integrates with `core/device`), `lib/features/more/presentation/pages/about_page.dart` (version, build, flavor, licenses via `showLicensePage`, share/rate buttons) + route from the More page, platform setup (Android `<queries>` for url_launcher/mailto, iOS `LSApplicationQueriesSchemes`), `pubspec.yaml`, `pubspec.lock`, `assets/translations/*.json` (+ generated), `test/core/sharing/**`, `test/core/links/**`, `test/core/review/**`, `test/core/app_info/**`, `test/features/more/**`, `test/goldens/more/**`
 - Done when: each service is a keepAlive provider with an injectable backend (fakes in `test/helpers`), no plugin imported outside its service; new packages recorded with exact versions in the report (D-041); About page shows flavor only in non-prod.
