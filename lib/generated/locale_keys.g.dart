@@ -54,4 +54,15 @@ abstract class LocaleKeys {
       'ds_inputs.errors.phoneTooShort';
   static const ds_inputs_errors = 'ds_inputs.errors';
   static const ds_inputs = 'ds_inputs';
+  static const errors_network = 'errors.network';
+  static const errors_timeout = 'errors.timeout';
+  static const errors_unauthorized = 'errors.unauthorized';
+  static const errors_forbidden = 'errors.forbidden';
+  static const errors_notFound = 'errors.notFound';
+  static const errors_validation = 'errors.validation';
+  static const errors_server = 'errors.server';
+  static const errors_cancelled = 'errors.cancelled';
+  static const errors_unknown = 'errors.unknown';
+  static const errors_retry = 'errors.retry';
+  static const errors = 'errors';
 }
