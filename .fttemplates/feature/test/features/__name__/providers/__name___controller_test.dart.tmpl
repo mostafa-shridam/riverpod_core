@@ -1,0 +1,77 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:{{package}}/core/errors/app_exception.dart';
+import 'package:{{package}}/features/{{name}}/providers/{{name}}_controller.dart';
+
+import '../{{name}}_test_support.dart';
+
+ProviderContainer _container(Fake{{Name}}Source source) {
+  final container = ProviderContainer(
+    // D-032: no silent retries, so failures settle at once.
+    retry: (_, _) => null,
+    overrides: {{nameCamel}}Overrides(source: source),
+  );
+  addTearDown(container.dispose);
+  // Keeps the auto-dispose controller alive between reads.
+  container.listen({{nameCamel}}ControllerProvider, (_, _) {});
+  return container;
+}
+
+void main() {
+  group('{{Name}}Controller', () {
+    test('starts loading, then holds the items', () async {
+      final container = _container(Fake{{Name}}Source.data({{nameCamel}}Sample));
+      expect(container.read({{nameCamel}}ControllerProvider).isLoading, isTrue);
+
+      final items = await container.read({{nameCamel}}ControllerProvider.future);
+
+      expect(items, {{nameCamel}}Sample);
+    });
+
+    test('failures end in AsyncError holding an AppException', () async {
+      final container = _container(
+        Fake{{Name}}Source.failing(const NetworkException()),
+      );
+      await expectLater(
+        container.read({{nameCamel}}ControllerProvider.future),
+        throwsA(isA<NetworkException>()),
+      );
+      expect(
+        container.read({{nameCamel}}ControllerProvider).error,
+        isA<NetworkException>(),
+      );
+    });
+
+    test('refresh loads again and replaces the items', () async {
+      final source = Fake{{Name}}Source([
+        () async => {{nameCamel}}Sample,
+        () async => [{{nameCamel}}Sample.first],
+      ]);
+      final container = _container(source);
+      await container.read({{nameCamel}}ControllerProvider.future);
+
+      await container.read({{nameCamel}}ControllerProvider.notifier).refresh();
+
+      expect(container.read({{nameCamel}}ControllerProvider).value, [
+        {{nameCamel}}Sample.first,
+      ]);
+      expect(source.calls, 2);
+    });
+
+    test('a failed refresh keeps the previous items', () async {
+      final source = Fake{{Name}}Source([
+        () async => {{nameCamel}}Sample,
+        () => Future.error(const ServerException(statusCode: 500)),
+      ]);
+      final container = _container(source);
+      await container.read({{nameCamel}}ControllerProvider.future);
+
+      await container.read({{nameCamel}}ControllerProvider.notifier).refresh();
+
+      final state = container.read({{nameCamel}}ControllerProvider);
+      expect(state.hasError, isTrue);
+      expect(state.error, isA<ServerException>());
+      expect(state.value, {{nameCamel}}Sample);
+    });
+  });
+}

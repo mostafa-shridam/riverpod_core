@@ -25,22 +25,23 @@ class ProductsController extends _$ProductsController {
 - Keep previous data during reload (`skipLoadingOnRefresh`, `isRefreshing`/`isReloading`, `hasValue`) → drives `refreshing`/`stale`, not `loading`.
 - `AsyncError` always holds an `AppException`.
 
-## Caching: stale-while-revalidate
-Implemented once in `core/storage/cache/`:
-- `CachedRepositoryHelper.watch<T>(key, fetch, ttl, decode, encode)` returns a `Stream<CacheResult<T>>`:
-  1. emits cached value immediately with `isStale = expired(ttl)` (if any),
-  2. fetches in background; on success writes cache and emits fresh value,
-  3. on failure emits cached value flagged `stale` + the error (→ `stale`/`offline` UI states), or just the error if no cache.
-- Cache entries: key, JSON payload, `savedAt`, optional `etag`. Stored in the local DB (below).
+## Caching: cache-first (D-038)
+Every read feature goes through the ONE helper in `core/storage/cache/` (Hive box):
+- `CachedRepositoryHelper.watch<T>(key, fetch, policy, decode, encode)` returns a `Stream<CacheResult<T>>`:
+  1. emits the cached value immediately, flagged `isStale` when older than `policy.ttl`;
+  2. revalidates in the background (`etag` / `If-None-Match` when supported);
+  3. unchanged (304 or same payload hash) → keeps the cache, emits nothing new; changed → writes the cache and emits the fresh value;
+  4. failure → keeps serving the cache flagged `stale` + the error (`stale`/`offline` UI states); error only when there is no cache.
+- Entries: key, JSON payload, `savedAt`, `lastAccessedAt`, `etag`, `ttl`, `maxAge`. Writes update or invalidate the affected keys.
+- Retention: `CachePolicy` presets (`short`/`medium`/`long`/`static`) set ttl and maxAge in days; expired entries are pruned at startup (off the critical path), on resume after 24h, and least-recently-accessed first when the box passes its cap.
 - Logout clears the whole cache. Cache keys include the user id for user-scoped data.
 
 ## Storage choices
 | Data | Store | Rule |
 |---|---|---|
-| Settings (theme, locale, onboarding seen, flags) | `shared_preferences` | `core/storage/prefs_storage.dart`; typed keys in one file |
+| Settings (theme, onboarding seen, flags) | `hive_ce` box | `core/storage/prefs_storage.dart`; typed keys in one file |
 | Tokens, refresh token, anything secret | `flutter_secure_storage` | `core/storage/secure_storage.dart`; never in prefs/DB/logs |
-| Structured/offline data, HTTP cache | one local DB | choice recorded in DECISIONS (D-004): Drift (SQLite) |
-Hive (current code) is removed by its migration task; no new code may use it.
+| Structured/offline data, HTTP cache | `hive_ce` boxes | D-034; no SQL, no Drift, no shared_preferences |
 
 ## Session lifecycle
 `SessionController` (keepAlive, `core/auth/`) is the single owner of auth state. Logout = clear secure storage + cache + DB user data

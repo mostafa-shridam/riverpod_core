@@ -37,6 +37,7 @@ lib/
 │   ├── remote_config/          # force update, maintenance, feature flags
 │   ├── logger/                 # leveled, silent in prod, never logs secrets
 │   ├── permissions/            # request + rationale + open settings
+│   ├── device/                 # device/app info provider (used by notifications, support, analytics)
 │   ├── media/                  # image/file picking, crop, compress
 │   ├── design_system/              # the ONLY place UI primitives are implemented (D-026)
 │   │   ├── tokens/                 # colors, typography, spacing, radius, elevation, durations

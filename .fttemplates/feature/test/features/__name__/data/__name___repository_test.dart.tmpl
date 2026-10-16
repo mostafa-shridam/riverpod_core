@@ -1,0 +1,97 @@
+import 'package:dio/dio.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:{{package}}/core/errors/app_exception.dart';
+import 'package:{{package}}/features/{{name}}/data/{{name}}_repository.dart';
+import 'package:{{package}}/features/{{name}}/data/sources/{{name}}_remote_source.dart';
+
+import '../../../helpers/helpers.dart';
+
+const _itemJson = {'id': 'a', 'title': 'A', 'description': 'About A'};
+
+/// Repository on the real remote source with a fake transport.
+({{{Name}}Repository repository, FakeHttpAdapter adapter}) _build() {
+  final adapter = FakeHttpAdapter();
+  final dio = Dio(BaseOptions(baseUrl: 'https://api.example.test'))
+    ..httpClientAdapter = adapter;
+  return (
+    repository: {{Name}}Repository({{Name}}RemoteSource(dio)),
+    adapter: adapter,
+  );
+}
+
+void main() {
+  group('{{Name}}Repository', () {
+    test('maps the JSON list to models', () async {
+      final r = _build();
+      r.adapter.enqueueJson(200, [
+        _itemJson,
+        {'id': 'b', 'title': 'B'},
+      ]);
+
+      final items = await r.repository.fetchItems();
+
+      expect(items.map((i) => i.id), ['a', 'b']);
+      expect(items.first.description, 'About A');
+      expect(items.last.description, isNull);
+      expect(r.adapter.requests.single.uri.path, {{nameCamel}}Endpoint);
+    });
+
+    test('an empty list is data, not an error', () async {
+      final r = _build();
+      r.adapter.enqueueJson(200, <Object>[]);
+      expect(await r.repository.fetchItems(), isEmpty);
+    });
+
+    DioException dioError(DioExceptionType type) =>
+        DioException(requestOptions: RequestOptions(), type: type);
+
+    final cases =
+        <String, ({void Function(FakeHttpAdapter) queue, Matcher expected})>{
+          '401': (
+            queue: (a) => a.enqueueJson(401, {}),
+            expected: isA<UnauthorizedException>(),
+          ),
+          '403': (
+            queue: (a) => a.enqueueJson(403, {}),
+            expected: isA<ForbiddenException>(),
+          ),
+          '404': (
+            queue: (a) => a.enqueueJson(404, {}),
+            expected: isA<NotFoundException>(),
+          ),
+          '500': (
+            queue: (a) => a.enqueueJson(500, {}),
+            expected: isA<ServerException>(),
+          ),
+          'connection error': (
+            queue: (a) =>
+                a.enqueueError(dioError(DioExceptionType.connectionError)),
+            expected: isA<NetworkException>(),
+          ),
+          'timeout': (
+            queue: (a) =>
+                a.enqueueError(dioError(DioExceptionType.receiveTimeout)),
+            expected: isA<RequestTimeoutException>(),
+          ),
+        };
+    for (final entry in cases.entries) {
+      test('${entry.key} becomes ${entry.value.expected}', () async {
+        final r = _build();
+        entry.value.queue(r.adapter);
+        await expectLater(
+          r.repository.fetchItems(),
+          throwsA(entry.value.expected),
+        );
+      });
+    }
+
+    test('an unexpected error becomes UnknownException', () async {
+      final r = _build();
+      r.adapter.enqueueError(StateError('boom'));
+      await expectLater(
+        r.repository.fetchItems(),
+        throwsA(isA<UnknownException>()),
+      );
+    });
+  });
+}

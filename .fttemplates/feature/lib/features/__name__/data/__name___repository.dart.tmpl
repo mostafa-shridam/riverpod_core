@@ -1,0 +1,48 @@
+import 'package:dio/dio.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:{{package}}/core/errors/app_exception.dart';
+import 'package:{{package}}/core/errors/error_mapper.dart';
+import 'package:{{package}}/core/network/dio_client.dart';
+import 'package:{{package}}/features/{{name}}/data/models/{{name}}_item.dart';
+import 'package:{{package}}/features/{{name}}/data/sources/{{name}}_remote_source.dart';
+
+part '{{name}}_repository.g.dart';
+
+/// {{Title}} data for the page. Returns models or throws an [AppException];
+/// JSON and `DioException` never leave this class.
+class {{Name}}Repository {
+  {{Name}}Repository(this._source);
+
+  final {{Name}}RemoteSource _source;
+
+  /// The ONE read of the list: every caller goes through this method. D-038
+  /// wants it cache-first (cached list first, then a background revalidate
+  /// that does not re-emit unchanged data): C-44 plugs the shared cache helper
+  /// in here without touching any caller.
+  Future<List<{{Name}}Item>> fetchItems() => _guard(_source.fetchItems);
+
+  Future<T> _guard<T>(Future<T> Function() call) async {
+    try {
+      return await call();
+    } on AppException {
+      rethrow;
+    } on DioException catch (error, stack) {
+      // The Dio error-mapping interceptor already wrapped an AppException.
+      final inner = error.error;
+      throw inner is AppException ? inner : mapError(error, stack);
+    } on Object catch (error, stack) {
+      throw mapError(error, stack);
+    }
+  }
+}
+
+/// The source the repository reads from. Tests override it.
+@Riverpod(keepAlive: true)
+{{Name}}RemoteSource {{nameCamel}}RemoteSource(Ref ref) {
+  return {{Name}}RemoteSource(ref.watch(dioProvider));
+}
+
+@Riverpod(keepAlive: true)
+{{Name}}Repository {{nameCamel}}Repository(Ref ref) {
+  return {{Name}}Repository(ref.watch({{nameCamel}}RemoteSourceProvider));
+}

@@ -1,0 +1,19 @@
+import 'package:flutter/material.dart';
+import 'package:{{package}}/core/design_system/widgets/display/app_list_tile.dart';
+import 'package:{{package}}/features/{{name}}/data/models/{{name}}_item.dart';
+
+/// One row of the {{Title}} list.
+class {{Name}}ItemTile extends StatelessWidget {
+  const {{Name}}ItemTile({super.key, required this.item});
+
+  final {{Name}}Item item;
+
+  @override
+  Widget build(BuildContext context) {
+    final description = item.description;
+    return AppListTile(
+      title: Text(item.title),
+      subtitle: description == null ? null : Text(description),
+    );
+  }
+}
