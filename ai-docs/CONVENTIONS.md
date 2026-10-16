@@ -36,6 +36,7 @@
 ## Strings and localization
 - No user-visible text in code. Every string comes from `assets/translations/{ar,en}.json` via generated `LocaleKeys`.
 - Keys: `feature.screen.element` lowerCamelCase segments, e.g. `auth.login.submit`. Errors under `errors.*`, common under `common.*`.
+- ALWAYS `LocaleKeys.group_key.tr()` from the generated file. NEVER `'group.key'.tr()` with a literal and never hand-written key-constant files (D-037). After editing the JSON run the two generation commands in `build.sh` and commit `lib/generated/*`.
 - Both languages in the same commit; the key-parity test must pass.
 - Developer-only strings (logs, assertions) may be English literals.
 - Numbers/dates: always via the locale-aware formatters in `core/l10n`, never `toString()` on user-facing values.

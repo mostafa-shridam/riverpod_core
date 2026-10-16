@@ -301,6 +301,15 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 - Done when: splash runs the startup sequence (config already loaded; session restore; onboarding-seen flag; remote flags later) with a minimum display time token and a retry state when a mandatory step fails; onboarding: 3 pages (title, body, illustration built from icons + tokens, no image assets), page indicator, skip/next/get-started, RTL-correct swipe direction, persists `onboardingSeen`; guards (C-11) route correctly afterwards.
 - Tests: startup states, onboarding flow persists flag, goldens light/dark x ar/en.
 
+## C-42 — Migrate to LocaleKeys everywhere (D-037) and add the guard test
+| status | owner | blocked by |
+|---|---|---|
+| BLOCKED | — | C-17, C-35, C-39 (they add code and keys) |
+- Goal: no literal translation keys anywhere.
+- Files: every `lib/core/design_system/widgets/**/**_strings.dart` (deleted; their key constants replaced by `LocaleKeys.<generated>` at the call sites in the same widget folders), `lib/core/**` and `lib/features/**` files that call `.tr()`/`.plural()` on a string literal (grep `'[a-zA-Z_]+\.[a-zA-Z_.]+'\.tr\(` and `.plural(`), `lib/generated/*.g.dart` (regenerated), `test/translations/no_literal_keys_test.dart`, tests that referenced the old key constants
+- Done when: the repo contains no `*_strings.dart` key-constant files; no `.tr()`/`.plural()` receives a string literal in `lib/` (override parameters of widgets still accept plain `String`); the guard test scans every `.dart` file under `lib/` (excluding generated) and fails on `'<literal>'.tr(` / `"<literal>".tr(` / `.plural('<literal>'`; widgets behave exactly as before (all existing widget and golden tests pass unchanged).
+- Tests: the guard test (with a self-test on an inline sample); full suite and goldens green.
+
 ---
 
 ## Backlog (full tasks written when dependencies near DONE)
