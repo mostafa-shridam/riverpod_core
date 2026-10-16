@@ -152,3 +152,9 @@ at implementation time and record them in its report.
 - Decision: two generic demo features ship with the template and double as the source for the `.fttemplates/feature` scaffold (C-25): `features/showcase` (C-35, the component gallery) and `features/videos` (C-39, a complete feature: model, mock remote source, repository, providers, list page + player page, all 8 data states, tests). Both are registered only in dev/staging flavors, contain no app-specific names, and can be deleted without touching anything else (nothing imports them).
 - Why: a complete working example is the best documentation of ARCHITECTURE.md; the mock source lets every data state be demonstrated without a backend.
 - Rejected: documentation-only examples (drift from code).
+
+## D-029 — Sample videos and YouTube
+- Context: owner asked for sample videos (YouTube or anywhere) to try the player.
+- Decision: `video_player` plays direct media files (MP4) and HLS (`.m3u8`) only; YouTube page links cannot be played by it (they need a WebView/iframe plugin and have ToS limits) and are out of scope. The demo list uses public test media verified with HTTP 200 on 2026-10-16: `https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4`, `.../bee.mp4`; `https://test-videos.co.uk/vids/{bigbuckbunny,sintel,jellyfish}/mp4/h264/720/{Big_Buck_Bunny,Sintel,Jellyfish}_720_10s_5MB.mp4`; HLS `https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8` and `.../img_bipbop_adv_example_ts/master.m3u8`. The Google `gtv-videos-bucket` samples return 403 and are not used. The URLs live in ONE file (`features/videos/data/sources/sample_videos.dart`) so they can be replaced.
+- Why: reliable demo content without a backend; honest about what the plugin supports.
+- Rejected: embedding YouTube via WebView in the core player.
