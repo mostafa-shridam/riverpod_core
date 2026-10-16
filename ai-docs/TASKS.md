@@ -223,7 +223,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-16 — Stale-while-revalidate cache helper
 | status | owner | blocked by |
 |---|---|---|
-| REVIEW | — | — |
+| DONE | worker-b | — |
 - Goal: STATE_AND_DATA.md "Caching: stale-while-revalidate", on top of the C-06 Drift `cache_entries` table.
 - Files: `lib/core/storage/cache/**` (`cache_result.dart`, `cached_repository_helper.dart`, `cache_policy.dart`), `test/core/storage/cache/**`
 - Done when: `CacheResult<T>(data, isStale, savedAt, error?)`; `CachedRepositoryHelper.watch<T>({key, fetch, decode, encode, ttl})` returns `Stream<CacheResult<T>>`: (1) emits the cached value immediately with `isStale = expired(ttl)` if present, (2) fetches in the background, on success writes the cache and emits the fresh value (`isStale=false`), (3) on failure emits the cached value flagged stale together with the `AppException` (mapped with `mapError`), or just errors when there is no cache; `read` (one-shot) and `invalidate(key)`/`clearAll` helpers; keys for user-scoped data take a `userId` parameter and are prefixed; `etag` stored when the fetch provides one; time source injectable (`Clock`-style function) so tests need no real time; `keepAlive` provider for the helper using `AppDatabase`.
@@ -277,7 +277,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-41 — Storage on hive_ce (remove shared_preferences and Drift)
 | status | owner | blocked by |
 |---|---|---|
-| BLOCKED | — | C-16 |
+| READY | — | — |
 - Goal: D-034. One local store.
 - Files: `lib/core/storage/**` (`prefs_storage.dart` re-implemented on a Hive box with the SAME public API and typed keys minus the locale and digits fields; `database/` replaced by `cache_store.dart` over a Hive box with the same operations the C-16 helper uses: read, write(key, payload, savedAt, etag), delete, deleteSavedBefore, clear), `lib/core/storage/cache/**` (adapt the C-16 helper to `CacheStore`), `lib/core/storage/clear_user_data.dart`, `lib/bootstrap.dart` (Hive.initFlutter + open boxes before runApp), `pubspec.yaml`, `pubspec.lock` (add `hive_ce`, `hive_ce_flutter`; remove `shared_preferences`, `drift`, `drift_flutter`, `drift_dev`), `test/core/storage/**`, `test/helpers/fake_prefs_storage.dart`, `test/helpers/pump_app.dart` (drop shared_preferences mock), `test/bootstrap_test.dart`
 - Done when: no import of shared_preferences or drift remains (grep); boxes are opened once in bootstrap and exposed through keepAlive providers; tests use a temp-dir Hive (`Hive.init(tempDir)`), no platform channel; cache expiry/etag/user-scoping behave exactly as in C-16 tests; `clearUserData` wipes secure storage, cache box and user-scoped prefs; the old Drift generated files are deleted.
