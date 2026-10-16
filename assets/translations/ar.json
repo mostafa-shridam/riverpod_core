@@ -8,8 +8,8 @@
   "confirmButton": "تأكيد",
   "cancelButton": "إلغاء",
   "selectLanguage": "اختر اللغة",
-  "goodEvening":"مساء الخير",
-  "goodMorning":"صباح الخير",
+  "goodEvening": "مساء الخير",
+  "goodMorning": "صباح الخير",
   "ds_display": {
     "imageError": "تعذر تحميل الصورة",
     "expand": "توسيع",
@@ -19,5 +19,23 @@
     "stepOf": "الخطوة {} من {}",
     "stepCompleted": "مكتملة",
     "stepCurrent": "الخطوة الحالية"
+  },
+  "ds_overlays": {
+    "close": "إغلاق",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "ok": "حسنًا",
+    "done": "تم",
+    "search": "بحث",
+    "noResults": "لا توجد نتائج",
+    "loading": "جارٍ التحميل"
+  },
+  "ds_feedback": {
+    "dismiss": "إغلاق",
+    "info": "معلومة",
+    "success": "نجاح",
+    "warning": "تنبيه",
+    "error": "خطأ",
+    "progress": "التقدم"
   }
 }
