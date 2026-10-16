@@ -129,10 +129,20 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 - Done when: switching ar↔en updates the UI without restart and survives restart; formatters tested in both locales; digit policy recorded as a DECISION; parity test green.
 - Tests: formatters, plurals 0/1/2/few/many, persistence.
 
+## C-13 — App rename script (name, package id, Dart package)
+| status | owner | blocked by |
+|---|---|---|
+| READY | — | — |
+- Goal: one command makes a copy of the template into a real app: users never see "riverpod_core" anywhere.
+- Files: `tool/rename_app.dart`, `tool/lib/rename_app_logic.dart` (pure logic), `test/tool/rename_app_test.dart`, `test/tool/fixtures/**` (tiny fake project tree)
+- Done when: `dart run tool/rename_app.dart --name "My App" --id com.company.myapp [--package my_app] [--dry-run]` updates, only when the file exists: `pubspec.yaml` (`name`, `description`), every `package:riverpod_core/` import in `lib/`, `test/`, `integration_test/`, Android `namespace` + `applicationId` in `android/app/build.gradle.kts`, the Kotlin `MainActivity` package line AND its folder path, `android:label` in `AndroidManifest.xml`, iOS `CFBundleDisplayName`/`CFBundleName`/`PRODUCT_BUNDLE_IDENTIFIER`, web `index.html`/`manifest.json`, `env/*.example.json` `APP_NAME`, README title. Validates inputs (reverse-DNS id, snake_case package, non-empty name), is idempotent, prints a summary of changed files, `--dry-run` changes nothing, refuses to run when the new values equal the current ones, and never touches `.git`, `build/`, `.dart_tool/`. Pure Dart, no new package.
+- Tests: run the logic against a copy of the fixture tree in a temp dir: every file above changed correctly, Kotlin file moved, imports rewritten, dry-run leaves the tree identical, bad inputs rejected, second run is a no-op.
+- Also: update `HOW_TO_START_A_NEW_APP.md` step 2 with the exact command.
+
 ---
 
 ## Backlog (full tasks written when dependencies near DONE)
-C-13 Platform folders (ios/web) + native flavors + `tool/rename_app` + launcher icons + native splash ·
+C-31 Platform folders (ios/web) + native flavors + launcher icons + native splash ·
 C-14 Pagination helpers + `PaginatedListView` · C-15 Upload/download with progress/cancel ·
 C-16 SWR cache helper · C-17 Auth (session controller, token handling, logout reset) ·
 C-18 Onboarding + splash pages · C-19 Biometric lock, screenshot blocking, root check ·
