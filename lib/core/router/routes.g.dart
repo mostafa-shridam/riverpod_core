@@ -13,6 +13,7 @@ List<RouteBase> get $appRoutes => [
   $registerRoute,
   $forgotPasswordRoute,
   $appShellRoute,
+  $securitySettingsRoute,
   $itemDetailRoute,
   $videosRoute,
   $videoDetailRoute,
@@ -204,6 +205,33 @@ mixin $MoreRoute on GoRouteData {
 
   @override
   String get location => GoRouteData.$location('/more');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $securitySettingsRoute => GoRouteData.$route(
+  path: '/security-settings',
+  hasOverriddenOnExit: false,
+  factory: $SecuritySettingsRoute._fromState,
+);
+
+mixin $SecuritySettingsRoute on GoRouteData {
+  static SecuritySettingsRoute _fromState(GoRouterState state) =>
+      const SecuritySettingsRoute();
+
+  @override
+  String get location => GoRouteData.$location('/security-settings');
 
   @override
   void go(BuildContext context) => context.go(location);

@@ -489,6 +489,26 @@ class CodegenLoader extends AssetLoader {
         },
       },
     },
+    "security": {
+      "lock": {
+        "title": "App locked",
+        "message": "Unlock to continue.",
+        "unlock": "Unlock",
+        "reason": "Unlock the app",
+        "enableReason": "Confirm to turn on app lock",
+      },
+      "settings": {
+        "title": "Security",
+        "appLock": "App lock",
+        "appLockSubtitle":
+            "Ask for biometrics or the device passcode when you return to the app.",
+        "unavailable":
+            "Set up biometrics or a device passcode in the system settings to use app lock.",
+        "cancelled": "Authentication was cancelled. App lock stays as it was.",
+        "failed": "Authentication failed. Try again.",
+        "lockedOut": "Too many attempts. Try again later.",
+      },
+    },
   };
   static const Map<String, dynamic> _ar = {
     "hello": "مرحبا",
@@ -956,6 +976,25 @@ class CodegenLoader extends AssetLoader {
           "body": "عناصرك وتقدمك محدّثة دائمًا.",
         },
         "secure": {"title": "حسابك آمن", "body": "سجّل الدخول لحماية بياناتك."},
+      },
+    },
+    "security": {
+      "lock": {
+        "title": "التطبيق مقفل",
+        "message": "افتح القفل للمتابعة.",
+        "unlock": "فتح القفل",
+        "reason": "افتح قفل التطبيق",
+        "enableReason": "أكّد لتفعيل قفل التطبيق",
+      },
+      "settings": {
+        "title": "الأمان",
+        "appLock": "قفل التطبيق",
+        "appLockSubtitle": "اطلب البصمة أو رمز الجهاز عند العودة إلى التطبيق.",
+        "unavailable":
+            "فعّل البصمة أو رمز الجهاز من إعدادات النظام لاستخدام قفل التطبيق.",
+        "cancelled": "تم إلغاء المصادقة. لم يتغير قفل التطبيق.",
+        "failed": "فشلت المصادقة. حاول مرة أخرى.",
+        "lockedOut": "محاولات كثيرة. حاول لاحقًا.",
       },
     },
   };

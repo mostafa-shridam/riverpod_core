@@ -65,6 +65,7 @@ export 'package:riverpod_core/core/design_system/widgets/media/app_video_overlay
 export 'package:riverpod_core/core/design_system/widgets/media/app_video_player.dart';
 export 'package:riverpod_core/core/design_system/widgets/media/app_video_seek_bar.dart';
 export 'package:riverpod_core/core/design_system/widgets/media/app_video_source.dart';
+export 'package:riverpod_core/core/design_system/widgets/security/app_lock_screen.dart';
 export 'package:riverpod_core/core/design_system/widgets/selection/app_checkbox.dart';
 export 'package:riverpod_core/core/design_system/widgets/selection/app_chip_group.dart';
 export 'package:riverpod_core/core/design_system/widgets/selection/app_date_field.dart';

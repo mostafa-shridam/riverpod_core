@@ -435,4 +435,20 @@ abstract class LocaleKeys {
   static const onboarding_slides_secure = 'onboarding.slides.secure';
   static const onboarding_slides = 'onboarding.slides';
   static const onboarding = 'onboarding';
+  static const security_lock_title = 'security.lock.title';
+  static const security_lock_message = 'security.lock.message';
+  static const security_lock_unlock = 'security.lock.unlock';
+  static const security_lock_reason = 'security.lock.reason';
+  static const security_lock_enableReason = 'security.lock.enableReason';
+  static const security_lock = 'security.lock';
+  static const security_settings_title = 'security.settings.title';
+  static const security_settings_appLock = 'security.settings.appLock';
+  static const security_settings_appLockSubtitle =
+      'security.settings.appLockSubtitle';
+  static const security_settings_unavailable = 'security.settings.unavailable';
+  static const security_settings_cancelled = 'security.settings.cancelled';
+  static const security_settings_failed = 'security.settings.failed';
+  static const security_settings_lockedOut = 'security.settings.lockedOut';
+  static const security_settings = 'security.settings';
+  static const security = 'security';
 }

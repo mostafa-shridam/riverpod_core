@@ -6,6 +6,7 @@ import 'package:riverpod_core/core/design_system/responsive/text_scale.dart';
 import 'package:riverpod_core/core/design_system/theme/app_theme.dart';
 import 'package:riverpod_core/core/design_system/widgets/feedback/snackbar/app_messenger.dart';
 import 'package:riverpod_core/core/router/app_router.dart';
+import 'package:riverpod_core/core/security/app_lock_overlay.dart';
 
 /// Root widget: messenger, locale (easy_localization), theme, router, and the
 /// clamped text scale. Breakpoints come from `design_system/responsive`.
@@ -30,7 +31,7 @@ class App extends ConsumerWidget {
           data: mediaQuery.copyWith(
             textScaler: clampTextScale(mediaQuery.textScaler),
           ),
-          child: child!,
+          child: AppLockOverlay(child: child!),
         );
       },
     );
