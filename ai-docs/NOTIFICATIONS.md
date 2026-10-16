@@ -12,7 +12,7 @@ notifications/
 ├── channels/     notification_channels.dart (THE channel table), notification_categories.dart (iOS)
 ├── local/        LocalNotificationBackend (+ flutter_local_notifications impl), LocalNotificationService, NotificationBadge, TimezoneBackend
 ├── push/         PushBackend (+ firebase_messaging impl), PushService, PushTokenManager, background handler, MessageDeduplicator
-├── permission/   NotificationPermissionBackend (+ permission_handler impl), NotificationPermissionFlow
+├── permission/   notification permission state mapping (`notificationStateOf`); the request itself goes through the shared `PermissionService` (`AppPermission.notifications`)
 ├── registration/ PushTokenRegistrar (interface), Noop (default), Dio example (disabled)
 ├── routing/      NotificationRouter (+ provider): every tap -> typed route
 └── settings/     NotificationSettings + NotificationSettingsController (user switches)
@@ -68,7 +68,7 @@ Channels: ONE table, `channels/notification_channels.dart` (`general`, `high_pri
 iOS categories/actions: `NotificationCategories.message` (inline reply + mark as read), registered at init and re-registered with localized titles by `syncChannelLabels()`.
 
 ## Permission
-`service.ensurePermission(context)` (`NotificationPermissionFlow`): granted/provisional returns; denied shows the rationale first when Android advises it, then the system prompt (Android 13 `POST_NOTIFICATIONS`; iOS alert + badge + sound); permanently denied shows the rationale with "open settings". `service.requestProvisionalPermission()` (iOS quiet delivery, no prompt, needs push). OS state for the UI: `notificationPermissionStateProvider` (invalidate it when the app resumes from settings). `service.openSystemSettings()` opens the app's settings page.
+`service.ensurePermission(context)` (through the shared `PermissionService`): granted/provisional returns; denied shows the rationale first when Android advises it, then the system prompt (Android 13 `POST_NOTIFICATIONS`; iOS alert + badge + sound); permanently denied shows the rationale with "open settings". `service.requestProvisionalPermission()` (iOS quiet delivery, no prompt, needs push). OS state for the UI: `notificationPermissionStateProvider` (invalidate it when the app resumes from settings). `service.openSystemSettings()` opens the app's settings page.
 
 Rationale UI: the flow takes a `NotificationRationalePresenter` from `notificationRationalePresenterProvider` (null = no explanation step). The shared design-system dialog is keyed by `AppPermission`, which has no `notifications` value yet (see the C-20 report follow-ups).
 

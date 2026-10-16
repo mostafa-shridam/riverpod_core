@@ -357,7 +357,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-45 — Notification permission through the shared PermissionService (D-039 item 3)
 | status | owner | blocked by |
 |---|---|---|
-| REVIEW | Worker A | — |
+| DONE | Worker A | — |
 - Goal: one permission flow. Add `AppPermission.notifications` (permission_handler maps to the platform notification permission), shared rationale copy in en/ar via LocaleKeys, and make `NotificationPermissionFlow` use `PermissionService` + the shared rationale dialog instead of its own presenter provider; delete `notificationRationalePresenterProvider`.
 - Files: `lib/core/permissions/**`, `lib/core/notifications/permission/**`, `lib/core/design_system/widgets/permissions/**` (copy switch only), `assets/translations/*.json` (+ generated), `test/core/permissions/**`, `test/core/notifications/**`, `test/helpers/**` fakes if needed
 - Done when: no second rationale mechanism remains (grep); Android 13+ and iOS prompts go through the service; existing notification tests keep their meaning; gate green.
@@ -368,6 +368,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## Backlog (full tasks written when dependencies near DONE)
 C-31 Native flavors (Android flavors / iOS schemes) + launcher icons + native splash ·
 C-19 Biometric lock, screenshot blocking, root check ·
+C-46 Wire `permissionRationalePresenterProvider` (override with `showPermissionRationale`) in the ProviderScope of bootstrap — after C-41 (same file) ·
 C-21 Remote config: force update, maintenance · C-22 Share, external links, in-app review, version page ·
 C-26 Integration tests (auth flow + one feature flow) · C-29 README + HOW_TO_START_A_NEW_APP · C-30 Crash/analytics vendor.
 
