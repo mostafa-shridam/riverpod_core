@@ -241,7 +241,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-15 — Upload and download with progress and cancel
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | — | — |
 - Goal: NETWORKING.md "Upload / download".
 - Files: `lib/core/network/transfer/**` (`transfer_progress.dart`, `upload_service.dart`, `download_service.dart`, `transfer_controller.dart`), `test/core/network/transfer/**`
 - Done when: `UploadService.upload({path, file(s), fields, onProgress, cancelToken})` multipart through `dioProvider`; `DownloadService.download(url, fileName, onProgress, cancelToken)` into the app cache/documents dir (path_provider) writing to a `.part` file renamed on success and deleted on cancel/failure, resumes NOT required; progress as `Stream<double>` 0..1 and as a `@riverpod` `TransferController` (state: idle, running(progress), done(result), failed(AppException), cancelled) with `cancel()`; errors mapped with `mapError`; no file kept on failure; directory provider injectable for tests.
