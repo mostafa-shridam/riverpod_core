@@ -62,4 +62,4 @@ final class NotificationRouterProvider
 }
 
 String _$notificationRouterHash() =>
-    r'f64a7f8bed6004eff6cd5f0d983eb37bdb6b9331';
+    r'df3d700652123f13357736f46335b842e04c489d';

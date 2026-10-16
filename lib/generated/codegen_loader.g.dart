@@ -179,6 +179,26 @@ class CodegenLoader extends AssetLoader {
       "retry": "Try again",
     },
     "app_nav": {"home": "Home", "more": "More", "continue": "Continue"},
+    "auth": {
+      "login": {
+        "title": "Sign in",
+        "submit": "Sign in",
+        "forgot": "Forgot password?",
+        "register": "Create an account",
+      },
+      "register": {
+        "title": "Create account",
+        "submit": "Create account",
+        "login": "I already have an account",
+      },
+      "forgot": {
+        "title": "Reset password",
+        "submit": "Send reset link",
+        "done": "If the account exists, a reset link is on its way",
+      },
+      "fields": {"email": "Email", "password": "Password", "name": "Full name"},
+      "logout": "Log out",
+    },
     "ds_permissions": {
       "allow": "Allow",
       "openSettings": "Open settings",
@@ -612,6 +632,30 @@ class CodegenLoader extends AssetLoader {
       "retry": "إعادة المحاولة",
     },
     "app_nav": {"home": "الرئيسية", "more": "المزيد", "continue": "متابعة"},
+    "auth": {
+      "login": {
+        "title": "تسجيل الدخول",
+        "submit": "تسجيل الدخول",
+        "forgot": "نسيت كلمة المرور؟",
+        "register": "إنشاء حساب",
+      },
+      "register": {
+        "title": "إنشاء حساب",
+        "submit": "إنشاء حساب",
+        "login": "لدي حساب بالفعل",
+      },
+      "forgot": {
+        "title": "إعادة تعيين كلمة المرور",
+        "submit": "إرسال رابط الاستعادة",
+        "done": "إذا كان الحساب موجودًا فسيصلك رابط الاستعادة",
+      },
+      "fields": {
+        "email": "البريد الإلكتروني",
+        "password": "كلمة المرور",
+        "name": "الاسم الكامل",
+      },
+      "logout": "تسجيل الخروج",
+    },
     "ds_permissions": {
       "allow": "سماح",
       "openSettings": "فتح الإعدادات",

@@ -2,6 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:riverpod_core/core/analytics/analytics_service.dart';
+import 'package:riverpod_core/core/auth/auth_tokens.dart';
 import 'package:riverpod_core/core/auth/session_controller.dart';
 import 'package:riverpod_core/core/device/device_info_provider.dart';
 import 'package:riverpod_core/core/logger/app_logger.dart';
@@ -16,7 +18,10 @@ import 'package:riverpod_core/core/notifications/registration/noop_push_token_re
 import 'package:riverpod_core/core/notifications/routing/notification_router_provider.dart';
 import 'package:riverpod_core/core/notifications/settings/notification_settings_controller.dart';
 import 'package:riverpod_core/core/router/routes.dart';
+import 'package:riverpod_core/core/storage/database/app_database.dart';
 import 'package:riverpod_core/core/storage/prefs_storage.dart';
+import 'package:riverpod_core/core/storage/secure_storage.dart';
+import 'package:riverpod_core/shared/models/auth_user.dart';
 
 import '../../helpers/fake_notification_backends.dart';
 import '../../helpers/helpers.dart';
@@ -27,6 +32,11 @@ class _Harness {
     container = createContainer(
       overrides: [
         prefsStorageProvider.overrideWith((ref) => Future.value(prefs)),
+        secureStorageProvider.overrideWithValue(FakeSecureStorage()),
+        appDatabaseProvider.overrideWithValue(AppDatabase.inMemory()),
+        analyticsServiceProvider.overrideWithValue(
+          const NoopAnalyticsService(),
+        ),
         loggerProvider.overrideWithValue(recordingLogger(logs)),
         localNotificationBackendProvider.overrideWithValue(local),
         pushBackendProvider.overrideWithValue(push),
@@ -63,7 +73,13 @@ class _Harness {
       container.read(sessionControllerProvider.notifier);
 
   Future<void> settle() => pumpEventQueue();
+
+  /// Signs in with fixture credentials; the notification hooks react to it.
+  Future<void> signIn() => session.signIn(tokens: _tokens, user: _user);
 }
+
+const _tokens = AuthTokens(accessToken: 'access-1', refreshToken: 'refresh-1');
+const _user = AuthUser(id: '1', email: 'ana@example.com', name: 'Ana');
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -143,7 +159,7 @@ void main() {
         await h.service.initialize();
         expect(h.opened, isEmpty, reason: 'not signed in yet');
 
-        h.session.signIn();
+        await h.signIn();
         await h.settle();
 
         expect((h.opened.single as ItemDetailRoute).id, '8');
@@ -165,7 +181,7 @@ void main() {
       final h = await _Harness.create();
       await h.service.initialize();
 
-      h.session.signIn();
+      await h.signIn();
       await h.settle();
 
       expect(h.registrar.registrations.single.token, 'token-1');
@@ -175,7 +191,7 @@ void main() {
     test('a token refresh after sign-in is registered', () async {
       final h = await _Harness.create();
       await h.service.initialize();
-      h.session.signIn();
+      await h.signIn();
       await h.settle();
 
       h.push.currentToken = 'token-2';
@@ -193,7 +209,7 @@ void main() {
       () async {
         final h = await _Harness.create();
         await h.service.initialize();
-        h.session.signIn();
+        await h.signIn();
         await h.settle();
 
         await h.container.read(notificationLogoutProvider)();
@@ -208,10 +224,10 @@ void main() {
     test('an unannounced sign-out still cleans up', () async {
       final h = await _Harness.create();
       await h.service.initialize();
-      h.session.signIn();
+      await h.signIn();
       await h.settle();
 
-      h.session.signOut();
+      await h.session.signOut();
       await h.settle();
 
       expect(h.registrar.unregistered, ['token-1']);
@@ -223,7 +239,7 @@ void main() {
       h.push.available = false;
       await h.service.initialize();
 
-      h.session.signIn();
+      await h.signIn();
       await h.settle();
       await h.service.onLogout();
 
@@ -239,7 +255,7 @@ void main() {
       () async {
         final h = await _Harness.create();
         await h.service.initialize();
-        h.session.signIn();
+        await h.signIn();
         await h.settle();
 
         expect(await h.service.setEnabled(enabled: false), isTrue);
@@ -255,7 +271,7 @@ void main() {
     test('turning them on again registers the token again', () async {
       final h = await _Harness.create();
       await h.service.initialize();
-      h.session.signIn();
+      await h.signIn();
       await h.settle();
       await h.service.setEnabled(enabled: false);
 
@@ -272,7 +288,7 @@ void main() {
         final h = await _Harness.create({PrefKeys.notificationsEnabled: false});
         await h.service.initialize();
 
-        h.session.signIn();
+        await h.signIn();
         await h.settle();
 
         expect(h.registrar.registrations, isEmpty);
@@ -317,7 +333,7 @@ void main() {
       final h = (await tester.runAsync(_Harness.create))!;
       await tester.runAsync(() async {
         await h.service.initialize();
-        h.session.signIn();
+        await h.signIn();
         await h.settle();
       });
       expect(h.registrar.registrations.length, 1);

@@ -1,4 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:riverpod_core/core/auth/session_controller.dart';
 import 'package:riverpod_core/core/errors/app_exception.dart';
 
 part 'token_refresher.g.dart';
@@ -30,8 +31,8 @@ class SingleFlightRefresher implements AccessTokenRefresher {
   }
 }
 
-/// Used until C-17 provides a real refresher: every attempt fails, so an
-/// expired session is reported as expired instead of retried forever.
+/// Fallback refresher: every attempt fails, so an expired session is reported
+/// as expired instead of retried forever. Not bound by default any more.
 class UnconfiguredRefresher implements AccessTokenRefresher {
   const UnconfiguredRefresher();
 
@@ -44,8 +45,8 @@ class UnconfiguredRefresher implements AccessTokenRefresher {
 }
 
 /// The refresher bound by the app. [dioProvider] wraps it in a
-/// [SingleFlightRefresher]; C-17 overrides this provider.
+/// [SingleFlightRefresher]. The session controller renews the tokens.
 @Riverpod(keepAlive: true)
 AccessTokenRefresher accessTokenRefresher(Ref ref) {
-  return const UnconfiguredRefresher();
+  return ref.watch(sessionControllerProvider.notifier);
 }

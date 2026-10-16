@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:riverpod_core/core/auth/auth_tokens.dart';
 import 'package:riverpod_core/core/auth/session_controller.dart';
 import 'package:riverpod_core/core/config/app_config.dart';
 import 'package:riverpod_core/core/config/flavor.dart';
@@ -14,7 +15,9 @@ import 'package:riverpod_core/core/notifications/models/notification_tap_source.
 import 'package:riverpod_core/core/notifications/routing/notification_router_provider.dart';
 import 'package:riverpod_core/core/router/app_router.dart';
 import 'package:riverpod_core/core/storage/prefs_storage.dart';
+import 'package:riverpod_core/core/storage/secure_storage.dart';
 import 'package:riverpod_core/generated/codegen_loader.g.dart';
+import 'package:riverpod_core/shared/models/auth_user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../helpers/helpers.dart';
@@ -40,6 +43,7 @@ Future<ProviderContainer> _container(
         }),
       ),
       prefsStorageProvider.overrideWith((ref) => Future.value(prefs)),
+      secureStorageProvider.overrideWithValue(FakeSecureStorage()),
     ],
   );
 }
@@ -76,6 +80,15 @@ Future<void> _pumpRouter(
   await tester.pumpAndSettle();
 }
 
+Future<void> _signIn(ProviderContainer container) {
+  return container
+      .read(sessionControllerProvider.notifier)
+      .signIn(
+        tokens: const AuthTokens(accessToken: 'a', refreshToken: 'r'),
+        user: const AuthUser(id: '1', email: 'a@b.co', name: 'A'),
+      );
+}
+
 Finder _page(String key) => find.byKey(ValueKey(key));
 
 void main() {
@@ -83,7 +96,7 @@ void main() {
     testWidgets('a new user sees onboarding first', (tester) async {
       final container = await _container(tester, onboardingSeen: false);
       addTearDown(container.dispose);
-      container.read(sessionControllerProvider.notifier).restore();
+      await container.read(sessionControllerProvider.notifier).restore();
 
       await _pumpRouter(tester, container);
 
@@ -93,7 +106,7 @@ void main() {
     testWidgets('signed out after onboarding shows login', (tester) async {
       final container = await _container(tester, onboardingSeen: true);
       addTearDown(container.dispose);
-      container.read(sessionControllerProvider.notifier).restore();
+      await container.read(sessionControllerProvider.notifier).restore();
 
       await _pumpRouter(tester, container);
 
@@ -103,7 +116,7 @@ void main() {
     testWidgets('signed in shows home', (tester) async {
       final container = await _container(tester, onboardingSeen: true);
       addTearDown(container.dispose);
-      container.read(sessionControllerProvider.notifier).signIn();
+      await _signIn(container);
 
       await _pumpRouter(tester, container);
 
@@ -116,7 +129,7 @@ void main() {
     ) async {
       final container = await _container(tester, onboardingSeen: true);
       addTearDown(container.dispose);
-      container.read(sessionControllerProvider.notifier).signIn();
+      await _signIn(container);
       await _pumpRouter(tester, container);
       expect(_page('home-page'), findsOneWidget);
 
@@ -131,7 +144,7 @@ void main() {
     testWidgets('an unknown location shows the error page', (tester) async {
       final container = await _container(tester, onboardingSeen: true);
       addTearDown(container.dispose);
-      container.read(sessionControllerProvider.notifier).signIn();
+      await _signIn(container);
       await _pumpRouter(tester, container);
 
       container.read(appRouterProvider).go('/does-not-exist');
@@ -143,7 +156,7 @@ void main() {
     testWidgets('a deep link opens the typed item route', (tester) async {
       final container = await _container(tester, onboardingSeen: true);
       addTearDown(container.dispose);
-      container.read(sessionControllerProvider.notifier).signIn();
+      await _signIn(container);
       await _pumpRouter(tester, container);
 
       container
