@@ -8,6 +8,10 @@
 - Generated files: `*.g.dart`, `*.freezed.dart` next to the source file. Never edit, never hand-write.
 - Test file: same path under `test/` + `_test.dart`.
 
+## Pages and routes
+- ONE page per file, in `features/<feature>/presentation/pages/<name>_page.dart` (app-level pages such as the splash live in `core/startup/`). Never put several pages in one file.
+- Every page declares `static const routeName = '/page-name';` (kebab-case, leading slash). There is no central paths class: `core/router/routes.dart` uses `XPage.routeName` in the typed-route annotations and redirect rules compare against it (D-036).
+
 ## Providers
 - Codegen names are derived from the function/class: `userRepository(Ref ref)` → `userRepositoryProvider`;
   `class AuthController` → `authControllerProvider`. Do not set provider prefixes/suffixes in build.yaml beyond the default.

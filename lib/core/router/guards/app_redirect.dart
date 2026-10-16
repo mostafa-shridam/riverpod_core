@@ -1,7 +1,8 @@
-import 'package:riverpod_core/app/router/placeholder_pages.dart';
-import 'package:riverpod_core/app/startup/splash_page.dart';
 import 'package:riverpod_core/core/auth/session_controller.dart';
+import 'package:riverpod_core/core/startup/splash_page.dart';
+import 'package:riverpod_core/features/auth/presentation/pages/login_page.dart';
 import 'package:riverpod_core/features/home/presentation/pages/home_page.dart';
+import 'package:riverpod_core/features/onboarding/presentation/pages/onboarding_page.dart';
 
 /// Redirect rules, pure so they can be tested without a router.
 ///

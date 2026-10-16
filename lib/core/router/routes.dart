@@ -1,9 +1,12 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
-import 'package:riverpod_core/app/router/app_shell.dart';
-import 'package:riverpod_core/app/router/placeholder_pages.dart';
-import 'package:riverpod_core/app/startup/splash_page.dart';
+import 'package:riverpod_core/core/router/app_shell.dart';
+import 'package:riverpod_core/core/startup/splash_page.dart';
+import 'package:riverpod_core/features/auth/presentation/pages/login_page.dart';
 import 'package:riverpod_core/features/home/presentation/pages/home_page.dart';
+import 'package:riverpod_core/features/items/presentation/pages/item_detail_page.dart';
+import 'package:riverpod_core/features/more/presentation/pages/more_page.dart';
+import 'package:riverpod_core/features/onboarding/presentation/pages/onboarding_page.dart';
 
 part 'routes.g.dart';
 

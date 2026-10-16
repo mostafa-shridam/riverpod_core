@@ -1,10 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_core/app/router/app_router.dart';
 import 'package:riverpod_core/core/design_system/responsive/text_scale.dart';
 import 'package:riverpod_core/core/design_system/theme/app_theme.dart';
 import 'package:riverpod_core/core/design_system/widgets/feedback/snackbar/app_messenger.dart';
+import 'package:riverpod_core/core/router/app_router.dart';
 import 'package:riverpod_core/core/services/scroll_behavior.dart';
 
 /// Root widget: messenger, locale (easy_localization), theme, router, and the

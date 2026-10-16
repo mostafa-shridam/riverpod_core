@@ -14,7 +14,7 @@ Read ARCHITECTURE.md and CONVENTIONS.md first. Status: `.fttemplates/feature` is
    - `providers/<name>_controller.dart` (`@riverpod` notifier: state + actions)
    - `presentation/pages/<name>_page.dart`, `presentation/widgets/`
 2. New endpoint -> `new-api-call` skill. New page -> `new-page` skill. Strings -> `add-translation-keys` skill.
-3. Register the typed route in `lib/app/router/routes.dart` (+ guard if protected). Edit no other feature.
+3. Register the typed route in `lib/core/router/routes.dart` (+ guard if protected). Edit no other feature.
 4. Tests mirror paths under `test/features/<name>/`: repository (success + each mapped exception), controller (initial/success/failure/refresh), pages (8 states, goldens).
 5. Codegen under the lock: `mkdir /tmp/riverpod_core.lock` -> `dart run build_runner build --delete-conflicting-outputs` -> `rmdir /tmp/riverpod_core.lock`.
 6. Run the gate; write the report; set REVIEW.

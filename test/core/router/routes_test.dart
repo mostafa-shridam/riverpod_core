@@ -1,8 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:riverpod_core/app/router/placeholder_pages.dart';
-import 'package:riverpod_core/app/router/routes.dart';
-import 'package:riverpod_core/app/startup/splash_page.dart';
+import 'package:riverpod_core/core/router/routes.dart';
+import 'package:riverpod_core/core/startup/splash_page.dart';
+import 'package:riverpod_core/features/auth/presentation/pages/login_page.dart';
 import 'package:riverpod_core/features/home/presentation/pages/home_page.dart';
+import 'package:riverpod_core/features/more/presentation/pages/more_page.dart';
+import 'package:riverpod_core/features/onboarding/presentation/pages/onboarding_page.dart';
 
 void main() {
   test('typed routes produce the paths in AppPaths', () {
