@@ -88,7 +88,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 |---|---|---|
 | DONE | worker-i | — |
 - Goal: ARCHITECTURE.md startup; leveled logger; global error handlers; interfaces only (no vendor).
-- Files: `lib/main.dart` (rewritten: only `bootstrap(Flavor.current)`), `lib/main_staging.dart`, `lib/bootstrap.dart`, `lib/app/app.dart`, `lib/core/logger/**`, `lib/core/crash/**`, `lib/core/analytics/**`, `test/core/logger/**`, `test/core/crash/**`, `test/core/analytics/**`, `test/bootstrap_test.dart`, `test/helpers/fake_crash_reporter.dart`, `test/helpers/fake_analytics.dart`
+- Files: `lib/main.dart` (rewritten: only `bootstrap(Flavor.current)`), `lib/main_staging.dart`, `lib/core/bootstrap/bootstrap.dart`, `lib/core/app/app.dart`, `lib/core/logger/**`, `lib/core/crash/**`, `lib/core/analytics/**`, `test/core/logger/**`, `test/core/crash/**`, `test/core/analytics/**`, `test/core/bootstrap/bootstrap_test.dart`, `test/helpers/fake_crash_reporter.dart`, `test/helpers/fake_analytics.dart`
 - Done when: entrypoints only call `bootstrap(flavor)` (D-024); invalid config → minimal error app with the problem list; `FlutterError.onError`, `PlatformDispatcher.onError`, zone errors → logger + `CrashReporter`; logger silent in prod; `CrashReporter`/`AnalyticsService` interfaces with `Noop` and `Console` implementations chosen from `AppConfig`; `dart:developer log` in `lib/core` replaced by the logger; `App` uses the temporary router until C-11.
 - Tests: handlers forward to fake reporter; logger level filtering; invalid config yields error app; staging entrypoint uses staging config.
 - Owner input needed later (not for this task): Sentry or Crashlytics vendor (C-30).
@@ -141,9 +141,9 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-35 — Widget showcase page ("component gallery")
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | worker-p | — |
 - Goal: one page where anyone can see and try every design_system widget fast (D-020). Registered only in `dev` and `staging` flavors at the typed route `/showcase`; reachable from a dev-only entry on the home page.
-- Files: `lib/features/showcase/presentation/pages/showcase_page.dart`, `lib/features/showcase/presentation/widgets/**` (section widgets), `lib/core/design_system/widgets/widgets.dart` (the barrel export of every widget), `lib/app/router/routes.dart` (add the route only), `assets/translations/*.json` + generated (`showcase.*` keys), `test/features/showcase/**`
+- Files: `lib/features/showcase/presentation/pages/showcase_page.dart`, `lib/features/showcase/presentation/widgets/**` (section widgets), `lib/core/design_system/widgets/widgets.dart` (the barrel export of every widget), `lib/core/router/routes.dart` (add the route only), `assets/translations/*.json` + generated (`showcase.*` keys), `test/features/showcase/**`
 - Done when: sections with headers — Buttons (all variants/sizes/loading/disabled), Inputs, Selection, Overlays (one button each: modal bottom sheet, action sheet, selection sheet, form sheet, alert, confirm, input dialog, loading overlay, snackbar ×4 types, toast, banner), Display (card, avatar, badge, chip, image, accordion, tabs), Media (`AppVideoPlayer` playing a public sample video, with a link to the `videos` feature), Feedback/States (skeleton, empty, error, offline banner, progress), Tokens (color swatches with names, type scale, spacing, radius, elevation). App bar actions: toggle light/dark, toggle ar/en, text scale slider, so every widget can be checked in all modes live. Works on phone and tablet.
 - Tests: page builds in light/dark × ar/en; each overlay button opens its overlay; mode toggles work; no overflow at text scale 2.0.
 
@@ -161,7 +161,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 |---|---|---|
 | DONE | worker-a | — |
 - Goal: D-016. Single `appRouterProvider`, typed routes (go_router_builder), guards, bottom-nav shell with separate stacks, error page.
-- Files: `lib/app/router/app_router.dart`, `lib/app/router/routes.dart`, `lib/app/router/guards/**`, `lib/app/startup/**` (splash), `lib/app/app.dart`, delete `lib/core/router/**`, delete `lib/core/services/app_router.dart`, `lib/core/helper/deep_link_helper.dart` (adapt to the provider only), `lib/features/home/presentation/pages/home_page.dart` (moved), `pubspec.yaml`/`pubspec.lock` (add `go_router_builder`), `test/app/router/**`
+- Files: `lib/core/router/app_router.dart`, `lib/core/router/routes.dart`, `lib/core/router/guards/**`, `lib/core/startup/**` (splash), `lib/core/app/app.dart`, delete `lib/core/router/**`, delete `lib/core/services/app_router.dart`, `lib/core/helper/deep_link_helper.dart` (adapt to the provider only), `lib/features/home/presentation/pages/home_page.dart` (moved), `pubspec.yaml`/`pubspec.lock` (add `go_router_builder`), `test/core/router/**`
 - Done when: splash → onboarding → auth → home skeleton with guards driven by a stub `SessionController` (`lib/core/auth/`); no `Routes.instance`/`MobileRouting.instance`; deep link resolves through typed routes.
 - Tests: guard redirect per session state; deep link resolution; unknown route → error page.
 
@@ -207,7 +207,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 |---|---|---|
 | READY | — | — |
 - Goal: D-028. A complete feature following ARCHITECTURE.md end to end, runnable without a backend.
-- Files: `lib/features/videos/**` (`data/models/video.dart`, `data/sources/videos_remote_source.dart` + `videos_mock_source.dart` + `sample_videos.dart`, `data/videos_repository.dart`, `providers/videos_controller.dart`, `providers/video_player_page_controller.dart` if needed, `presentation/pages/videos_page.dart`, `presentation/pages/video_detail_page.dart`, `presentation/widgets/**`), `lib/app/router/routes.dart` (add the two routes only), `assets/translations/*.json` + generated (`videos.*`), `test/features/videos/**`
+- Files: `lib/features/videos/**` (`data/models/video.dart`, `data/sources/videos_remote_source.dart` + `videos_mock_source.dart` + `sample_videos.dart`, `data/videos_repository.dart`, `providers/videos_controller.dart`, `providers/video_player_page_controller.dart` if needed, `presentation/pages/videos_page.dart`, `presentation/pages/video_detail_page.dart`, `presentation/widgets/**`), `lib/core/router/routes.dart` (add the two routes only), `assets/translations/*.json` + generated (`videos.*`), `test/features/videos/**`
 - Done when: list page with `AsyncValueView` (all 8 states reachable through a "simulate" menu that switches the mock source: success, empty, error, offline, slow, partial), pull-to-refresh, search field filtering, item cards (thumbnail `AppImage`, title, duration badge); detail page with `AppVideoPlayer`, description, related list, favorite toggle persisted in prefs; repository returns models or throws `AppException`; mock source is selected by a provider override flag so it can be replaced by the real Dio source in one place; typed routes; registered only in dev/staging; sample videos come from D-029 (the vetted list, in `data/sources/sample_videos.dart`: 2 Flutter MP4s, 3 test-videos.co.uk MP4s, 2 Apple HLS streams); include a custom-URL input in the list page app bar so the owner can paste any MP4/HLS link and play it; no hard-coded text, tokens only.
 - Tests: repository (success/each exception), controller (initial/success/failure/refresh/search), pages (8 states + goldens), detail page with fake player controller.
 
@@ -234,7 +234,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 |---|---|---|
 | READY | — | — |
 - Goal: close loose ends of C-08/C-12/C-14 after D-035: bootstrap uses easy_localization's own persistence and plurals, Riverpod auto-retry policy is explicit.
-- Files: `lib/bootstrap.dart`, `lib/app/app.dart`, `test/bootstrap_test.dart`, `test/helpers/pump_app.dart` (pass `ignorePluralRules: false`), `ai-docs/STATE_AND_DATA.md` (copyWithPrevious note)
+- Files: `lib/core/bootstrap/bootstrap.dart`, `lib/core/app/app.dart`, `test/core/bootstrap/bootstrap_test.dart`, `test/helpers/pump_app.dart` (pass `ignorePluralRules: false`), `ai-docs/STATE_AND_DATA.md` (copyWithPrevious note)
 - Done when: `EasyLocalization(saveLocale: true, ignorePluralRules: false, startLocale: null (device locale if supported, else fallback))` + `await initFormatting()` before `runApp`; no reference to the legacy `getLanguageCodeHelper` stubs; the root `ProviderContainer` is created with `retry: (retryCount, error) => null` (D-032); STATE_AND_DATA.md no longer shows the internal `copyWithPrevious` pattern (see D-031).
 - Tests: bootstrap starts; a failing provider build is not retried; Arabic plurals work in `pumpApp`.
 
@@ -259,7 +259,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-27 — GitHub Actions CI
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | worker-m | — |
 - Goal: every push/PR runs the gate.
 - Files: `.github/workflows/ci.yml`, `.github/workflows/README.md` (how it works, how to add secrets, nothing secret inside)
 - Done when: workflow on `push` and `pull_request` using the stable Flutter channel pinned through `subosito/flutter-action` with caching (`cache: true`), steps: checkout, `flutter pub get`, create `env/*.env` from the committed `*.env.example` files, `dart run easy_localization:generate` x2 (as in `build.sh`), `dart run build_runner build --delete-conflicting-outputs`, `git diff --exit-code` on tracked generated files (fails when generated code is stale), `dart format --set-exit-if-changed lib test tool`, `flutter analyze`, `flutter test --coverage`, upload `coverage/lcov.info` as an artifact, and a build job `flutter build apk --debug` (Android) plus `flutter build ios --no-codesign --debug` on macOS runner (separate job, `needs` the test job); concurrency group cancels superseded runs; least-privilege `permissions: contents: read`. No secrets required. Pin action versions to the latest stable major/sha you verify, record them in the README.
@@ -268,7 +268,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-28 — Release scripts and signing from untracked files
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | worker-m | — |
 - Goal: checklist "Android/iOS release scripts with signing from untracked files".
 - Files: `tool/release/build_android.sh`, `tool/release/build_ios.sh`, `tool/release/README.md`, `android/app/build.gradle.kts` (signing config reading `android/key.properties`, falls back to debug signing ONLY when the file is absent AND the build type is not release: a release build without `key.properties` must fail with a clear message), `android/key.properties.example`, `ios/ExportOptions.plist.example`, `.gitignore` (add `android/key.properties`, `*.jks`, `*.keystore`, `ios/ExportOptions.plist`, `*.mobileprovision`, `build-symbols/`)
 - Done when: `build_android.sh [--flavor staging|prod]` runs the `release-check` skill pre-gate (`dart format`, `analyze`, `test`), then `flutter build appbundle --release --obfuscate --split-debug-info=build-symbols/android` (entrypoint `lib/main.dart` for prod, `lib/main_staging.dart` for staging), verifies `env/<flavor>.env` exists, and prints the artifact path; `build_ios.sh` does the same with `flutter build ipa --release --export-options-plist=ios/ExportOptions.plist`; scripts are `set -euo pipefail`, executable, never echo secrets; the README documents creating the keystore (`keytool` command), `key.properties` fields, where to keep the files, and the iOS export options; no secrets committed (only `*.example`).
@@ -279,7 +279,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 |---|---|---|
 | READY | — | — |
 - Goal: D-034. One local store.
-- Files: `lib/core/storage/**` (`prefs_storage.dart` re-implemented on a Hive box with the SAME public API and typed keys minus the locale and digits fields; `database/` replaced by `cache_store.dart` over a Hive box with the same operations the C-16 helper uses: read, write(key, payload, savedAt, etag), delete, deleteSavedBefore, clear), `lib/core/storage/cache/**` (adapt the C-16 helper to `CacheStore`), `lib/core/storage/clear_user_data.dart`, `lib/bootstrap.dart` (Hive.initFlutter + open boxes before runApp), `pubspec.yaml`, `pubspec.lock` (add `hive_ce`, `hive_ce_flutter`; remove `shared_preferences`, `drift`, `drift_flutter`, `drift_dev`), `test/core/storage/**`, `test/helpers/fake_prefs_storage.dart`, `test/helpers/pump_app.dart` (drop shared_preferences mock), `test/bootstrap_test.dart`
+- Files: `lib/core/storage/**` (`prefs_storage.dart` re-implemented on a Hive box with the SAME public API and typed keys minus the locale and digits fields; `database/` replaced by `cache_store.dart` over a Hive box with the same operations the C-16 helper uses: read, write(key, payload, savedAt, etag), delete, deleteSavedBefore, clear), `lib/core/storage/cache/**` (adapt the C-16 helper to `CacheStore`), `lib/core/storage/clear_user_data.dart`, `lib/core/bootstrap/bootstrap.dart` (Hive.initFlutter + open boxes before runApp), `pubspec.yaml`, `pubspec.lock` (add `hive_ce`, `hive_ce_flutter`; remove `shared_preferences`, `drift`, `drift_flutter`, `drift_dev`), `test/core/storage/**`, `test/helpers/fake_prefs_storage.dart`, `test/helpers/pump_app.dart` (drop shared_preferences mock), `test/core/bootstrap/bootstrap_test.dart`
 - Done when: no import of shared_preferences or drift remains (grep); boxes are opened once in bootstrap and exposed through keepAlive providers; tests use a temp-dir Hive (`Hive.init(tempDir)`), no platform channel; cache expiry/etag/user-scoping behave exactly as in C-16 tests; `clearUserData` wipes secure storage, cache box and user-scoped prefs; the old Drift generated files are deleted.
 - Tests: ports of all existing prefs, cache and clear tests (none dropped); box reopened after restart keeps data; bootstrap still starts.
 
@@ -288,7 +288,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 |---|---|---|
 | READY | — | — |
 - Goal: checklist "Auth & security": real `SessionController`, token handling, login/register/forgot-password pages, logout.
-- Files: `lib/core/auth/**` (`session_controller.dart` real implementation replacing the C-11 stub, `auth_tokens.dart`, `logout.dart`), `lib/features/auth/**` (`data/models/{auth_tokens,auth_user,login_request,register_request}.dart` freezed, `data/sources/auth_remote_source.dart`, `data/auth_repository.dart`, `providers/{login_controller,register_controller,forgot_password_controller}.dart`, `presentation/pages/{login_page,register_page,forgot_password_page}.dart`, `presentation/widgets/**`), `lib/app/router/routes.dart` + `placeholder_pages.dart` (replace the placeholder LoginPage by the real one, add register/forgot routes only), `assets/translations/*.json` (top-level `auth`, appended), `test/core/auth/**`, `test/features/auth/**`, `test/goldens/auth/**`
+- Files: `lib/core/auth/**` (`session_controller.dart` real implementation replacing the C-11 stub, `auth_tokens.dart`, `logout.dart`), `lib/features/auth/**` (`data/models/{auth_tokens,auth_user,login_request,register_request}.dart` freezed, `data/sources/auth_remote_source.dart`, `data/auth_repository.dart`, `providers/{login_controller,register_controller,forgot_password_controller}.dart`, `presentation/pages/{login_page,register_page,forgot_password_page}.dart`, `presentation/widgets/**`), `lib/core/router/routes.dart` + `placeholder_pages.dart` (replace the placeholder LoginPage by the real one, add register/forgot routes only), `assets/translations/*.json` (top-level `auth`, appended), `test/core/auth/**`, `test/features/auth/**`, `test/goldens/auth/**`
 - Done when: `SessionController` (keepAlive): restores the session from `SecureStorage` at startup, exposes `SessionStatus {unknown, signedOut, signedIn}` + current `AuthUser?`, `signIn(tokens, user)`, `signOut()`; implements `AccessTokenRefresher` (override of `accessTokenRefresherProvider`, C-07) so the Dio single-flight refresh works; listens to `SessionEvents.expired`; `logout()` is ONE function: calls the repository logout (best effort), then `clearUserData` (secure storage, cache, user-scoped prefs), clears analytics user, and invalidates the provider graph (root container reset via a `ProviderScope` key or `ref.invalidate` of user-scoped providers; document the chosen mechanism); the auth repository talks to endpoints configured in ONE file (`auth_endpoints.dart`; defaults `/auth/login`, `/auth/register`, `/auth/refresh`, `/auth/logout`, `/auth/forgot-password`) and has a mock source switch like the videos feature (D-028) so the app runs without a backend; pages use only design_system widgets (AppTextField, AppPasswordField, AppButton with loading, AppSnackbar for errors, field errors from `ValidationException`), all 8 states where they apply, ar/en keys, validators from `core/utils`; social sign-in (google_sign_in/firebase_auth are dependencies) is NOT built here: leave an `AuthProvider` extension point and say in the report how to add it.
 - Tests: session restore/sign-in/sign-out, refresher override, logout clears everything (fakes), login controller success/validation error/network error, pages widget tests + goldens (light/dark x ar/en).
 
@@ -297,9 +297,18 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 |---|---|---|
 | BLOCKED | — | C-17 |
 - Goal: real splash startup sequence and onboarding carousel.
-- Files: `lib/app/startup/**` (splash page + `startup_controller.dart`), `lib/features/onboarding/**` (`providers/onboarding_controller.dart`, `presentation/pages/onboarding_page.dart`, `presentation/widgets/**`), `lib/app/router/placeholder_pages.dart` (remove the onboarding placeholder), `assets/translations/*.json` (top-level `onboarding`), `test/app/startup/**`, `test/features/onboarding/**`, `test/goldens/onboarding/**`
+- Files: `lib/core/startup/**` (splash page + `startup_controller.dart`), `lib/features/onboarding/**` (`providers/onboarding_controller.dart`, `presentation/pages/onboarding_page.dart`, `presentation/widgets/**`), `lib/core/router/placeholder_pages.dart` (remove the onboarding placeholder), `assets/translations/*.json` (top-level `onboarding`), `test/core/startup/**`, `test/features/onboarding/**`, `test/goldens/onboarding/**`
 - Done when: splash runs the startup sequence (config already loaded; session restore; onboarding-seen flag; remote flags later) with a minimum display time token and a retry state when a mandatory step fails; onboarding: 3 pages (title, body, illustration built from icons + tokens, no image assets), page indicator, skip/next/get-started, RTL-correct swipe direction, persists `onboardingSeen`; guards (C-11) route correctly afterwards.
 - Tests: startup states, onboarding flow persists flag, goldens light/dark x ar/en.
+
+## C-42 — Migrate to LocaleKeys everywhere (D-037) and add the guard test
+| status | owner | blocked by |
+|---|---|---|
+| BLOCKED | — | C-17, C-35, C-39 (they add code and keys) |
+- Goal: no literal translation keys anywhere.
+- Files: every `lib/core/design_system/widgets/**/**_strings.dart` (deleted; their key constants replaced by `LocaleKeys.<generated>` at the call sites in the same widget folders), `lib/core/**` and `lib/features/**` files that call `.tr()`/`.plural()` on a string literal (grep `'[a-zA-Z_]+\.[a-zA-Z_.]+'\.tr\(` and `.plural(`), `lib/generated/*.g.dart` (regenerated), `test/translations/no_literal_keys_test.dart`, tests that referenced the old key constants
+- Done when: the repo contains no `*_strings.dart` key-constant files; no `.tr()`/`.plural()` receives a string literal in `lib/` (override parameters of widgets still accept plain `String`); the guard test scans every `.dart` file under `lib/` (excluding generated) and fails on `'<literal>'.tr(` / `"<literal>".tr(` / `.plural('<literal>'`; widgets behave exactly as before (all existing widget and golden tests pass unchanged).
+- Tests: the guard test (with a self-test on an inline sample); full suite and goldens green.
 
 ---
 

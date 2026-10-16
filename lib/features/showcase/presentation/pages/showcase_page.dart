@@ -19,6 +19,7 @@ import 'package:riverpod_core/features/showcase/presentation/widgets/selection_s
 import 'package:riverpod_core/features/showcase/presentation/widgets/showcase_scale_bar.dart';
 import 'package:riverpod_core/features/showcase/presentation/widgets/states_section.dart';
 import 'package:riverpod_core/features/showcase/presentation/widgets/tokens_section.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// The component gallery (D-020): every design_system widget, live, with
 /// light/dark, ar/en and text scale switches in the app bar.
@@ -30,6 +31,9 @@ class ShowcasePage extends StatefulWidget {
     super.key,
     this.videoBackendFactory = createVideoPlayerBackend,
   });
+
+  /// Route path of the gallery.
+  static const routeName = '/showcase';
 
   /// Playback engine factory for the video samples; tests pass a fake.
   final AppVideoBackendFactory videoBackendFactory;
@@ -86,35 +90,42 @@ class _ShowcasePageState extends State<ShowcasePage> {
 
     return AppScaffold(
       appBar: AppAppBar(
-        title: 'showcase.title'.tr(),
+        title: LocaleKeys.showcase_title.tr(),
         actions: [
           AppIconButton(
             key: const ValueKey('toggle-theme'),
             icon: isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-            tooltip: 'showcase.toggleTheme'.tr(),
+            tooltip: LocaleKeys.showcase_toggleTheme.tr(),
             onPressed: () => setState(() => _dark = !isDark),
           ),
           AppButton(
             key: const ValueKey('toggle-locale'),
-            label: 'showcase.toggleLocale'.tr(),
+            label: LocaleKeys.showcase_toggleLocale.tr(),
             variant: AppButtonVariant.text,
             size: AppButtonSize.sm,
-            onPressed: () =>
-                context.setLocale(Locale(isArabic ? 'en' : 'ar')),
+            onPressed: () => context.setLocale(Locale(isArabic ? 'en' : 'ar')),
           ),
         ],
-        bottom: ShowcaseScaleBar(
-          value: scale.clamp(minTextScale, maxTextScale),
-          onChanged: (v) => setState(() => _scale = v),
-        ),
       ),
-      // Only the body is scaled, so the controls stay usable at 2.0x.
-      body: _scale == null
-          ? body
-          : MediaQuery(
-              data: media.copyWith(textScaler: TextScaler.linear(_scale!)),
-              child: body,
-            ),
+      body: Column(
+        children: [
+          ShowcaseScaleBar(
+            value: scale.clamp(minTextScale, maxTextScale),
+            onChanged: (v) => setState(() => _scale = v),
+          ),
+          // Only the list is scaled, so the controls stay usable at 2.0x.
+          Expanded(
+            child: _scale == null
+                ? body
+                : MediaQuery(
+                    data: media.copyWith(
+                      textScaler: TextScaler.linear(_scale!),
+                    ),
+                    child: body,
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }

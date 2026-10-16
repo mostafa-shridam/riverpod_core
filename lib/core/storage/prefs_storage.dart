@@ -43,6 +43,15 @@ class PrefsStorage {
   Future<bool> setNotificationsEnabled({required bool value}) =>
       _prefs.setBool(PrefKeys.notificationsEnabled, value);
 
+  /// Generic string-list slot for features (for example favorite ids). Name
+  /// the key `user.<feature>.<name>` when it belongs to the signed-in user, so
+  /// [clearUserScoped] removes it on logout.
+  List<String> getStringList(String key) =>
+      _prefs.getStringList(key) ?? const [];
+
+  Future<bool> setStringList(String key, List<String> value) =>
+      _prefs.setStringList(key, value);
+
   /// Removes every key under [PrefKeys.userPrefix]. Device settings stay.
   Future<void> clearUserScoped() async {
     final userKeys = _prefs.getKeys().where(

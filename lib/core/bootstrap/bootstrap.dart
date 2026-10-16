@@ -1,0 +1,212 @@
+import 'dart:async';
+import 'dart:ui' show PlatformDispatcher;
+
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
+import 'package:riverpod_core/core/app/app.dart';
+import 'package:riverpod_core/core/config/app_config.dart';
+import 'package:riverpod_core/core/config/config_exception.dart';
+import 'package:riverpod_core/core/config/env_loader.dart';
+import 'package:riverpod_core/core/config/flavor.dart';
+import 'package:riverpod_core/core/config/log_level.dart';
+import 'package:riverpod_core/core/constants.dart';
+import 'package:riverpod_core/core/crash/crash_reporter.dart';
+import 'package:riverpod_core/core/logger/app_logger.dart';
+import 'package:riverpod_core/core/notifications/local_notifications_service.dart';
+import 'package:riverpod_core/core/services/helper.dart';
+import 'package:riverpod_core/core/storage/prefs_storage.dart';
+import 'package:riverpod_core/generated/codegen_loader.g.dart';
+
+/// Shows the app. `runApp` in production; a capture in tests.
+typedef AppRunner = void Function(Widget app);
+
+/// Starts the app for [flavor] (D-024): load and validate config, install the
+/// global error handlers, warm storage, then run the app.
+///
+/// A config failure shows [ConfigErrorApp]; optional services never block.
+/// [envReader], [runner], [overrides] and [initNotifications] exist for tests.
+Future<void> bootstrap(
+  Flavor flavor, {
+  AssetReader? envReader,
+  AppRunner runner = runApp,
+  List<Override> overrides = const [],
+  Future<void> Function()? initNotifications,
+}) {
+  final done = Completer<void>();
+  // Before the config is known only errors are logged; replaced below.
+  var logger = const AppLogger(level: LogLevel.error);
+  CrashReporter crashReporter = const NoopCrashReporter();
+
+  runZonedGuarded(
+    () async {
+      try {
+        WidgetsFlutterBinding.ensureInitialized();
+
+        final AppConfig config;
+        try {
+          final env = await EnvLoader.load(flavor, reader: envReader);
+          config = AppConfig.fromMap(flavor, env);
+        } on ConfigException catch (e) {
+          logger.error('Invalid app configuration', error: e);
+          runner(ConfigErrorApp(problems: e.problems));
+          return;
+        }
+
+        final container = ProviderContainer(
+          overrides: [
+            appConfigProvider.overrideWithValue(config),
+            ...overrides,
+          ],
+        );
+        logger = container.read(loggerProvider);
+        crashReporter = container.read(crashReporterProvider);
+        installErrorHandlers(logger: logger, crashReporter: crashReporter);
+
+        try {
+          await container.read(prefsStorageProvider.future);
+        } on Object catch (e, s) {
+          // Not fatal here: consumers see the same error in their AsyncValue.
+          await reportError(
+            logger,
+            crashReporter,
+            e,
+            s,
+            reason: 'Preferences failed to load',
+          );
+        }
+
+        try {
+          await (initNotifications ?? _initLocalNotifications)();
+        } on Object catch (e) {
+          logger.warning('Error when init LocalNotificationsService', error: e);
+        }
+
+        runner(
+          UncontrolledProviderScope(
+            container: container,
+            child: EasyLocalization(
+              supportedLocales: supportedLocales,
+              path: translationsPath,
+              fallbackLocale: Locale(getLanguageCodeHelper()),
+              startLocale: Locale(getLanguageCodeHelper()),
+              assetLoader: const CodegenLoader(),
+              child: const App(),
+            ),
+          ),
+        );
+      } finally {
+        done.complete();
+      }
+    },
+    (error, stackTrace) {
+      unawaited(
+        reportError(
+          logger,
+          crashReporter,
+          error,
+          stackTrace,
+          fatal: true,
+          reason: 'Uncaught zone error',
+        ),
+      );
+    },
+  );
+  return done.future;
+}
+
+Future<void> _initLocalNotifications() =>
+    LocalNotificationsService.instance.init();
+
+/// Routes framework and platform errors to the logger and [crashReporter].
+void installErrorHandlers({
+  required AppLogger logger,
+  required CrashReporter crashReporter,
+}) {
+  FlutterError.onError = (details) {
+    unawaited(
+      reportError(
+        logger,
+        crashReporter,
+        details.exception,
+        details.stack,
+        reason: details.exceptionAsString(),
+      ),
+    );
+  };
+  PlatformDispatcher.instance.onError = (error, stackTrace) {
+    unawaited(
+      reportError(
+        logger,
+        crashReporter,
+        error,
+        stackTrace,
+        fatal: true,
+        reason: 'Uncaught platform error',
+      ),
+    );
+    return true;
+  };
+}
+
+/// Logs [error] and forwards it to [crashReporter]. Never throws.
+Future<void> reportError(
+  AppLogger logger,
+  CrashReporter crashReporter,
+  Object error,
+  StackTrace? stackTrace, {
+  bool fatal = false,
+  String? reason,
+}) async {
+  logger.error(
+    reason ?? 'Unhandled error',
+    error: error,
+    stackTrace: stackTrace,
+  );
+  try {
+    await crashReporter.recordError(
+      error,
+      stackTrace,
+      fatal: fatal,
+      reason: reason,
+    );
+  } on Object catch (e) {
+    logger.error('Crash reporter failed', error: e);
+  }
+}
+
+/// Minimal app shown when the config is invalid. English literals on purpose:
+/// localization is not loaded yet and this screen is for the developer.
+class ConfigErrorApp extends StatelessWidget {
+  const ConfigErrorApp({required this.problems, super.key});
+
+  final List<String> problems;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        body: SafeArea(
+          child: ListView(
+            padding: const EdgeInsetsDirectional.all(24),
+            children: [
+              const Text(
+                'Invalid app configuration',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              for (final problem in problems) Text('- $problem'),
+              const SizedBox(height: 16),
+              const Text(
+                'Fix env/<flavor>.env (copy env/<flavor>.env.example) '
+                'and restart the app.',
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

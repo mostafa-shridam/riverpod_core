@@ -1,8 +1,18 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// Release signing values live in the untracked android/key.properties (see tool/release/README.md).
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+val hasReleaseKey = keystorePropertiesFile.exists()
+if (hasReleaseKey) {
+    keystorePropertiesFile.inputStream().use { keystoreProperties.load(it) }
 }
 
 android {
@@ -31,11 +41,39 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (hasReleaseKey) {
+            create("release") {
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+                storeFile = keystoreProperties.getProperty("storeFile")?.let { rootProject.file(it) }
+                storePassword = keystoreProperties.getProperty("storePassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            // Real signing only. Without android/key.properties a release build is refused
+            // (see the taskGraph check below); the debug key is never used for a release artifact.
+            signingConfig = if (hasReleaseKey) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
+        }
+    }
+}
+
+// Release artifacts (assemble/bundle/package ...Release) require android/key.properties.
+// Debug/profile builds (flutter run) are unaffected.
+gradle.taskGraph.whenReady {
+    if (!hasReleaseKey) {
+        val releaseTask = allTasks.firstOrNull {
+            it.project == project && Regex("^(assemble|bundle|package)(.*)Release$").matches(it.name)
+        }
+        if (releaseTask != null) {
+            throw GradleException(
+                "Release build requires android/key.properties (not found). " +
+                    "Copy android/key.properties.example to android/key.properties and fill it in; " +
+                    "see tool/release/README.md. Release builds are never signed with the debug key."
+            )
         }
     }
 }

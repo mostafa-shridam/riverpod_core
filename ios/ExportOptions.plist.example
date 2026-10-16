@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Copy to ios/ExportOptions.plist (git-ignored) and replace the placeholders. -->
+<plist version="1.0">
+<dict>
+    <key>method</key>
+    <string>app-store-connect</string>
+    <key>teamID</key>
+    <string>YOUR_TEAM_ID</string>
+    <key>signingStyle</key>
+    <string>automatic</string>
+    <key>uploadSymbols</key>
+    <true/>
+    <!-- For manual signing: set signingStyle to manual and add
+    <key>provisioningProfiles</key>
+    <dict>
+        <key>com.your.bundle.id</key>
+        <string>Your Distribution Profile Name</string>
+    </dict>
+    -->
+</dict>
+</plist>

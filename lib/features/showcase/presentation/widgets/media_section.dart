@@ -8,6 +8,7 @@ import 'package:riverpod_core/core/design_system/widgets/media/app_video_player.
 import 'package:riverpod_core/core/design_system/widgets/media/app_video_source.dart';
 import 'package:riverpod_core/features/showcase/presentation/widgets/showcase_samples.dart';
 import 'package:riverpod_core/features/showcase/presentation/widgets/showcase_section.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// `AppVideoPlayer` with an MP4 and, on demand, an HLS stream.
 class MediaSection extends StatefulWidget {
@@ -34,14 +35,20 @@ class _MediaSectionState extends State<MediaSection> {
     final spacing = context.tokens.spacing;
     return ShowcaseSection(
       sectionKey: const ValueKey('showcase-media'),
-      title: 'showcase.sections.media'.tr(),
+      title: LocaleKeys.showcase_sections_media.tr(),
       children: [
-        Text('showcase.media.mp4'.tr(), style: theme.textTheme.labelLarge),
+        Text(
+          LocaleKeys.showcase_media_mp4.tr(),
+          style: theme.textTheme.labelLarge,
+        ),
         AppVideoPlayer(
           source: const AppVideoSource.network(showcaseVideoUrl),
           backendFactory: widget.backendFactory,
         ),
-        Text('showcase.media.hls'.tr(), style: theme.textTheme.labelLarge),
+        Text(
+          LocaleKeys.showcase_media_hls.tr(),
+          style: theme.textTheme.labelLarge,
+        ),
         if (_hlsLoaded)
           AppVideoPlayer(
             source: const AppVideoSource.network(showcaseHlsUrl),
@@ -52,7 +59,7 @@ class _MediaSectionState extends State<MediaSection> {
             alignment: AlignmentDirectional.centerStart,
             child: AppButton(
               key: const ValueKey('load-hls'),
-              label: 'showcase.media.loadHls'.tr(),
+              label: LocaleKeys.showcase_media_loadHls.tr(),
               icon: Icons.play_circle_outline_rounded,
               variant: AppButtonVariant.tonal,
               onPressed: () => setState(() => _hlsLoaded = true),
@@ -61,7 +68,7 @@ class _MediaSectionState extends State<MediaSection> {
         Padding(
           padding: EdgeInsetsDirectional.only(top: spacing.xs),
           child: Text(
-            'showcase.media.note'.tr(),
+            LocaleKeys.showcase_media_note.tr(),
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),

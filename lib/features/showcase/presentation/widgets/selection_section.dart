@@ -13,6 +13,7 @@ import 'package:riverpod_core/core/design_system/widgets/selection/app_slider.da
 import 'package:riverpod_core/core/design_system/widgets/selection/app_switch.dart';
 import 'package:riverpod_core/core/design_system/widgets/selection/app_time_field.dart';
 import 'package:riverpod_core/features/showcase/presentation/widgets/showcase_section.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Checkbox, switch, radio, dropdown, segmented control, sliders, date and
 /// time fields, rating and chip group, all live.
@@ -45,31 +46,31 @@ class _SelectionSectionState extends State<SelectionSection> {
       for (var i = 0; i < 3; i++)
         AppSelectionOption<int>(
           value: i,
-          label: 'showcase.selection.option'.tr(args: ['${i + 1}']),
+          label: LocaleKeys.showcase_selection_option.tr(args: ['${i + 1}']),
         ),
     ];
     return ShowcaseSection(
       sectionKey: const ValueKey('showcase-selection'),
-      title: 'showcase.sections.selection'.tr(),
+      title: LocaleKeys.showcase_sections_selection.tr(),
       children: [
         AppCheckbox(
           value: _checked,
           onChanged: (v) => setState(() => _checked = v),
-          label: 'showcase.selection.checkbox'.tr(),
-          subtitle: 'showcase.selection.checkboxHint'.tr(),
+          label: LocaleKeys.showcase_selection_checkbox.tr(),
+          subtitle: LocaleKeys.showcase_selection_checkboxHint.tr(),
         ),
         AppCheckbox(
           value: false,
           onChanged: null,
-          label: 'showcase.selection.disabled'.tr(),
+          label: LocaleKeys.showcase_selection_disabled.tr(),
         ),
         AppSwitch(
           value: _switched,
           onChanged: (v) => setState(() => _switched = v),
-          label: 'showcase.selection.switch'.tr(),
+          label: LocaleKeys.showcase_selection_switch.tr(),
         ),
         AppRadioGroup<int>(
-          label: 'showcase.selection.radio'.tr(),
+          label: LocaleKeys.showcase_selection_radio.tr(),
           value: _radio,
           onChanged: (v) => setState(() => _radio = v),
           options: [
@@ -78,14 +79,14 @@ class _SelectionSectionState extends State<SelectionSection> {
           ],
         ),
         AppDropdown<int>(
-          label: 'showcase.selection.dropdown'.tr(),
-          hint: 'showcase.selection.dropdownHint'.tr(),
+          label: LocaleKeys.showcase_selection_dropdown.tr(),
+          hint: LocaleKeys.showcase_selection_dropdownHint.tr(),
           options: options,
           value: _dropdown,
           onChanged: (v) => setState(() => _dropdown = v),
         ),
         AppSegmentedControl<int>(
-          label: 'showcase.selection.segmented'.tr(),
+          label: LocaleKeys.showcase_selection_segmented.tr(),
           value: _segment,
           onChanged: (v) => setState(() => _segment = v),
           segments: [
@@ -94,34 +95,34 @@ class _SelectionSectionState extends State<SelectionSection> {
           ],
         ),
         AppSlider(
-          label: 'showcase.selection.slider'.tr(),
+          label: LocaleKeys.showcase_selection_slider.tr(),
           value: _slider,
           onChanged: (v) => setState(() => _slider = v),
         ),
         AppRangeSlider(
-          label: 'showcase.selection.range'.tr(),
+          label: LocaleKeys.showcase_selection_range.tr(),
           values: _range,
           onChanged: (v) => setState(() => _range = v),
         ),
         AppDateField(
-          label: 'showcase.selection.date'.tr(),
+          label: LocaleKeys.showcase_selection_date.tr(),
           value: _date,
           firstDate: _firstDate,
           lastDate: _lastDate,
           onChanged: (v) => setState(() => _date = v),
         ),
         AppTimeField(
-          label: 'showcase.selection.time'.tr(),
+          label: LocaleKeys.showcase_selection_time.tr(),
           value: _time,
           onChanged: (v) => setState(() => _time = v),
         ),
         AppRating(
-          label: 'showcase.selection.rating'.tr(),
+          label: LocaleKeys.showcase_selection_rating.tr(),
           value: _rating,
           onChanged: (v) => setState(() => _rating = v),
         ),
         AppChipGroup<int>(
-          label: 'showcase.selection.chips'.tr(),
+          label: LocaleKeys.showcase_selection_chips.tr(),
           multiSelect: true,
           selected: _chips,
           onChanged: (v) => setState(() => _chips = v),

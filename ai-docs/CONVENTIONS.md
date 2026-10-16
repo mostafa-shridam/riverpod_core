@@ -8,6 +8,10 @@
 - Generated files: `*.g.dart`, `*.freezed.dart` next to the source file. Never edit, never hand-write.
 - Test file: same path under `test/` + `_test.dart`.
 
+## Pages and routes
+- ONE page per file, in `features/<feature>/presentation/pages/<name>_page.dart` (app-level pages such as the splash live in `core/startup/`). Never put several pages in one file.
+- Every page declares `static const routeName = '/page-name';` (kebab-case, leading slash). There is no central paths class: `core/router/routes.dart` uses `XPage.routeName` in the typed-route annotations and redirect rules compare against it (D-036).
+
 ## Providers
 - Codegen names are derived from the function/class: `userRepository(Ref ref)` → `userRepositoryProvider`;
   `class AuthController` → `authControllerProvider`. Do not set provider prefixes/suffixes in build.yaml beyond the default.
@@ -32,6 +36,7 @@
 ## Strings and localization
 - No user-visible text in code. Every string comes from `assets/translations/{ar,en}.json` via generated `LocaleKeys`.
 - Keys: `feature.screen.element` lowerCamelCase segments, e.g. `auth.login.submit`. Errors under `errors.*`, common under `common.*`.
+- ALWAYS `LocaleKeys.group_key.tr()` from the generated file. NEVER `'group.key'.tr()` with a literal and never hand-written key-constant files (D-037). After editing the JSON run the two generation commands in `build.sh` and commit `lib/generated/*`.
 - Both languages in the same commit; the key-parity test must pass.
 - Developer-only strings (logs, assertions) may be English literals.
 - Numbers/dates: always via the locale-aware formatters in `core/l10n`, never `toString()` on user-facing values.

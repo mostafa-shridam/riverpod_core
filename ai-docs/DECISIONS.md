@@ -88,7 +88,7 @@ at implementation time and record them in its report.
 - Rejected: Clean Architecture with domain layer.
 
 ## D-016 — Typed routes with go_router_builder (supersedes routing details of D-005)
-- Decision: add dev dependency `go_router_builder` (BSD-3, latest stable resolved in C-11); all route paths in `lib/app/router/routes.dart`; `appRouterProvider` in `app_router.dart`; guards in `app/router/guards/`. Single router, responsive pages.
+- Decision: add dev dependency `go_router_builder` (BSD-3, latest stable resolved in C-11); all route paths in `lib/core/router/routes.dart`; `appRouterProvider` in `app_router.dart`; guards in `app/router/guards/`. Single router, responsive pages.
 - Why: compile-time-safe navigation; deep links and notification taps resolve through the same routes.
 - Rejected: string paths scattered in widgets; `auto_route` (second routing ecosystem).
 
@@ -187,3 +187,12 @@ at implementation time and record them in its report.
 - Context: C-12 added `lib/l10n/` with a `LocaleController` and prefs persistence that duplicated easy_localization (which already persists with `saveLocale: true`, switches with `context.setLocale` and supports plurals). Owner objected.
 - Decision: no `lib/l10n/` folder and no locale controller. Locale = `context.locale` / `context.setLocale` from easy_localization. Only pure formatting helpers remain, in `lib/core/utils/formatting/` (`AppFormatters` via `context.formatters`, `pluralText`, `relativeTime`); their translation keys live under the top-level `common` object. The digit flag stays a constructor parameter (Latin digits by default, D-030) with no persistence.
 - Why: one localization mechanism; less code.
+
+## D-036 — Everything under core; pages own their routeName (owner instructions; supersedes the app/ folder of D-015 and AppPaths of C-11)
+- Decision: there is no `lib/app/` folder. App wiring lives in `lib/core/`: `core/bootstrap/`, `core/app/`, `core/router/` (appRouterProvider, typed routes, guards, shell), `core/startup/` (splash). `lib/` root only has `main.dart`, `main_staging.dart`, `features/` and generated folders. Every page file contains ONE page and declares `static const routeName = '/page-name'`; no `AppPaths` class. Pages live in their feature (`features/<f>/presentation/pages/`), never grouped in a shared file.
+- Why: owner wants one `core` root and the page, its route and its file together.
+
+## D-037 — Translations: ONLY generated LocaleKeys (owner rule; supersedes the per-family string-constant files of D-023)
+- Decision: user text is always `LocaleKeys.some_key.tr()` (or `.plural`) from `lib/generated/locale_keys.g.dart`. Never `'a.b'.tr()` with a string literal and never hand-written key-constant files (`*_strings.dart`). Agents add keys to BOTH JSON files, run the two easy_localization generation commands from `build.sh`, `dart format lib/generated`, and COMMIT the regenerated files with their task. When several branches touch `lib/generated/*.g.dart`, the Lead resolves the conflict by regenerating after the merge. A guard test (`test/translations/no_literal_keys_test.dart`, C-42) fails when `.tr()` is called on a string literal anywhere under `lib/`.
+- Why: compile-time-checked keys, rename-safe, one mechanism.
+- Existing violations (the `*_strings.dart` files of the design-system widgets, `'app_nav.continue'.tr()`) are migrated by C-42.

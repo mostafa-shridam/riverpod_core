@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
 import 'package:riverpod_core/features/showcase/presentation/widgets/showcase_group.dart';
 import 'package:riverpod_core/features/showcase/presentation/widgets/showcase_section.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Color roles, type scale, spacing, radius and elevation, all read from the
 /// active theme so the page shows what widgets really get.
@@ -110,17 +111,17 @@ class TokensSection extends StatelessWidget {
 
     return ShowcaseSection(
       sectionKey: const ValueKey('showcase-tokens'),
-      title: 'showcase.sections.tokens'.tr(),
+      title: LocaleKeys.showcase_sections_tokens.tr(),
       children: [
         ShowcaseGroup(
-          label: 'showcase.tokens.colorRoles'.tr(),
+          label: LocaleKeys.showcase_tokens_colorRoles.tr(),
           children: [
             for (final (name, color) in _schemeRoles(theme.colorScheme))
               _Swatch(name: name, color: color),
           ],
         ),
         ShowcaseGroup(
-          label: 'showcase.tokens.semanticColors'.tr(),
+          label: LocaleKeys.showcase_tokens_semanticColors.tr(),
           children: [
             for (final (name, color) in semantic)
               _Swatch(name: name, color: color),
@@ -130,21 +131,21 @@ class TokensSection extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'showcase.tokens.typeScale'.tr(),
+              LocaleKeys.showcase_tokens_typeScale.tr(),
               style: theme.textTheme.labelLarge,
             ),
             for (final (name, style) in styles)
               Padding(
                 padding: EdgeInsetsDirectional.only(top: spacing.xs),
                 child: Text(
-                  '$name · ${'showcase.tokens.sample'.tr()}',
+                  '$name · ${LocaleKeys.showcase_tokens_sample.tr()}',
                   style: style,
                 ),
               ),
           ],
         ),
         ShowcaseGroup(
-          label: 'showcase.tokens.spacing'.tr(),
+          label: LocaleKeys.showcase_tokens_spacing.tr(),
           children: [
             for (final (name, value) in spacings)
               _Sample(
@@ -158,7 +159,7 @@ class TokensSection extends StatelessWidget {
           ],
         ),
         ShowcaseGroup(
-          label: 'showcase.tokens.radius'.tr(),
+          label: LocaleKeys.showcase_tokens_radius.tr(),
           children: [
             for (final (name, value) in radii)
               _Sample(
@@ -175,7 +176,7 @@ class TokensSection extends StatelessWidget {
           ],
         ),
         ShowcaseGroup(
-          label: 'showcase.tokens.elevation'.tr(),
+          label: LocaleKeys.showcase_tokens_elevation.tr(),
           children: [
             for (final (name, value) in elevations)
               _Sample(

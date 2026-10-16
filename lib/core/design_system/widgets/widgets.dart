@@ -1,6 +1,7 @@
 /// Barrel of every public design_system widget (D-020). Features may import
 /// this one file instead of each widget path. Key-constant files
 /// (`*_strings.dart`) and layout internals stay private to their family.
+library;
 
 export 'package:riverpod_core/core/design_system/widgets/async/async_value_view.dart';
 export 'package:riverpod_core/core/design_system/widgets/async/empty_state.dart';

@@ -39,20 +39,36 @@ Future<void> pumpShowcase(
     textScale: textScale,
     size: size,
     scaffold: false,
+    // The loading buttons spin forever, so the page never settles.
+    disableAnimations: false,
   );
 }
 
-/// Scrolls the gallery list until [finder] is built and on screen.
+/// Lets short animations finish; `pumpAndSettle` would never return while
+/// a loading button spins.
+Future<void> settle(WidgetTester tester) async {
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 400));
+}
+
+/// Scrolls the gallery list until [finder] is built and on screen. Jumps the
+/// list's own position, because a drag at the center can land on a nested
+/// scrollable (the data-state demo).
 Future<void> scrollTo(WidgetTester tester, Finder finder) async {
-  await tester.scrollUntilVisible(
-    finder,
-    300,
-    scrollable: find
-        .descendant(
-          of: find.byKey(const ValueKey('showcase-list')),
-          matching: find.byType(Scrollable),
-        )
-        .first,
-  );
-  await tester.pumpAndSettle();
+  final scrollable = find
+      .descendant(
+        of: find.byKey(const ValueKey('showcase-list')),
+        matching: find.byType(Scrollable),
+      )
+      .first;
+  final position = tester.state<ScrollableState>(scrollable).position;
+  while (finder.evaluate().isEmpty &&
+      position.pixels < position.maxScrollExtent) {
+    position.jumpTo(
+      (position.pixels + 400).clamp(0, position.maxScrollExtent).toDouble(),
+    );
+    await tester.pump();
+  }
+  await tester.ensureVisible(finder);
+  await settle(tester);
 }

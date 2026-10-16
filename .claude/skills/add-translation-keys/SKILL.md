@@ -15,7 +15,7 @@ description: Add or change localization keys in both Arabic and English, regener
    dart run easy_localization:generate --source-dir assets/translations
    dart run easy_localization:generate -S assets/translations -f keys -o locale_keys.g.dart
    ```
-   (the repo's `build.sh` wraps these). Commit the regenerated `lib/generated/*.g.dart` together with the JSON.
-4. Use keys only through `LocaleKeys.<path>.tr()` / `.plural()` — no string literals.
+   (the repo's `build.sh` wraps these). Run `dart format lib/generated`, then commit the regenerated `lib/generated/*.g.dart` together with the JSON (if a merge conflicts in generated files, regenerate; never hand-edit).
+4. Use keys only through `LocaleKeys.<path>.tr()` / `.plural()` — NEVER a string literal like `'a.b'.tr()` and never a hand-written key-constant file (D-037).
 5. Run `flutter test test/translations` (parity test: same keys, no empty values, same placeholders) and the full gate.
 6. Never delete a key still referenced: `grep -rn "LocaleKeys.<key>" lib` first.

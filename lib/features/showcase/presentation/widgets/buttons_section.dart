@@ -6,6 +6,7 @@ import 'package:riverpod_core/core/design_system/widgets/buttons/app_fab.dart';
 import 'package:riverpod_core/core/design_system/widgets/buttons/app_icon_button.dart';
 import 'package:riverpod_core/features/showcase/presentation/widgets/showcase_group.dart';
 import 'package:riverpod_core/features/showcase/presentation/widgets/showcase_section.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Every `AppButton` variant, size, loading and disabled state, plus icon
 /// buttons and FABs.
@@ -22,22 +23,23 @@ class _ButtonsSectionState extends State<ButtonsSection> {
   static void _noop() {}
 
   String _variantLabel(AppButtonVariant variant) => switch (variant) {
-    AppButtonVariant.primary => 'showcase.buttons.primary'.tr(),
-    AppButtonVariant.secondary => 'showcase.buttons.secondary'.tr(),
-    AppButtonVariant.tonal => 'showcase.buttons.tonal'.tr(),
-    AppButtonVariant.outlined => 'showcase.buttons.outlined'.tr(),
-    AppButtonVariant.text => 'showcase.buttons.text'.tr(),
-    AppButtonVariant.destructive => 'showcase.buttons.destructive'.tr(),
+    AppButtonVariant.primary => LocaleKeys.showcase_buttons_primary.tr(),
+    AppButtonVariant.secondary => LocaleKeys.showcase_buttons_secondary.tr(),
+    AppButtonVariant.tonal => LocaleKeys.showcase_buttons_tonal.tr(),
+    AppButtonVariant.outlined => LocaleKeys.showcase_buttons_outlined.tr(),
+    AppButtonVariant.text => LocaleKeys.showcase_buttons_text.tr(),
+    AppButtonVariant.destructive =>
+      LocaleKeys.showcase_buttons_destructive.tr(),
   };
 
   @override
   Widget build(BuildContext context) {
     return ShowcaseSection(
       sectionKey: const ValueKey('showcase-buttons'),
-      title: 'showcase.sections.buttons'.tr(),
+      title: LocaleKeys.showcase_sections_buttons.tr(),
       children: [
         ShowcaseGroup(
-          label: 'showcase.buttons.variants'.tr(),
+          label: LocaleKeys.showcase_buttons_variants.tr(),
           children: [
             for (final variant in AppButtonVariant.values)
               AppButton(
@@ -48,38 +50,41 @@ class _ButtonsSectionState extends State<ButtonsSection> {
           ],
         ),
         ShowcaseGroup(
-          label: 'showcase.buttons.sizes'.tr(),
+          label: LocaleKeys.showcase_buttons_sizes.tr(),
           children: [
             AppButton(
-              label: 'showcase.buttons.small'.tr(),
+              label: LocaleKeys.showcase_buttons_small.tr(),
               size: AppButtonSize.sm,
               onPressed: _noop,
             ),
-            AppButton(label: 'showcase.buttons.medium'.tr(), onPressed: _noop),
             AppButton(
-              label: 'showcase.buttons.large'.tr(),
+              label: LocaleKeys.showcase_buttons_medium.tr(),
+              onPressed: _noop,
+            ),
+            AppButton(
+              label: LocaleKeys.showcase_buttons_large.tr(),
               size: AppButtonSize.lg,
               onPressed: _noop,
             ),
           ],
         ),
         ShowcaseGroup(
-          label: 'showcase.buttons.loading'.tr(),
+          label: LocaleKeys.showcase_buttons_loading.tr(),
           children: [
             AppButton(
-              label: 'showcase.buttons.tapToLoad'.tr(),
-              loadingLabel: 'showcase.buttons.loadingLabel'.tr(),
+              label: LocaleKeys.showcase_buttons_tapToLoad.tr(),
+              loadingLabel: LocaleKeys.showcase_buttons_loadingLabel.tr(),
               isLoading: _loading,
               onPressed: () => setState(() => _loading = !_loading),
             ),
             AppButton(
-              label: 'showcase.buttons.tonal'.tr(),
+              label: LocaleKeys.showcase_buttons_tonal.tr(),
               variant: AppButtonVariant.tonal,
               isLoading: true,
               onPressed: _noop,
             ),
             AppButton(
-              label: 'showcase.buttons.outlined'.tr(),
+              label: LocaleKeys.showcase_buttons_outlined.tr(),
               variant: AppButtonVariant.outlined,
               isLoading: true,
               onPressed: _noop,
@@ -87,31 +92,34 @@ class _ButtonsSectionState extends State<ButtonsSection> {
           ],
         ),
         ShowcaseGroup(
-          label: 'showcase.buttons.disabled'.tr(),
+          label: LocaleKeys.showcase_buttons_disabled.tr(),
           children: [
-            AppButton(label: 'showcase.buttons.primary'.tr(), onPressed: null),
             AppButton(
-              label: 'showcase.buttons.outlined'.tr(),
+              label: LocaleKeys.showcase_buttons_primary.tr(),
+              onPressed: null,
+            ),
+            AppButton(
+              label: LocaleKeys.showcase_buttons_outlined.tr(),
               variant: AppButtonVariant.outlined,
               onPressed: null,
             ),
             AppButton(
-              label: 'showcase.buttons.text'.tr(),
+              label: LocaleKeys.showcase_buttons_text.tr(),
               variant: AppButtonVariant.text,
               onPressed: null,
             ),
           ],
         ),
         ShowcaseGroup(
-          label: 'showcase.buttons.icons'.tr(),
+          label: LocaleKeys.showcase_buttons_icons.tr(),
           children: [
             AppButton(
-              label: 'showcase.buttons.leadingIcon'.tr(),
+              label: LocaleKeys.showcase_buttons_leadingIcon.tr(),
               icon: Icons.add_rounded,
               onPressed: _noop,
             ),
             AppButton(
-              label: 'showcase.buttons.trailingIcon'.tr(),
+              label: LocaleKeys.showcase_buttons_trailingIcon.tr(),
               trailingIcon: Icons.arrow_forward_rounded,
               variant: AppButtonVariant.tonal,
               onPressed: _noop,
@@ -119,39 +127,39 @@ class _ButtonsSectionState extends State<ButtonsSection> {
           ],
         ),
         AppButton(
-          label: 'showcase.buttons.fullWidth'.tr(),
+          label: LocaleKeys.showcase_buttons_fullWidth.tr(),
           fullWidth: true,
           onPressed: _noop,
         ),
         ShowcaseGroup(
-          label: 'showcase.buttons.iconButtons'.tr(),
+          label: LocaleKeys.showcase_buttons_iconButtons.tr(),
           children: [
             for (final variant in AppIconButtonVariant.values)
               AppIconButton(
                 icon: Icons.favorite_rounded,
-                tooltip: 'showcase.buttons.iconButton'.tr(),
+                tooltip: LocaleKeys.showcase_buttons_iconButton.tr(),
                 variant: variant,
                 onPressed: _noop,
               ),
             AppIconButton(
               icon: Icons.favorite_rounded,
-              tooltip: 'showcase.buttons.iconButton'.tr(),
+              tooltip: LocaleKeys.showcase_buttons_iconButton.tr(),
               onPressed: null,
             ),
           ],
         ),
         ShowcaseGroup(
-          label: 'showcase.buttons.fabs'.tr(),
+          label: LocaleKeys.showcase_buttons_fabs.tr(),
           children: [
             AppFab(
               icon: Icons.add_rounded,
-              tooltip: 'showcase.buttons.fab'.tr(),
+              tooltip: LocaleKeys.showcase_buttons_fab.tr(),
               onPressed: _noop,
             ),
             AppFab(
               icon: Icons.edit_rounded,
-              tooltip: 'showcase.buttons.fab'.tr(),
-              label: 'showcase.buttons.fabLabel'.tr(),
+              tooltip: LocaleKeys.showcase_buttons_fab.tr(),
+              label: LocaleKeys.showcase_buttons_fabLabel.tr(),
               onPressed: _noop,
             ),
           ],

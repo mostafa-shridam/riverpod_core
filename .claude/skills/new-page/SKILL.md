@@ -7,7 +7,7 @@ description: Build a page with all 8 data states, responsive layout, RTL-safe wi
 
 Read DESIGN_SYSTEM.md and CONVENTIONS.md first.
 
-1. Create `features/<f>/presentation/pages/<name>_page.dart` as a `ConsumerWidget`/`ConsumerStatefulWidget` (one page per file). Add its typed route in `lib/app/router/routes.dart` (go_router_builder) and run codegen.
+1. Create `features/<f>/presentation/pages/<name>_page.dart` as a `ConsumerWidget`/`ConsumerStatefulWidget` (one page per file). Declare `static const routeName = '/page-name';` on the page (one page per file, no AppPaths), add its typed route in `lib/core/router/routes.dart` using `XPage.routeName` (go_router_builder) and run codegen.
 2. Watch ONE provider (`ref.watch(xControllerProvider)`); side effects via `ref.listen`. No Dio/DB/Navigator calls in logic; navigate with typed routes (`const XRoute().go(context)`).
 3. Render data with `AsyncValueView` so all eight states exist: loading (skeleton shaped like the content), empty, error, offline, stale, partial, refreshing (pull-to-refresh), success.
 4. Compose only widgets from `lib/core/design_system/widgets/` and tokens from `context.tokens`. Missing primitive -> stop and ask the Lead.

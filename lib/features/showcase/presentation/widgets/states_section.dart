@@ -19,6 +19,7 @@ import 'package:riverpod_core/core/design_system/widgets/selection/app_chip_grou
 import 'package:riverpod_core/core/errors/app_exception.dart';
 import 'package:riverpod_core/features/showcase/presentation/widgets/showcase_group.dart';
 import 'package:riverpod_core/features/showcase/presentation/widgets/showcase_section.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// The eight data states of `AsyncValueView`.
 enum ShowcaseDataState {
@@ -48,14 +49,14 @@ class _StatesSectionState extends State<StatesSection> {
   ShowcaseDataState _state = ShowcaseDataState.success;
 
   String _label(ShowcaseDataState state) => switch (state) {
-    ShowcaseDataState.loading => 'showcase.states.loading'.tr(),
-    ShowcaseDataState.empty => 'showcase.states.empty'.tr(),
-    ShowcaseDataState.error => 'showcase.states.error'.tr(),
-    ShowcaseDataState.offline => 'showcase.states.offline'.tr(),
-    ShowcaseDataState.stale => 'showcase.states.stale'.tr(),
-    ShowcaseDataState.partial => 'showcase.states.partial'.tr(),
-    ShowcaseDataState.refreshing => 'showcase.states.refreshing'.tr(),
-    ShowcaseDataState.success => 'showcase.states.success'.tr(),
+    ShowcaseDataState.loading => LocaleKeys.showcase_states_loading.tr(),
+    ShowcaseDataState.empty => LocaleKeys.showcase_states_empty.tr(),
+    ShowcaseDataState.error => LocaleKeys.showcase_states_error.tr(),
+    ShowcaseDataState.offline => LocaleKeys.showcase_states_offline.tr(),
+    ShowcaseDataState.stale => LocaleKeys.showcase_states_stale.tr(),
+    ShowcaseDataState.partial => LocaleKeys.showcase_states_partial.tr(),
+    ShowcaseDataState.refreshing => LocaleKeys.showcase_states_refreshing.tr(),
+    ShowcaseDataState.success => LocaleKeys.showcase_states_success.tr(),
   };
 
   AsyncValue<List<String>> get _value => switch (_state) {
@@ -70,9 +71,10 @@ class _StatesSectionState extends State<StatesSection> {
       StackTrace.empty,
     ),
     // ignore: invalid_use_of_internal_member
-    ShowcaseDataState.refreshing => const AsyncLoading<List<String>>()
-        // ignore: invalid_use_of_internal_member
-        .copyWithPrevious(const AsyncData(_items)),
+    ShowcaseDataState.refreshing =>
+      const AsyncLoading<List<String>>()
+      // ignore: invalid_use_of_internal_member
+      .copyWithPrevious(const AsyncData(_items)),
     _ => const AsyncData(_items),
   };
 
@@ -106,7 +108,7 @@ class _StatesSectionState extends State<StatesSection> {
               for (final item in data)
                 AppListTile(
                   leading: const Icon(Icons.article_outlined),
-                  title: Text('showcase.states.item'.tr(args: [item])),
+                  title: Text(LocaleKeys.showcase_states_item.tr(args: [item])),
                 ),
             ],
           ),
@@ -120,10 +122,10 @@ class _StatesSectionState extends State<StatesSection> {
     final spacing = context.tokens.spacing;
     return ShowcaseSection(
       sectionKey: const ValueKey('showcase-states'),
-      title: 'showcase.sections.states'.tr(),
+      title: LocaleKeys.showcase_sections_states.tr(),
       children: [
         AppChipGroup<ShowcaseDataState>(
-          label: 'showcase.states.pick'.tr(),
+          label: LocaleKeys.showcase_states_pick.tr(),
           selected: [_state],
           allowDeselect: false,
           onChanged: (v) => setState(() => _state = v.first),
@@ -138,7 +140,7 @@ class _StatesSectionState extends State<StatesSection> {
           child: _demo(),
         ),
         ShowcaseGroup(
-          label: 'showcase.states.skeleton'.tr(),
+          label: LocaleKeys.showcase_states_skeleton.tr(),
           children: [
             Skeleton(
               child: Row(
@@ -155,9 +157,9 @@ class _StatesSectionState extends State<StatesSection> {
         AppCard(
           variant: AppCardVariant.outlined,
           child: EmptyState(
-            title: 'showcase.states.emptyTitle'.tr(),
-            message: 'showcase.states.emptyMessage'.tr(),
-            actionLabel: 'showcase.states.emptyAction'.tr(),
+            title: LocaleKeys.showcase_states_emptyTitle.tr(),
+            message: LocaleKeys.showcase_states_emptyMessage.tr(),
+            actionLabel: LocaleKeys.showcase_states_emptyAction.tr(),
             onAction: () {},
           ),
         ),
@@ -181,11 +183,11 @@ class _StatesSectionState extends State<StatesSection> {
         const AppProgressBar(),
         AppProgressBar(
           value: 0.6,
-          label: 'showcase.states.progress'.tr(),
+          label: LocaleKeys.showcase_states_progress.tr(),
           showPercent: true,
         ),
         ShowcaseGroup(
-          label: 'showcase.states.spinners'.tr(),
+          label: LocaleKeys.showcase_states_spinners.tr(),
           children: [
             for (final size in AppProgressSize.values)
               AppProgressIndicator(size: size),

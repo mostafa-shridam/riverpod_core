@@ -9,15 +9,11 @@ Shared things live in `core/`, `core/design_system/` or `shared/`. Current code 
 ```
 lib/
 ├── main.dart / main_staging.dart   # thin: bootstrap(Flavor.current) / bootstrap(Flavor.staging) (D-024)
-├── bootstrap.dart              # zones, error handlers, config load+validate, ProviderScope, runApp
-├── app/
-│   ├── app.dart                # MaterialApp.router: theme, locale, router, builders
-│   ├── router/
-│   │   ├── app_router.dart     # GoRouter provider; redirect = guards
-│   │   ├── routes.dart         # typed routes (go_router_builder): all paths in one place
-│   │   └── guards/             # auth, onboarding, maintenance/force-update
-│   └── startup/                # splash + startup sequence (config, session restore, remote flags)
 ├── core/                       # app-agnostic infrastructure + the design system (UI primitives live ONLY in core/design_system)
+│   ├── bootstrap/              # bootstrap(): zones, error handlers, config load+validate, ProviderScope, runApp
+│   ├── app/                    # app.dart: MaterialApp.router, theme, locale, text scale, messenger key
+│   ├── router/                 # appRouterProvider (go_router_builder typed routes in routes.dart), guards/, shell
+│   ├── startup/                # splash page + startup sequence
 │   ├── config/                 # AppConfig (from env/<flavor>.env via flutter_dotenv), Flavor.current (kReleaseMode ? prod : dev), validation
 │   ├── network/
 │   │   ├── dio_client.dart     # one Dio provider
@@ -73,9 +69,8 @@ env/               *.env.example (real *.env files git-ignored)
 ## Dependency direction
 - `features/x/presentation` → `features/x/providers` → `features/x/data` → `core/`, `shared/`.
 - `core/design_system/` imports only Flutter, `core/utils`, `core/errors`, `core/connectivity` and `l10n/` (D-031). It never imports `features/`, `app/` or providers of a feature.
-- `core/` never imports `features/` or `app/`. Non-UI core folders (network, storage, errors…) never import `core/design_system/`.
+- `core/` never imports `features/`, except the router, which wires pages together (`core/router`, `core/bootstrap`, `core/app`). Non-UI core folders (network, storage, errors…) never import `core/design_system/`.
 - A feature never imports another feature's `data/`, `providers/` or `presentation/`. Shared need → `core/`, `shared/` or `core/design_system/`.
-- `app/` may import everything.
 
 ## Architecture rules
 - Providers: riverpod_generator only (`@riverpod`). Repositories/services = keepAlive providers; page state = autoDispose notifiers. No global singletons, no service locators, no `setState` for business logic. Override providers in tests; never mock statics.

@@ -5,11 +5,7 @@ import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
 /// A small captioned row of demo widgets. Children wrap onto new lines, so a
 /// group survives narrow screens and a 2.0x text scale.
 class ShowcaseGroup extends StatelessWidget {
-  const ShowcaseGroup({
-    required this.label,
-    required this.children,
-    super.key,
-  });
+  const ShowcaseGroup({required this.label, required this.children, super.key});
 
   final String label;
   final List<Widget> children;

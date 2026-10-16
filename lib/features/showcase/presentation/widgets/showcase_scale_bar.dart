@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:riverpod_core/core/design_system/responsive/text_scale.dart';
 import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
 import 'package:riverpod_core/core/design_system/widgets/selection/app_slider.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
-/// App bar bottom with the text scale slider (0.8x to 2.0x). It only reports
-/// the chosen factor; the page applies it to its body.
-class ShowcaseScaleBar extends StatelessWidget implements PreferredSizeWidget {
+/// Strip under the app bar with the text scale slider (0.8x to 2.0x). It
+/// only reports the chosen factor; the page applies it to its list.
+class ShowcaseScaleBar extends StatelessWidget {
   const ShowcaseScaleBar({
     required this.value,
     required this.onChanged,
@@ -18,13 +19,10 @@ class ShowcaseScaleBar extends StatelessWidget implements PreferredSizeWidget {
   final ValueChanged<double> onChanged;
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
-
-  @override
   Widget build(BuildContext context) {
     final spacing = context.tokens.spacing;
-    return SizedBox(
-      height: kToolbarHeight,
+    return Material(
+      color: Theme.of(context).colorScheme.surface,
       child: Padding(
         padding: EdgeInsetsDirectional.symmetric(horizontal: spacing.lg),
         child: Row(
@@ -32,7 +30,7 @@ class ShowcaseScaleBar extends StatelessWidget implements PreferredSizeWidget {
             Flexible(
               flex: 0,
               child: Text(
-                'showcase.textScale'.tr(),
+                LocaleKeys.showcase_textScale.tr(),
                 style: Theme.of(context).textTheme.labelLarge,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

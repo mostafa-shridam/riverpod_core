@@ -51,4 +51,26 @@ void main() {
       expect(prefs.onboardingSeen, isTrue, reason: 'device setting kept');
     });
   });
+
+  group('PrefsStorage string lists', () {
+    test('missing key reads as empty, writes are read back', () async {
+      final prefs = await fakePrefsStorage();
+      expect(prefs.getStringList('user.videos.favorites'), isEmpty);
+
+      await prefs.setStringList('user.videos.favorites', ['a', 'b']);
+
+      expect(prefs.getStringList('user.videos.favorites'), ['a', 'b']);
+    });
+
+    test('user.* lists are removed by clearUserScoped', () async {
+      final prefs = await fakePrefsStorage();
+      await prefs.setStringList('user.videos.favorites', ['a']);
+      await prefs.setStringList('settings.other', ['x']);
+
+      await prefs.clearUserScoped();
+
+      expect(prefs.getStringList('user.videos.favorites'), isEmpty);
+      expect(prefs.getStringList('settings.other'), ['x']);
+    });
+  });
 }

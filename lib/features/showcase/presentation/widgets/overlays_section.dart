@@ -17,6 +17,7 @@ import 'package:riverpod_core/core/design_system/widgets/feedback/snackbar/app_s
 import 'package:riverpod_core/core/design_system/widgets/inputs/app_text_field.dart';
 import 'package:riverpod_core/features/showcase/presentation/widgets/showcase_group.dart';
 import 'package:riverpod_core/features/showcase/presentation/widgets/showcase_section.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// One button per overlay: sheets, dialogs, loading overlay, snackbars,
 /// toasts and the banner.
@@ -34,10 +35,10 @@ class _OverlaysSectionState extends State<OverlaysSection> {
   bool _bannerVisible = false;
 
   String _typeName(AppStatusType type) => switch (type) {
-    AppStatusType.info => 'showcase.overlays.info'.tr(),
-    AppStatusType.success => 'showcase.overlays.success'.tr(),
-    AppStatusType.warning => 'showcase.overlays.warning'.tr(),
-    AppStatusType.error => 'showcase.overlays.error'.tr(),
+    AppStatusType.info => LocaleKeys.showcase_overlays_info.tr(),
+    AppStatusType.success => LocaleKeys.showcase_overlays_success.tr(),
+    AppStatusType.warning => LocaleKeys.showcase_overlays_warning.tr(),
+    AppStatusType.error => LocaleKeys.showcase_overlays_error.tr(),
   };
 
   Widget _button(String label, VoidCallback onPressed, {Key? key}) {
@@ -53,36 +54,36 @@ class _OverlaysSectionState extends State<OverlaysSection> {
     if (!mounted || choice == null) return;
     showAppSnackbar(
       context,
-      message: 'showcase.overlays.chose'.tr(args: ['$choice']),
+      message: LocaleKeys.showcase_overlays_chose.tr(args: ['$choice']),
       type: AppStatusType.success,
     );
   }
 
   Future<void> _modalSheet() => showAppBottomSheet<void>(
     context: context,
-    title: 'showcase.overlays.sheetTitle'.tr(),
+    title: LocaleKeys.showcase_overlays_sheetTitle.tr(),
     showCloseButton: true,
-    builder: (_) => Text('showcase.overlays.sheetBody'.tr()),
+    builder: (_) => Text(LocaleKeys.showcase_overlays_sheetBody.tr()),
   );
 
   Future<void> _actionSheet() async {
     final choice = await AppActionSheet.show<String>(
       context: context,
-      title: 'showcase.overlays.actionTitle'.tr(),
-      message: 'showcase.overlays.actionMessage'.tr(),
+      title: LocaleKeys.showcase_overlays_actionTitle.tr(),
+      message: LocaleKeys.showcase_overlays_actionMessage.tr(),
       actions: [
         AppSheetAction(
-          label: 'showcase.overlays.share'.tr(),
+          label: LocaleKeys.showcase_overlays_share.tr(),
           value: 'share',
           icon: Icons.share_rounded,
         ),
         AppSheetAction(
-          label: 'showcase.overlays.edit'.tr(),
+          label: LocaleKeys.showcase_overlays_edit.tr(),
           value: 'edit',
           icon: Icons.edit_rounded,
         ),
         AppSheetAction(
-          label: 'showcase.overlays.delete'.tr(),
+          label: LocaleKeys.showcase_overlays_delete.tr(),
           value: 'delete',
           icon: Icons.delete_rounded,
           isDestructive: true,
@@ -95,13 +96,13 @@ class _OverlaysSectionState extends State<OverlaysSection> {
   Future<void> _selectionSheet() async {
     final choice = await AppSelectionSheet.showSingle<int>(
       context: context,
-      title: 'showcase.overlays.selectionTitle'.tr(),
+      title: LocaleKeys.showcase_overlays_selectionTitle.tr(),
       searchable: true,
       options: [
         for (var i = 1; i <= 8; i++)
           AppSelectionOption<int>(
             value: i,
-            label: 'showcase.selection.option'.tr(args: ['$i']),
+            label: LocaleKeys.showcase_selection_option.tr(args: ['$i']),
           ),
       ],
     );
@@ -110,35 +111,36 @@ class _OverlaysSectionState extends State<OverlaysSection> {
 
   Future<void> _formSheet() => AppFormSheet.show<void>(
     context: context,
-    title: 'showcase.overlays.formTitle'.tr(),
-    primaryLabel: 'showcase.overlays.save'.tr(),
+    title: LocaleKeys.showcase_overlays_formTitle.tr(),
+    primaryLabel: LocaleKeys.showcase_overlays_save.tr(),
     onPrimary: (sheetContext) => Navigator.of(sheetContext).pop(),
-    content: (_) => AppTextField(label: 'showcase.overlays.formField'.tr()),
+    content: (_) =>
+        AppTextField(label: LocaleKeys.showcase_overlays_formField.tr()),
   );
 
   Future<void> _alert(AppStatusType type) => AppAlertDialog.show(
     context: context,
     type: type,
     title: _typeName(type),
-    message: 'showcase.overlays.alertMessage'.tr(),
+    message: LocaleKeys.showcase_overlays_alertMessage.tr(),
   );
 
   Future<void> _confirm({required bool destructive}) async {
     final ok = await AppConfirmDialog.show(
       context: context,
-      title: 'showcase.overlays.confirmTitle'.tr(),
-      message: 'showcase.overlays.confirmMessage'.tr(),
+      title: LocaleKeys.showcase_overlays_confirmTitle.tr(),
+      message: LocaleKeys.showcase_overlays_confirmMessage.tr(),
       isDestructive: destructive,
     );
-    _result(ok ? 'showcase.overlays.confirmed'.tr() : null);
+    _result(ok ? LocaleKeys.showcase_overlays_confirmed.tr() : null);
   }
 
   Future<void> _inputDialog() async {
     final text = await AppInputDialog.show(
       context: context,
-      title: 'showcase.overlays.inputTitle'.tr(),
-      message: 'showcase.overlays.inputMessage'.tr(),
-      label: 'showcase.overlays.inputLabel'.tr(),
+      title: LocaleKeys.showcase_overlays_inputTitle.tr(),
+      message: LocaleKeys.showcase_overlays_inputMessage.tr(),
+      label: LocaleKeys.showcase_overlays_inputLabel.tr(),
     );
     _result(text);
   }
@@ -146,7 +148,7 @@ class _OverlaysSectionState extends State<OverlaysSection> {
   Future<void> _loadingOverlay() async {
     final close = AppLoadingDialog.show(
       context: context,
-      message: 'showcase.overlays.loadingMessage'.tr(),
+      message: LocaleKeys.showcase_overlays_loadingMessage.tr(),
     );
     await Future<void>.delayed(_loadingTime);
     close();
@@ -154,14 +156,16 @@ class _OverlaysSectionState extends State<OverlaysSection> {
 
   void _snackbar(AppStatusType type) => showAppSnackbar(
     context,
-    message: 'showcase.overlays.snackbarMessage'.tr(args: [_typeName(type)]),
+    message: LocaleKeys.showcase_overlays_snackbarMessage.tr(
+      args: [_typeName(type)],
+    ),
     type: type,
     replaceCurrent: true,
   );
 
   void _toast(AppToastPosition position) => showAppToast(
     context,
-    message: 'showcase.overlays.toastMessage'.tr(),
+    message: LocaleKeys.showcase_overlays_toastMessage.tr(),
     position: position,
     replaceCurrent: true,
   );
@@ -170,66 +174,68 @@ class _OverlaysSectionState extends State<OverlaysSection> {
   Widget build(BuildContext context) {
     return ShowcaseSection(
       sectionKey: const ValueKey('showcase-overlays'),
-      title: 'showcase.sections.overlays'.tr(),
+      title: LocaleKeys.showcase_sections_overlays.tr(),
       children: [
         ShowcaseGroup(
-          label: 'showcase.overlays.sheets'.tr(),
+          label: LocaleKeys.showcase_overlays_sheets.tr(),
           children: [
             _button(
-              'showcase.overlays.modalSheet'.tr(),
+              LocaleKeys.showcase_overlays_modalSheet.tr(),
               _modalSheet,
               key: const ValueKey('open-modal-sheet'),
             ),
             _button(
-              'showcase.overlays.actionSheet'.tr(),
+              LocaleKeys.showcase_overlays_actionSheet.tr(),
               _actionSheet,
               key: const ValueKey('open-action-sheet'),
             ),
             _button(
-              'showcase.overlays.selectionSheet'.tr(),
+              LocaleKeys.showcase_overlays_selectionSheet.tr(),
               _selectionSheet,
               key: const ValueKey('open-selection-sheet'),
             ),
             _button(
-              'showcase.overlays.formSheet'.tr(),
+              LocaleKeys.showcase_overlays_formSheet.tr(),
               _formSheet,
               key: const ValueKey('open-form-sheet'),
             ),
           ],
         ),
         ShowcaseGroup(
-          label: 'showcase.overlays.dialogs'.tr(),
+          label: LocaleKeys.showcase_overlays_dialogs.tr(),
           children: [
             for (final type in AppStatusType.values)
               _button(
-                'showcase.overlays.alertType'.tr(args: [_typeName(type)]),
+                LocaleKeys.showcase_overlays_alertType.tr(
+                  args: [_typeName(type)],
+                ),
                 () => _alert(type),
                 key: ValueKey('open-alert-${type.name}'),
               ),
             _button(
-              'showcase.overlays.confirm'.tr(),
+              LocaleKeys.showcase_overlays_confirm.tr(),
               () => _confirm(destructive: false),
               key: const ValueKey('open-confirm'),
             ),
             _button(
-              'showcase.overlays.confirmDestructive'.tr(),
+              LocaleKeys.showcase_overlays_confirmDestructive.tr(),
               () => _confirm(destructive: true),
               key: const ValueKey('open-confirm-destructive'),
             ),
             _button(
-              'showcase.overlays.inputDialog'.tr(),
+              LocaleKeys.showcase_overlays_inputDialog.tr(),
               _inputDialog,
               key: const ValueKey('open-input-dialog'),
             ),
             _button(
-              'showcase.overlays.loadingOverlay'.tr(),
+              LocaleKeys.showcase_overlays_loadingOverlay.tr(),
               _loadingOverlay,
               key: const ValueKey('open-loading-overlay'),
             ),
           ],
         ),
         ShowcaseGroup(
-          label: 'showcase.overlays.snackbars'.tr(),
+          label: LocaleKeys.showcase_overlays_snackbars.tr(),
           children: [
             for (final type in AppStatusType.values)
               _button(
@@ -240,25 +246,25 @@ class _OverlaysSectionState extends State<OverlaysSection> {
           ],
         ),
         ShowcaseGroup(
-          label: 'showcase.overlays.toasts'.tr(),
+          label: LocaleKeys.showcase_overlays_toasts.tr(),
           children: [
             _button(
-              'showcase.overlays.toastTop'.tr(),
+              LocaleKeys.showcase_overlays_toastTop.tr(),
               () => _toast(AppToastPosition.top),
               key: const ValueKey('open-toast-top'),
             ),
             _button(
-              'showcase.overlays.toastBottom'.tr(),
+              LocaleKeys.showcase_overlays_toastBottom.tr(),
               () => _toast(AppToastPosition.bottom),
               key: const ValueKey('open-toast-bottom'),
             ),
           ],
         ),
         ShowcaseGroup(
-          label: 'showcase.overlays.banner'.tr(),
+          label: LocaleKeys.showcase_overlays_banner.tr(),
           children: [
             _button(
-              'showcase.overlays.toggleBanner'.tr(),
+              LocaleKeys.showcase_overlays_toggleBanner.tr(),
               () => setState(() => _bannerVisible = !_bannerVisible),
               key: const ValueKey('toggle-banner'),
             ),
@@ -268,9 +274,9 @@ class _OverlaysSectionState extends State<OverlaysSection> {
           AppBanner(
             key: const ValueKey('showcase-banner'),
             type: AppStatusType.warning,
-            title: 'showcase.overlays.bannerTitle'.tr(),
-            message: 'showcase.overlays.bannerMessage'.tr(),
-            actionLabel: 'showcase.overlays.bannerAction'.tr(),
+            title: LocaleKeys.showcase_overlays_bannerTitle.tr(),
+            message: LocaleKeys.showcase_overlays_bannerMessage.tr(),
+            actionLabel: LocaleKeys.showcase_overlays_bannerAction.tr(),
             onAction: () => setState(() => _bannerVisible = false),
             onDismiss: () => setState(() => _bannerVisible = false),
           ),
