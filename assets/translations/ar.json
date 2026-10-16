@@ -184,6 +184,23 @@
     "microphoneTitle": "الوصول إلى الميكروفون",
     "microphoneMessage": "اسمح بالوصول إلى الميكروفون لتسجيل الصوت داخل التطبيق."
   },
+  "notifications": {
+    "groupUpdates": "التحديثات",
+    "groupReminders": "التذكيرات",
+    "channelGeneralName": "عام",
+    "channelGeneralDescription": "الأخبار والتحديثات اليومية.",
+    "channelHighPriorityName": "مهم",
+    "channelHighPriorityDescription": "تنبيهات عاجلة تحتاج إلى انتباهك.",
+    "channelSilentName": "صامت",
+    "channelSilentDescription": "تحديثات تصل بدون صوت أو اهتزاز.",
+    "channelRemindersName": "التذكيرات",
+    "channelRemindersDescription": "التذكيرات التي طلبتها.",
+    "actionReply": "رد",
+    "actionReplySend": "إرسال",
+    "actionReplyHint": "اكتب رداً",
+    "actionMarkRead": "تعليم كمقروء",
+    "groupSummary": "{} إشعارات جديدة"
+  },
   "showcase": {
     "title": "معرض المكوّنات",
     "entry": "معرض المكوّنات",

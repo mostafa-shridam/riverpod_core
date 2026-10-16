@@ -184,6 +184,23 @@
     "microphoneTitle": "Microphone access",
     "microphoneMessage": "Allow microphone access to record audio inside the app."
   },
+  "notifications": {
+    "groupUpdates": "Updates",
+    "groupReminders": "Reminders",
+    "channelGeneralName": "General",
+    "channelGeneralDescription": "News and everyday updates.",
+    "channelHighPriorityName": "Important",
+    "channelHighPriorityDescription": "Time-sensitive alerts that need your attention.",
+    "channelSilentName": "Silent",
+    "channelSilentDescription": "Updates delivered without sound or vibration.",
+    "channelRemindersName": "Reminders",
+    "channelRemindersDescription": "Reminders you asked for.",
+    "actionReply": "Reply",
+    "actionReplySend": "Send",
+    "actionReplyHint": "Write a reply",
+    "actionMarkRead": "Mark as read",
+    "groupSummary": "{} new notifications"
+  },
   "showcase": {
     "title": "Component gallery",
     "entry": "Component gallery",
