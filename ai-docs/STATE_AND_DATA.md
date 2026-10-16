@@ -11,18 +11,18 @@ class ProductsController extends _$ProductsController {
   Future<List<Product>> build() => ref.watch(productRepositoryProvider).list();
 
   Future<void> refresh() async {
-    state = const AsyncLoading<List<Product>>().copyWithPrevious(state);
+    state = const AsyncLoading<List<Product>>(); // keeps the previous value
     state = await AsyncValue.guard(() => ref.read(productRepositoryProvider).list());
   }
 }
 ```
-- Mutations: set `AsyncLoading().copyWithPrevious(state)` → `AsyncValue.guard` → never leave state stuck in loading.
+- Mutations: set `state = const AsyncLoading<T>()` → `AsyncValue.guard` → never leave state stuck in loading. Assigning to a notifier's `state` makes riverpod carry the previous value over (`hasValue` stays true, `isReloading` true; a following `AsyncError` also keeps `value`). `copyWithPrevious` is internal (D-031): never call it.
 - Side effects (navigation, snackbar) happen in the widget via `ref.listen`, not in the notifier.
 - State classes: `freezed` + sealed unions when a notifier has more than one dimension of state (e.g. filters + page); otherwise plain `AsyncValue<T>`.
 
 ## AsyncValue handling in UI
 - Always render with `AsyncValueView` (DESIGN_SYSTEM.md); never ad-hoc `when(loading: CircularProgressIndicator)`.
-- Keep previous data during reload (`skipLoadingOnRefresh`, `copyWithPrevious`) → drives `refreshing`/`stale`, not `loading`.
+- Keep previous data during reload (`skipLoadingOnRefresh`, `isRefreshing`/`isReloading`, `hasValue`) → drives `refreshing`/`stale`, not `loading`.
 - `AsyncError` always holds an `AppException`.
 
 ## Caching: stale-while-revalidate

@@ -15,8 +15,8 @@ import 'package:riverpod_core/core/constants.dart';
 import 'package:riverpod_core/core/crash/crash_reporter.dart';
 import 'package:riverpod_core/core/logger/app_logger.dart';
 import 'package:riverpod_core/core/notifications/local_notifications_service.dart';
-import 'package:riverpod_core/core/services/helper.dart';
 import 'package:riverpod_core/core/storage/prefs_storage.dart';
+import 'package:riverpod_core/core/utils/formatting/formatting_setup.dart';
 import 'package:riverpod_core/generated/codegen_loader.g.dart';
 
 /// Shows the app. `runApp` in production; a capture in tests.
@@ -54,7 +54,9 @@ Future<void> bootstrap(
           return;
         }
 
+        // D-032: no silent provider retries; Dio retries network calls only.
         final container = ProviderContainer(
+          retry: (retryCount, error) => null,
           overrides: [
             appConfigProvider.overrideWithValue(config),
             ...overrides,
@@ -83,14 +85,19 @@ Future<void> bootstrap(
           logger.warning('Error when init LocalNotificationsService', error: e);
         }
 
+        await initFormatting();
+
         runner(
           UncontrolledProviderScope(
             container: container,
             child: EasyLocalization(
               supportedLocales: supportedLocales,
               path: translationsPath,
-              fallbackLocale: Locale(getLanguageCodeHelper()),
-              startLocale: Locale(getLanguageCodeHelper()),
+              // No startLocale: the saved locale, else the device locale if
+              // supported, else the fallback (D-035).
+              fallbackLocale: const Locale('en'),
+              saveLocale: true,
+              ignorePluralRules: false,
               assetLoader: const CodegenLoader(),
               child: const App(),
             ),

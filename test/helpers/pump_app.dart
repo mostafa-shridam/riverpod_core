@@ -48,6 +48,7 @@ Future<void> pumpApp(
         startLocale: locale,
         assetLoader: const CodegenLoader(),
         saveLocale: false,
+        ignorePluralRules: false,
         child: Builder(
           builder: (context) => MaterialApp(
             debugShowCheckedModeBanner: false,
