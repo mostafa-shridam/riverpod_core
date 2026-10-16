@@ -214,7 +214,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-14 — Pagination helpers and PaginatedListView
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | — | — |
 - Goal: NETWORKING.md "Pagination" (cursor + offset) with infinite scroll.
 - Files: `lib/core/network/pagination/**` (`page.dart`, `page_request.dart`, `paginated_state.dart` freezed, `paginated_notifier.dart`), `lib/core/design_system/widgets/lists/**` (`paginated_list_view.dart`, `pagination_footer.dart`, `lists_strings.dart`), `assets/translations/ar.json` + `en.json` (top-level `ds_lists`, appended, D-023), `test/core/network/pagination/**`, `test/core/design_system/widgets/lists/**`, `test/goldens/lists/**`
 - Done when: `Page<T>(items, nextCursor/nextOffset, hasMore)`; `PageRequest` sealed (cursor | offset, pageSize); `PaginatedNotifier<T>` base for `@riverpod` notifiers: abstract `fetchPage(PageRequest)`, `build` loads the first page, `loadMore()` (ignores calls while loading or when `!hasMore`), `refresh()` keeps previous items while reloading, de-duplication by an overridable `idOf`, error on a next page keeps the loaded items and exposes a retryable page error (the `partial` state), cancels in-flight work on dispose; `PaginatedListView` (sliver-based, pull-to-refresh, triggers `loadMore` at 80% scroll, footer shows loader / retry row / end-of-list, empty and first-load states left to the caller via builders, RTL-safe, tokens only, Semantics).

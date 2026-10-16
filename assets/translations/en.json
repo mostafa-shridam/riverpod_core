@@ -161,5 +161,10 @@
     "bannerStale": "Showing saved data",
     "bannerLastUpdated": "Last updated {}",
     "partialError": "Some content couldn't be loaded."
+  },
+  "ds_lists": {
+    "loadingMore": "Loading more",
+    "endOfList": "You've reached the end",
+    "retry": "Try again"
   }
 }

@@ -161,5 +161,10 @@
     "bannerStale": "يتم عرض البيانات المحفوظة",
     "bannerLastUpdated": "آخر تحديث {}",
     "partialError": "تعذّر تحميل بعض المحتوى."
+  },
+  "ds_lists": {
+    "loadingMore": "جارٍ تحميل المزيد",
+    "endOfList": "لقد وصلت إلى النهاية",
+    "retry": "إعادة المحاولة"
   }
 }
