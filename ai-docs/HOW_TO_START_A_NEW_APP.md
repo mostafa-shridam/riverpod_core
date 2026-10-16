@@ -8,6 +8,6 @@ Status: skeleton. Steps marked (pending C-xx) depend on a task that is not DONE 
 4. **Firebase** (only if you use notifications/crash): add your own `google-services.json` and `GoogleService-Info.plist` locally. They are git-ignored; never commit them.
 5. **Branding**: edit ONLY `lib/core/design_system/tokens/brand_config.dart` (seed color, font) (pending C-05); replace `assets/images/appLogo.png`, then `dart run flutter_launcher_icons` and the splash command (pending C-13).
 6. **Translations**: edit `assets/translations/{ar,en}.json`, run the generation commands in `build.sh`; the parity test must stay green.
-7. **First feature**: follow `.claude/skills/new-feature/SKILL.md` (scaffold from `.fttemplates`, register the route, write tests).
+7. **First feature**: run `dart run tool/new_feature.dart --name product_orders` (`--dry-run` only prints the plan). It scaffolds the feature and its tests from `.fttemplates/feature`, adds its translation keys to both files and prints the typed route to paste into `lib/core/router/routes.dart`; then follow `.claude/skills/new-feature/SKILL.md` (generation commands, tests).
 8. **Gate before every commit**: the Definition of Done commands in `CLAUDE.md`.
 9. **Release** (pending C-28): `.claude/skills/release-check/SKILL.md`, signing files stay untracked.

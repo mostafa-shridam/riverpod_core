@@ -1,0 +1,12 @@
+// lib/core/router/routes.dart: add the import
+import 'package:{{package}}/features/{{name}}/presentation/pages/{{name}}_page.dart';
+
+// ... and the typed route (add a redirect/guard if the page is protected)
+@TypedGoRoute<{{Name}}Route>(path: {{Name}}Page.routeName)
+class {{Name}}Route extends GoRouteData with ${{Name}}Route {
+  const {{Name}}Route();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const {{Name}}Page();
+}

@@ -348,7 +348,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-25 — Feature scaffold: `.fttemplates/feature` + `tool/new_feature.dart`
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | worker-u | — |
 - Goal: HOW_TO_START step 7. One command creates a feature skeleton in the documented shape, based on the videos feature (C-39).
 - Files: `tool/new_feature.dart`, `tool/lib/new_feature_logic.dart`, `.fttemplates/feature/**` (template files with placeholders), `.claude/skills/new-feature/SKILL.md` (update to the command), `ai-docs/HOW_TO_START_A_NEW_APP.md` (step 7 only), `test/tool/new_feature_test.dart`
 - Done when: `dart run tool/new_feature.dart --name product_orders` creates `lib/features/product_orders/{data/{models,sources,product_orders_repository.dart},providers,presentation/{pages,widgets}}` + matching `test/features/product_orders/` skeleton: freezed model, remote source (Dio), repository that reads through ONE `fetch*` method (D-038: cache-first helper plugged in by C-44), AsyncNotifier controller, one page with `static const routeName`, `AsyncValueView`, `LocaleKeys` keys added to BOTH translation JSON files (+ prints the two generation commands), a typed route snippet printed (never edits routes.dart automatically), analyzer-clean when generated into a temp copy; `--dry-run`; refuses existing feature, invalid names; name casing helpers unit-tested; no new package.
