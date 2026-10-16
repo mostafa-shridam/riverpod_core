@@ -1,0 +1,107 @@
+import 'dart:async';
+import 'dart:ui';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:{{package}}/core/design_system/widgets/async/empty_state.dart';
+import 'package:{{package}}/core/design_system/widgets/async/error_state.dart';
+import 'package:{{package}}/core/errors/app_exception.dart';
+import 'package:{{package}}/features/{{name}}/presentation/pages/{{name}}_page.dart';
+import 'package:{{package}}/features/{{name}}/presentation/widgets/{{name}}_item_tile.dart';
+
+import '../../../../core/design_system/widgets/display/ds_test_harness.dart';
+import '../../{{name}}_test_support.dart';
+
+Future<void> _pump(
+  WidgetTester tester,
+  Fake{{Name}}Source source, {
+  String locale = 'en',
+  bool dark = false,
+  double textScale = 1,
+  Size size = phoneSize,
+}) async {
+  final container = ProviderContainer(
+    retry: (_, _) => null, // D-032
+    overrides: {{nameCamel}}Overrides(source: source),
+  );
+  addTearDown(container.dispose);
+  await pumpDs(
+    tester,
+    UncontrolledProviderScope(
+      container: container,
+      child: const {{Name}}Page(),
+    ),
+    locale: locale,
+    dark: dark,
+    textScale: textScale,
+    size: size,
+    scaffold: false,
+  );
+}
+
+void main() {
+  test('the route name is kebab-case with a leading slash', () {
+    expect({{Name}}Page.routeName, '/{{nameKebab}}');
+  });
+
+  group('data states', () {
+    testWidgets('loading shows no items yet', (tester) async {
+      final source = Fake{{Name}}Source.data({{nameCamel}}Sample)
+        ..gate = Completer<void>();
+      await _pump(tester, source);
+
+      expect(find.byType({{Name}}ItemTile), findsNothing);
+      expect(find.byType(EmptyState), findsNothing);
+      expect(find.byType(ErrorState), findsNothing);
+    });
+
+    testWidgets('success lists the items', (tester) async {
+      await _pump(tester, Fake{{Name}}Source.data({{nameCamel}}Sample));
+      await tester.pumpAndSettle();
+
+      expect(find.byType({{Name}}ItemTile), findsNWidgets(2));
+      expect(find.text('First'), findsOneWidget);
+    });
+
+    testWidgets('empty shows the empty state', (tester) async {
+      await _pump(tester, Fake{{Name}}Source.data(const []));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(EmptyState), findsOneWidget);
+      expect(find.byType({{Name}}ItemTile), findsNothing);
+    });
+
+    testWidgets('error shows the error state', (tester) async {
+      await _pump(
+        tester,
+        Fake{{Name}}Source.failing(const ServerException(statusCode: 500)),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ErrorState), findsOneWidget);
+    });
+  });
+
+  group('layouts', () {
+    for (final locale in ['en', 'ar']) {
+      for (final dark in [false, true]) {
+        testWidgets('${dark ? 'dark' : 'light'} $locale on a tablet at 2x text', (
+          tester,
+        ) async {
+          await _pump(
+            tester,
+            Fake{{Name}}Source.data({{nameCamel}}Sample),
+            locale: locale,
+            dark: dark,
+            textScale: 2,
+            size: tabletSize,
+          );
+          await tester.pumpAndSettle();
+
+          expect(find.byType({{Name}}ItemTile), findsNWidgets(2));
+          expect(tester.takeException(), isNull);
+        });
+      }
+    }
+  });
+}

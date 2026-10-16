@@ -1,5 +1,8 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:riverpod_core/core/config/app_config.dart';
+import 'package:riverpod_core/core/config/flavor.dart';
 import 'package:riverpod_core/core/router/app_shell.dart';
 import 'package:riverpod_core/core/startup/splash_page.dart';
 import 'package:riverpod_core/features/auth/presentation/pages/forgot_password_page.dart';
@@ -9,6 +12,9 @@ import 'package:riverpod_core/features/home/presentation/pages/home_page.dart';
 import 'package:riverpod_core/features/items/presentation/pages/item_detail_page.dart';
 import 'package:riverpod_core/features/more/presentation/pages/more_page.dart';
 import 'package:riverpod_core/features/onboarding/presentation/pages/onboarding_page.dart';
+import 'package:riverpod_core/features/showcase/presentation/pages/showcase_page.dart';
+import 'package:riverpod_core/features/videos/presentation/pages/video_detail_page.dart';
+import 'package:riverpod_core/features/videos/presentation/pages/videos_page.dart';
 
 part 'routes.g.dart';
 
@@ -118,4 +124,65 @@ GoRouteData? routeForDeepLink({required String type, required String id}) {
     'myEvents' => ItemDetailRoute(id: id),
     _ => null,
   };
+}
+
+/// Dev and staging only (D-028): in a prod build these routes redirect home,
+/// so a deep link cannot reach the reference feature. The entry points are
+/// hidden by the same flavor check (home tile, `videosSimulationEnabled`).
+String? _devOnlyRedirect(BuildContext context) {
+  final flavor = ProviderScope.containerOf(
+    context,
+    listen: false,
+  ).read(appConfigProvider).flavor;
+  return flavor == Flavor.prod ? HomePage.routeName : null;
+}
+
+@TypedGoRoute<VideosRoute>(path: VideosPage.routeName)
+class VideosRoute extends GoRouteData with $VideosRoute {
+  const VideosRoute();
+
+  @override
+  String? redirect(BuildContext context, GoRouterState state) =>
+      _devOnlyRedirect(context);
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const VideosPage();
+}
+
+@TypedGoRoute<VideoDetailRoute>(path: VideoDetailPage.routeName)
+class VideoDetailRoute extends GoRouteData with $VideoDetailRoute {
+  const VideoDetailRoute({required this.id, this.url});
+
+  final String id;
+
+  /// A pasted link to play; only used with `id == customVideoId`.
+  final String? url;
+
+  @override
+  String? redirect(BuildContext context, GoRouterState state) =>
+      _devOnlyRedirect(context);
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      VideoDetailPage(id: id, customUrl: url);
+}
+
+/// The component gallery (C-35). Only dev and staging builds have it: in prod
+/// the redirect sends the request to the home route.
+@TypedGoRoute<ShowcaseRoute>(path: ShowcasePage.routeName)
+class ShowcaseRoute extends GoRouteData with $ShowcaseRoute {
+  const ShowcaseRoute();
+
+  @override
+  String? redirect(BuildContext context, GoRouterState state) {
+    final flavor = ProviderScope.containerOf(
+      context,
+      listen: false,
+    ).read(appConfigProvider).flavor;
+    return ShowcasePage.isEnabled(flavor) ? null : HomePage.routeName;
+  }
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const ShowcasePage();
 }

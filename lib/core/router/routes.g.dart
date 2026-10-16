@@ -14,6 +14,9 @@ List<RouteBase> get $appRoutes => [
   $forgotPasswordRoute,
   $appShellRoute,
   $itemDetailRoute,
+  $videosRoute,
+  $videoDetailRoute,
+  $showcaseRoute,
 ];
 
 RouteBase get $splashRoute => GoRouteData.$route(
@@ -231,6 +234,92 @@ mixin $ItemDetailRoute on GoRouteData {
   @override
   String get location =>
       GoRouteData.$location('/items/${Uri.encodeComponent(_self.id)}');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $videosRoute => GoRouteData.$route(
+  path: '/videos',
+  hasOverriddenOnExit: false,
+  factory: $VideosRoute._fromState,
+);
+
+mixin $VideosRoute on GoRouteData {
+  static VideosRoute _fromState(GoRouterState state) => const VideosRoute();
+
+  @override
+  String get location => GoRouteData.$location('/videos');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $videoDetailRoute => GoRouteData.$route(
+  path: '/videos/:id',
+  hasOverriddenOnExit: false,
+  factory: $VideoDetailRoute._fromState,
+);
+
+mixin $VideoDetailRoute on GoRouteData {
+  static VideoDetailRoute _fromState(GoRouterState state) => VideoDetailRoute(
+    id: state.pathParameters['id']!,
+    url: state.uri.queryParameters['url'],
+  );
+
+  VideoDetailRoute get _self => this as VideoDetailRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/videos/${Uri.encodeComponent(_self.id)}',
+    queryParams: {if (_self.url != null) 'url': _self.url},
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $showcaseRoute => GoRouteData.$route(
+  path: '/showcase',
+  hasOverriddenOnExit: false,
+  factory: $ShowcaseRoute._fromState,
+);
+
+mixin $ShowcaseRoute on GoRouteData {
+  static ShowcaseRoute _fromState(GoRouterState state) => const ShowcaseRoute();
+
+  @override
+  String get location => GoRouteData.$location('/showcase');
 
   @override
   void go(BuildContext context) => context.go(location);

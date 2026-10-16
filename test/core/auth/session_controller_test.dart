@@ -14,6 +14,7 @@ import 'package:riverpod_core/core/errors/app_exception.dart';
 import 'package:riverpod_core/core/network/dio_client.dart';
 import 'package:riverpod_core/core/network/session_events.dart';
 import 'package:riverpod_core/core/network/token_refresher.dart';
+import 'package:riverpod_core/core/notifications/notification_service_provider.dart';
 import 'package:riverpod_core/core/storage/database/app_database.dart';
 import 'package:riverpod_core/core/storage/prefs_storage.dart';
 import 'package:riverpod_core/core/storage/secure_storage.dart';
@@ -71,7 +72,10 @@ class _Harness {
   AuthUser? get user => container.read(sessionUserProvider);
 }
 
-Future<_Harness> _harness({Map<String, String> secure = const {}}) async {
+Future<_Harness> _harness({
+  Map<String, String> secure = const {},
+  Future<void> Function()? notificationLogout,
+}) async {
   final prefs = await fakePrefsStorage({PrefKeys.themeMode: 'dark'});
   final database = AppDatabase.inMemory();
   final analytics = _RecordingAnalytics();
@@ -85,6 +89,10 @@ Future<_Harness> _harness({Map<String, String> secure = const {}}) async {
       appDatabaseProvider.overrideWithValue(database),
       analyticsServiceProvider.overrideWithValue(analytics),
       httpClientAdapterProvider.overrideWithValue(adapter),
+      // Real notification plugins are never touched in these tests.
+      notificationLogoutProvider.overrideWith(
+        (ref) => notificationLogout ?? () async {},
+      ),
     ],
   );
   return _Harness(
@@ -215,8 +223,10 @@ void main() {
   });
 
   group('logout', () {
-    Future<_Harness> signedIn() async {
-      final h = await _harness();
+    Future<_Harness> signedIn({
+      Future<void> Function()? notificationLogout,
+    }) async {
+      final h = await _harness(notificationLogout: notificationLogout);
       await h.session.signIn(tokens: _tokens, user: _user);
       await h.database.writeCache(
         key: 'user-1/orders',
@@ -267,6 +277,52 @@ void main() {
       );
 
       expect(remoteSawTokens, isTrue);
+      expect(h.secure.values, isEmpty);
+    });
+
+    test(
+      'the notification hook runs before the remote logout and the wipe',
+      () async {
+        final events = <String>[];
+        late final _Harness h;
+        h = await signedIn(
+          notificationLogout: () async {
+            events.add(
+              'notifications, token kept: '
+              '${h.secure.values.containsKey(SecureKeys.accessToken)}',
+            );
+          },
+        );
+        addTearDown(h.database.close);
+
+        await h.session.logout(
+          remoteLogout: () async {
+            events.add(
+              'remote, token kept: '
+              '${h.secure.values.containsKey(SecureKeys.accessToken)}',
+            );
+          },
+        );
+
+        expect(events, [
+          'notifications, token kept: true',
+          'remote, token kept: true',
+        ]);
+        expect(h.secure.values, isEmpty);
+      },
+    );
+
+    test('a failing notification hook does not block logout', () async {
+      final h = await signedIn(
+        notificationLogout: () async {
+          throw const NetworkException();
+        },
+      );
+      addTearDown(h.database.close);
+
+      await h.session.logout();
+
+      expect(h.state, SessionStatus.signedOut);
       expect(h.secure.values, isEmpty);
     });
 

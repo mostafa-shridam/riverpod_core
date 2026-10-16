@@ -1,0 +1,43 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:{{package}}/core/design_system/widgets/async/async_value_view.dart';
+import 'package:{{package}}/core/design_system/widgets/async/empty_state.dart';
+import 'package:{{package}}/core/design_system/widgets/layout/app_app_bar.dart';
+import 'package:{{package}}/core/design_system/widgets/layout/app_scaffold.dart';
+import 'package:{{package}}/features/{{name}}/data/models/{{name}}_item.dart';
+import 'package:{{package}}/features/{{name}}/presentation/widgets/{{name}}_item_tile.dart';
+import 'package:{{package}}/features/{{name}}/providers/{{name}}_controller.dart';
+import 'package:{{package}}/generated/locale_keys.g.dart';
+
+/// The {{Title}} list page. `AsyncValueView` renders the 8 data states.
+class {{Name}}Page extends ConsumerWidget {
+  static const routeName = '/{{nameKebab}}';
+
+  const {{Name}}Page({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final items = ref.watch({{nameCamel}}ControllerProvider);
+    final controller = ref.read({{nameCamel}}ControllerProvider.notifier);
+
+    return AppScaffold(
+      appBar: AppAppBar(title: LocaleKeys.{{nameCamel}}_title.tr()),
+      body: AsyncValueView<List<{{Name}}Item>>(
+        value: items,
+        isEmpty: items.value?.isEmpty ?? false,
+        onRetry: controller.refresh,
+        onRefresh: controller.refresh,
+        empty: EmptyState(
+          title: LocaleKeys.{{nameCamel}}_emptyTitle.tr(),
+          message: LocaleKeys.{{nameCamel}}_emptyMessage.tr(),
+        ),
+        builder: (context, data) => ListView.builder(
+          physics: const AlwaysScrollableScrollPhysics(),
+          itemCount: data.length,
+          itemBuilder: (context, index) => {{Name}}ItemTile(item: data[index]),
+        ),
+      ),
+    );
+  }
+}

@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:riverpod_core/core/auth/session_controller.dart';
-import 'package:riverpod_core/core/helper/deep_link_helper.dart';
+import 'package:riverpod_core/core/notifications/routing/notification_router_provider.dart';
 import 'package:riverpod_core/core/router/app_error_page.dart';
 import 'package:riverpod_core/core/router/guards/app_redirect.dart';
 import 'package:riverpod_core/core/router/routes.dart';
@@ -39,13 +39,12 @@ GoRouter appRouter(Ref ref) {
     routes: $appRoutes,
   );
 
-  // Notification taps arrive as events; they open the matching typed route.
-  final links = DeepLinkHelper.instance.events.listen((event) {
-    final route = routeForDeepLink(type: event.type, id: event.id);
-    if (route != null) router.go(route.location);
-  });
+  // Notification taps (push and local) are resolved by NotificationRouter and
+  // opened here; it queues them until the user is signed in.
+  final notifications = ref.watch(notificationRouterProvider)
+    ..attach((route) => router.go(route.location));
   ref.onDispose(() {
-    links.cancel();
+    notifications.detach();
     router.dispose();
   });
   return router;

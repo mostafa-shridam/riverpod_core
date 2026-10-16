@@ -1,0 +1,23 @@
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:{{package}}/features/{{name}}/data/models/{{name}}_item.dart';
+import 'package:{{package}}/features/{{name}}/data/{{name}}_repository.dart';
+
+part '{{name}}_controller.g.dart';
+
+/// State and actions of the {{Title}} page.
+@riverpod
+class {{Name}}Controller extends _${{Name}}Controller {
+  @override
+  Future<List<{{Name}}Item>> build() {
+    return ref.watch({{nameCamel}}RepositoryProvider).fetchItems();
+  }
+
+  /// Reloads while keeping the previous data on screen (refreshing; a failure
+  /// leaves the old data with the error, which the view shows as stale).
+  Future<void> refresh() async {
+    state = const AsyncLoading<List<{{Name}}Item>>();
+    state = await AsyncValue.guard(
+      () => ref.read({{nameCamel}}RepositoryProvider).fetchItems(),
+    );
+  }
+}

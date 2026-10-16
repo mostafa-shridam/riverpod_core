@@ -10,6 +10,7 @@ import 'package:riverpod_core/core/logger/app_logger.dart';
 import 'package:riverpod_core/core/network/dio_client.dart';
 import 'package:riverpod_core/core/network/session_events.dart';
 import 'package:riverpod_core/core/network/token_refresher.dart';
+import 'package:riverpod_core/core/notifications/notification_service_provider.dart';
 import 'package:riverpod_core/core/storage/clear_user_data.dart';
 import 'package:riverpod_core/core/storage/database/app_database.dart';
 import 'package:riverpod_core/core/storage/prefs_storage.dart';
@@ -100,24 +101,20 @@ class SessionController extends _$SessionController
   }
 
   /// Signs out everywhere on this device. The ONE logout path:
-  /// 1. remote logout, best effort: a failure is logged and never blocks;
-  /// 2. local wipe: secrets, cache and user-scoped settings (`clearUserData`);
-  /// 3. analytics forgets the user;
-  /// 4. [SessionEpoch] bumps, so user-scoped providers rebuild;
-  /// 5. the session becomes signed out, and the router goes to login.
+  /// 1. notifications unregister this device (`notificationLogoutProvider`),
+  ///    best effort; it needs the session, so it runs before the wipe;
+  /// 2. remote logout, best effort: a failure is logged and never blocks;
+  /// 3. local wipe: secrets, cache and user-scoped settings (`clearUserData`);
+  /// 4. analytics forgets the user;
+  /// 5. [SessionEpoch] bumps, so user-scoped providers rebuild;
+  /// 6. the session becomes signed out, and the router goes to login.
   Future<void> logout({Future<void> Function()? remoteLogout}) async {
+    await _bestEffort(
+      () => ref.read(notificationLogoutProvider)(),
+      'Notification logout failed; clearing locally',
+    );
     if (remoteLogout != null) {
-      try {
-        await remoteLogout();
-      } catch (error, stackTrace) {
-        ref
-            .read(loggerProvider)
-            .warning(
-              'Remote logout failed; clearing locally',
-              error: error,
-              stackTrace: stackTrace,
-            );
-      }
+      await _bestEffort(remoteLogout, 'Remote logout failed; clearing locally');
     }
     await clearUserData(
       secure: _secure,
@@ -130,6 +127,20 @@ class SessionController extends _$SessionController
     ref.read(sessionEpochProvider.notifier).bump();
     ref.read(sessionUserProvider.notifier).update(null);
     state = SessionStatus.signedOut;
+  }
+
+  /// Runs one logout step. A failure is logged and never stops the wipe.
+  Future<void> _bestEffort(
+    Future<void> Function() step,
+    String failureMessage,
+  ) async {
+    try {
+      await step();
+    } catch (error, stackTrace) {
+      ref
+          .read(loggerProvider)
+          .warning(failureMessage, error: error, stackTrace: stackTrace);
+    }
   }
 
   /// Local sign-out without a remote call.
