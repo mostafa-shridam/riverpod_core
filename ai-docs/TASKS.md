@@ -339,7 +339,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-36 — Legacy cleanup
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | Worker S2 | — |
 - Goal: remove pre-template leftovers so only the documented tree remains.
 - Files (delete or move ONLY after `grep -rn` proves nothing imports them; otherwise leave and report): `lib/core/constants.dart`, `lib/core/enum/**`, `lib/core/extension/**` (incl. `theme_extenison.dart` hard-coded swatch, `font_family.dart`, `font_size.dart`, `language.dart`, `theme_mode.dart`), `lib/core/local_services/**`, `lib/core/mixins/**` (`url_launcher.dart` is C-22's: keep), `lib/core/services/scroll_behavior.dart` (move into `lib/core/app/` if used by app.dart, else delete), `lib/gen/**` + `flutter_gen` config in pubspec (decide: keep only if assets are actually used via `Assets.`; otherwise delete and remove from pubspec/build.sh), stale assets under `assets/` that nothing references, unused packages in pubspec (verify each with grep; removing a package is allowed, adding is not), `pubspec.yaml`, `pubspec.lock`, tests that covered deleted code
 - Done when: nothing under `lib/core/` is outside the folders listed in ARCHITECTURE.md (apart from the files the architecture names); `flutter pub get`, build_runner and the full gate pass; the report lists every removed file and package with the grep proof; no behaviour test deleted without a note on which behaviour stopped existing.
