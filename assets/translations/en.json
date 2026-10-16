@@ -54,5 +54,21 @@
       "invalidPhone": "Enter a valid phone number",
       "phoneTooShort": "Phone number is too short"
     }
+  },
+  "ds_media": {
+    "play": "Play",
+    "pause": "Pause",
+    "replay": "Replay",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "speed": "Playback speed",
+    "fullscreen": "Fullscreen",
+    "exitFullscreen": "Exit fullscreen",
+    "rewind": "Rewind 10 seconds",
+    "forward": "Forward 10 seconds",
+    "seekBar": "Seek bar",
+    "buffering": "Buffering",
+    "error": "This video could not be played",
+    "retry": "Retry"
   }
 }
