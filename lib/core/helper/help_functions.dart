@@ -5,11 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod_core/core/constants.dart';
-import 'package:riverpod_core/core/design_system/tokens/app_colors.dart';
-import 'package:riverpod_core/core/design_system/tokens/brand_config.dart';
-import 'package:riverpod_core/core/extension/theme_extenison.dart';
 import 'package:riverpod_core/generated/locale_keys.g.dart';
-import 'package:riverpod_core/main.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 String getLanguageCodeHelper() {
@@ -80,54 +76,6 @@ String formatDateTime(String date, BuildContext context, {String? format}) {
     log('Error in formatDateTime: $e');
     return '';
   }
-}
-
-void showSnackBar({
-  required String message,
-  SnackBarType type = SnackBarType.info,
-  double? width,
-}) {
-  IconData? icon;
-  Color? color;
-  switch (type) {
-    case SnackBarType.info:
-      icon = Icons.info;
-      color = AppSemanticColors.light.warning;
-      break;
-    case SnackBarType.success:
-      icon = Icons.check_circle;
-      color = AppSemanticColors.light.success;
-      break;
-    case SnackBarType.error:
-      icon = Icons.error;
-      color = ColorScheme.fromSeed(seedColor: brandSeedColor).error;
-      break;
-  }
-  width ??= kIsWeb ? 400 : width;
-  final context = scaffoldMessengerKey.currentState;
-  if (context == null) return;
-  context.showSnackBar(
-    SnackBar(
-      width: width,
-      content: Row(
-        children: [
-          Icon(icon, color: Colors.white),
-          const SizedBox(width: 8),
-          Text(
-            message,
-            style: context.context.textTheme.bodyMedium?.copyWith(
-              color: Colors.white,
-            ),
-          ),
-        ],
-      ),
-      behavior: SnackBarBehavior.floating,
-      elevation: 1,
-      backgroundColor: color,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      hitTestBehavior: HitTestBehavior.translucent,
-    ),
-  );
 }
 
 enum SnackBarType { info, success, error }

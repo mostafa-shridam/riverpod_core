@@ -54,5 +54,17 @@
       "invalidPhone": "Enter a valid phone number",
       "phoneTooShort": "Phone number is too short"
     }
+  },
+  "errors": {
+    "network": "No internet connection. Check your network and try again.",
+    "timeout": "The request took too long. Please try again.",
+    "unauthorized": "Your session has expired. Please sign in again.",
+    "forbidden": "You don't have permission to do that.",
+    "notFound": "We couldn't find what you were looking for.",
+    "validation": "Please check the highlighted fields and try again.",
+    "server": "Something went wrong on our side. Please try again later.",
+    "cancelled": "The request was cancelled.",
+    "unknown": "Something went wrong. Please try again.",
+    "retry": "Try again"
   }
 }
