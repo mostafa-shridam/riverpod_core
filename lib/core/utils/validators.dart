@@ -1,43 +1,52 @@
+/// Why a field value is invalid. Core stays free of UI text: the design
+/// system maps each case to a localized message.
+enum ValidationError {
+  required,
+  invalidEmail,
+  passwordTooShort,
+  invalidPhone,
+  phoneTooShort,
+}
+
+/// Pure field rules. Each returns `null` when the value is valid.
 class Validators {
-  static String? validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Email is required';
-    }
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegex.hasMatch(value)) {
-      return 'Enter a valid email address';
+  /// Minimum password length accepted by [password].
+  static const int minPasswordLength = 6;
+
+  /// Minimum digit count accepted by [phone].
+  static const int minPhoneDigits = 9;
+
+  static final RegExp _emailPattern = RegExp(
+    r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+  );
+  static final RegExp _phonePattern = RegExp(r'^[0-9+]+$');
+
+  static ValidationError? required(String? value) {
+    if (value == null || value.isEmpty) return ValidationError.required;
+    return null;
+  }
+
+  static ValidationError? email(String? value) {
+    final missing = required(value);
+    if (missing != null) return missing;
+    if (!_emailPattern.hasMatch(value!)) return ValidationError.invalidEmail;
+    return null;
+  }
+
+  static ValidationError? password(String? value) {
+    final missing = required(value);
+    if (missing != null) return missing;
+    if (value!.length < minPasswordLength) {
+      return ValidationError.passwordTooShort;
     }
     return null;
   }
 
-  static String? validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Password is required';
-    }
-    if (value.length < 6) {
-      return 'Password must be at least 6 characters';
-    }
-    return null;
-  }
-
-  static String? validateRequired(String? value, String fieldName) {
-    if (value == null || value.isEmpty) {
-      return '$fieldName is required';
-    }
-    return null;
-  }
-
-  static String? validatePhone(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Phone number is required';
-    }
-    final phoneRegex = RegExp(r'^[0-9+]+$');
-    if (!phoneRegex.hasMatch(value)) {
-      return 'Enter a valid phone number';
-    }
-    if (value.length < 9) {
-      return 'Phone number too short';
-    }
+  static ValidationError? phone(String? value) {
+    final missing = required(value);
+    if (missing != null) return missing;
+    if (!_phonePattern.hasMatch(value!)) return ValidationError.invalidPhone;
+    if (value.length < minPhoneDigits) return ValidationError.phoneTooShort;
     return null;
   }
 }

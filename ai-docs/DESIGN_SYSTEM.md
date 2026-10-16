@@ -13,6 +13,7 @@ All tokens are `ThemeExtension`s read via `context.tokens` (and `Theme.of(contex
 | Radius | `sm 8, md 12, lg 16, xl 24, full 999`. |
 | Elevation | `none, low, mid, high` mapped to M3 surface tint levels. |
 | Motion | `fast 150ms, normal 250ms, slow 400ms` + standard curves. |
+| Sizes | Component sizes: button height `sm 40, md 48, lg 56`; icons `18/20/24`; `minTouchTarget 48`; OTP box `48×56`; outline `1`, focused outline `2`, spinner stroke `2`. Search debounce `300ms` (in Motion). |
 
 The resolved light/dark color role table (seed `#4A6FA5`, success/warning/info accents) is in `ai-docs/reports/C-05.md`. Dark mode uses the dark tonal palette (surfaces `#111318` → `#32353A`), not an inverted light scheme.
 
