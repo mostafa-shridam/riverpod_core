@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod_core/core/auth/session_controller.dart';
+import 'package:riverpod_core/core/config/app_config.dart';
+import 'package:riverpod_core/core/config/flavor.dart';
 import 'package:riverpod_core/core/constants.dart';
 import 'package:riverpod_core/core/design_system/theme/app_theme.dart';
 import 'package:riverpod_core/core/network/session_events.dart';
@@ -28,6 +30,15 @@ Future<ProviderContainer> _container(
   );
   return createContainer(
     overrides: [
+      // The home page reads the flavor for the dev-only gallery entry.
+      appConfigProvider.overrideWithValue(
+        AppConfig.fromMap(Flavor.dev, const {
+          'APP_NAME': 'Test App',
+          'API_BASE_URL': 'https://api.example.com',
+          'CONNECT_TIMEOUT_MS': '15000',
+          'RECEIVE_TIMEOUT_MS': '20000',
+        }),
+      ),
       prefsStorageProvider.overrideWith((ref) => Future.value(prefs)),
     ],
   );
