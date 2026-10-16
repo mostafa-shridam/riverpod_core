@@ -14,6 +14,13 @@ const _request = RenameRequest(
   package: 'my_app',
 );
 
+// 'acme_app' sorts before 'flutter', so the renamed import block must be re-sorted.
+const _acmeRequest = RenameRequest(
+  name: 'Acme App',
+  id: 'com.acme.app',
+  package: 'acme_app',
+);
+
 /// Copies the fixture tree into [destination], dropping the `.fixture` suffix.
 Future<void> _copyFixtures(Directory destination) async {
   final source = Directory(_fixtures).absolute;
@@ -111,6 +118,31 @@ void main() {
           File('${project.path}/integration_test/flow.dart').readAsStringSync(),
           contains("import 'package:my_app/main.dart';"),
         );
+      },
+    );
+
+    test(
+      're-sorts import blocks when the new package changes their order',
+      () async {
+        await renameApp(root: project, request: _acmeRequest);
+
+        final output = File(
+          '${project.path}/lib/ordering.dart',
+        ).readAsStringSync();
+        expect(
+          output,
+          "import 'dart:async';\n"
+          '\n'
+          "import 'package:acme_app/main.dart';\n"
+          "import 'package:acme_app/src/theme.dart';\n"
+          "import 'package:flutter/material.dart';\n"
+          '\n'
+          "import 'helpers.dart';\n"
+          '\n'
+          "part 'ordering.g.dart';\n",
+        );
+        // Sorting an already-sorted block again changes nothing.
+        expect(sortDirectives(output), output);
       },
     );
 
@@ -361,6 +393,59 @@ void main() {
           ),
         ),
       );
+    });
+  });
+
+  group('sortDirectives', () {
+    test('sorts dart, package and relative groups within each run', () {
+      const input =
+          "import 'local.dart';\n"
+          "import 'package:z/z.dart';\n"
+          "import 'dart:io';\n"
+          "import 'package:a/a.dart';\n";
+
+      expect(
+        sortDirectives(input),
+        "import 'dart:io';\n"
+        "import 'package:a/a.dart';\n"
+        "import 'package:z/z.dart';\n"
+        "import 'local.dart';\n",
+      );
+    });
+
+    test('keeps export runs, part lines and blank-line groups in place', () {
+      const input =
+          "export 'b.dart';\n"
+          "export 'a.dart';\n"
+          "part 'x.g.dart';\n"
+          "import 'package:z/z.dart';\n"
+          "import 'package:a/a.dart';\n"
+          '\n'
+          "import 'package:c/c.dart';\n"
+          "import 'package:b/b.dart';\n";
+
+      expect(
+        sortDirectives(input),
+        "export 'a.dart';\n"
+        "export 'b.dart';\n"
+        "part 'x.g.dart';\n"
+        "import 'package:a/a.dart';\n"
+        "import 'package:z/z.dart';\n"
+        '\n'
+        "import 'package:b/b.dart';\n"
+        "import 'package:c/c.dart';\n",
+      );
+    });
+
+    test('leaves unsorted code lines alone and is idempotent', () {
+      const input =
+          'void main() {}\n'
+          "import 'package:z/z.dart';\n"
+          "import 'package:a/a.dart';\n";
+      final once = sortDirectives(input);
+
+      expect(once.startsWith('void main() {}\n'), isTrue);
+      expect(sortDirectives(once), once);
     });
   });
 

@@ -222,11 +222,70 @@ String rewriteEnvExample(String content, String name) =>
       (m) => '${m[1]!}$name${m[2]!}',
     );
 
+/// Rewrites `package:<from>/` to `package:<to>/`, then re-sorts the directives.
+/// A new package name can change the alphabetical order of an import block,
+/// and `directives_ordering` rejects an unsorted block.
 String rewriteDartImports(
   String content, {
   required String from,
   required String to,
-}) => content.replaceAll('package:$from/', 'package:$to/');
+}) {
+  final rewritten = content.replaceAll('package:$from/', 'package:$to/');
+  return rewritten == content ? content : sortDirectives(rewritten);
+}
+
+final _directivePattern = RegExp(r"^(import|export) '([^']+)'.*;$");
+
+/// Sorts each run of consecutive single-line `import` (or `export`) lines the way
+/// `directives_ordering` expects: `dart:` first, then `package:`, then relative,
+/// each group alphabetical by URI. Blank lines, comments, `part` and other lines
+/// end a run and stay where they are. Idempotent.
+String sortDirectives(String content) {
+  final out = <String>[];
+  var run = <String>[];
+  String? runKeyword;
+
+  void flush() {
+    final entries =
+        [
+          for (var i = 0; i < run.length; i++)
+            (key: _directiveSortKey(run[i]), index: i, line: run[i]),
+        ]..sort((a, b) {
+          final byKey = a.key.compareTo(b.key);
+          return byKey != 0 ? byKey : a.index.compareTo(b.index);
+        });
+    out.addAll(entries.map((e) => e.line));
+    run = [];
+  }
+
+  for (final line in content.split('\n')) {
+    final match = _directivePattern.firstMatch(line);
+    if (match == null) {
+      flush();
+      runKeyword = null;
+      out.add(line);
+      continue;
+    }
+    if (match.group(1) != runKeyword) {
+      flush();
+      runKeyword = match.group(1);
+    }
+    run.add(line);
+  }
+  flush();
+  return out.join('\n');
+}
+
+/// Group rank first (dart, package, relative), then the URI, so a plain string sort works.
+String _directiveSortKey(String line) {
+  final uri = _directivePattern.firstMatch(line)!.group(2)!;
+  final rank = uri.startsWith('dart:')
+      ? 0
+      : uri.startsWith('package:')
+      ? 1
+      : 2;
+  return '$rank|$uri';
+}
 
 /// Renames the Flutter project at [root]. Returns the changes; with [dryRun] nothing is written.
 ///

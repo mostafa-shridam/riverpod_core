@@ -39,7 +39,12 @@ Future<void> main(List<String> args) async {
       stdout.writeln('  ${change.path} (${change.detail})');
     }
     if (!options.dryRun) {
-      stdout.writeln('Next: flutter pub get && flutter analyze');
+      stdout.writeln('''
+Next steps:
+  flutter pub get
+  dart run build_runner build --delete-conflicting-outputs
+  dart format .
+  flutter analyze''');
     }
   } on RenameException catch (error) {
     stderr.writeln(error);
