@@ -1,0 +1,5 @@
+{
+  "FLAVOR": "prod",
+  "APP_NAME": "riverpod_core",
+  "API_BASE_URL": "https://api.example.com"
+}
