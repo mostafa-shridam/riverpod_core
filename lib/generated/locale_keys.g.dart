@@ -70,4 +70,17 @@ abstract class LocaleKeys {
   static const ds_selection_selectTime = 'ds_selection.selectTime';
   static const ds_selection_ratingValue = 'ds_selection.ratingValue';
   static const ds_selection = 'ds_selection';
+  static const l10n_nativeName_ar = 'l10n.nativeName.ar';
+  static const l10n_nativeName_en = 'l10n.nativeName.en';
+  static const l10n_nativeName = 'l10n.nativeName';
+  static const l10n_itemsCount = 'l10n.itemsCount';
+  static const l10n_relative_now = 'l10n.relative.now';
+  static const l10n_relative_minutesAgo = 'l10n.relative.minutesAgo';
+  static const l10n_relative_hoursAgo = 'l10n.relative.hoursAgo';
+  static const l10n_relative_daysAgo = 'l10n.relative.daysAgo';
+  static const l10n_relative_minutesIn = 'l10n.relative.minutesIn';
+  static const l10n_relative_hoursIn = 'l10n.relative.hoursIn';
+  static const l10n_relative_daysIn = 'l10n.relative.daysIn';
+  static const l10n_relative = 'l10n.relative';
+  static const l10n = 'l10n';
 }

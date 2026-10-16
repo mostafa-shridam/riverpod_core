@@ -21,6 +21,17 @@ enum Language {
 
   String get toStr => name;
 
+  /// The locale for this language (`ar` / `en`).
+  Locale get locale => Locale(displayName);
+
+  /// Language name written in its own language, shown in the switcher.
+  String get nativeName => switch (this) {
+    Language.arabic => LocaleKeys.l10n_nativeName_ar.tr(),
+    Language.english => LocaleKeys.l10n_nativeName_en.tr(),
+  };
+
+  static Language fromLocale(Locale locale) => fromString(locale.languageCode);
+
   static String getLanguageName(Language language) {
     switch (language) {
       case Language.arabic:

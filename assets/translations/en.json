@@ -72,5 +72,64 @@
     "selectDate": "Select date",
     "selectTime": "Select time",
     "ratingValue": "{} of {}"
+  },
+  "l10n": {
+    "nativeName": {
+      "ar": "العربية",
+      "en": "English"
+    },
+    "itemsCount": {
+      "zero": "No items",
+      "one": "One item",
+      "two": "Two items",
+      "few": "{} items",
+      "many": "{} items",
+      "other": "{} items"
+    },
+    "relative": {
+      "now": "Just now",
+      "minutesAgo": {
+        "one": "1 minute ago",
+        "other": "{} minutes ago",
+        "two": "2 minutes ago",
+        "few": "{} minutes ago",
+        "many": "{} minutes ago"
+      },
+      "hoursAgo": {
+        "one": "1 hour ago",
+        "other": "{} hours ago",
+        "two": "2 hours ago",
+        "few": "{} hours ago",
+        "many": "{} hours ago"
+      },
+      "daysAgo": {
+        "one": "Yesterday",
+        "other": "{} days ago",
+        "two": "2 days ago",
+        "few": "{} days ago",
+        "many": "{} days ago"
+      },
+      "minutesIn": {
+        "one": "In 1 minute",
+        "other": "In {} minutes",
+        "two": "In 2 minutes",
+        "few": "In {} minutes",
+        "many": "In {} minutes"
+      },
+      "hoursIn": {
+        "one": "In 1 hour",
+        "other": "In {} hours",
+        "two": "In 2 hours",
+        "few": "In {} hours",
+        "many": "In {} hours"
+      },
+      "daysIn": {
+        "one": "Tomorrow",
+        "other": "In {} days",
+        "two": "In 2 days",
+        "few": "In {} days",
+        "many": "In {} days"
+      }
+    }
   }
 }
