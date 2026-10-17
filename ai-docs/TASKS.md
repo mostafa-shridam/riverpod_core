@@ -420,7 +420,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-48 — Verify merged main, de-flake timing tests, refresh Podfile.lock
 | status | owner | blocked by |
 |---|---|---|
-| REVIEW | Worker S10 (worker-v2) | — |
+| DONE | Worker S10 (worker-v2) | — |
 - Goal: full gate + both debug builds on merged main; make `transfer_controller_test` cancel test deterministic; commit the plugin-only `ios/Podfile.lock` refresh.
 - Files: `test/core/network/transfer/transfer_controller_test.dart`, `ios/Podfile.lock`, `ai-docs/reports/C-48.md`, `ai-docs/TASKS.md`.
 - Report: `ai-docs/reports/C-48.md`.
