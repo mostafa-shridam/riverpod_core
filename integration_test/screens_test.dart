@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:riverpod_core/core/design_system/widgets/buttons/app_button.dart';
+import 'package:riverpod_core/core/router/routes.dart';
+import 'package:riverpod_core/features/videos/data/sources/sample_videos.dart';
 import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 import 'helpers/flow_setup.dart';
@@ -51,11 +53,27 @@ void main() {
     await pumpUntilFound(tester, find.text(LocaleKeys.videos_title.tr()));
     await shot('videos-list');
 
-    // Back to home, then the showcase: English light, dark, then Arabic in
-    // dark and light (the page toggles theme and locale).
-    await tester.pageBack();
-    await tester.pump();
+    // The first video's detail page (the fake player keeps the surface fixed).
+    await tapWhenFound(tester, find.text(sampleVideos.first.title));
+    await pumpUntilFound(tester, find.byKey(const ValueKey('flow-video')));
+    await shot('video-detail');
+    await popRoute(tester);
+    await popRoute(tester);
     await pumpUntilFound(tester, find.byKey(const ValueKey('home-page')));
+
+    // More is reached by route, not by its tab: a tap on the tab is the known
+    // defect in ai-docs/reports/C-26.md.
+    final home = tester.element(find.byKey(const ValueKey('home-page')));
+    const MoreRoute().go(home);
+    await pumpUntilFound(tester, find.byKey(const ValueKey('more-page')));
+    await shot('more');
+    const HomeRoute().go(
+      tester.element(find.byKey(const ValueKey('more-page'))),
+    );
+    await pumpUntilFound(tester, find.byKey(const ValueKey('home-page')));
+
+    // The showcase: English light, dark, then Arabic in dark and light (the
+    // page toggles theme and locale).
     await tapWhenFound(tester, find.byKey(const ValueKey('open-showcase')));
     await pumpUntilFound(tester, find.byKey(const ValueKey('showcase-list')));
     await shot('showcase-en-light');
