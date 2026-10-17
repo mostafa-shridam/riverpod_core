@@ -104,7 +104,9 @@ class NotificationService {
     try {
       final zone = await _timezone.localTimezone() ?? 'UTC';
       await _localBackend.initialize(timezoneName: zone, onTap: router.handle);
-      await syncChannelLabels();
+      // Channels are NOT created here: translations are not loaded yet at
+      // bootstrap, so the names would be raw keys (C-47). The
+      // `NotificationLabelSync` widget creates them after the first frame.
       final launch = await _localBackend.launchTap();
       if (launch != null) router.handle(launch);
     } on Object catch (error, stackTrace) {
@@ -129,8 +131,8 @@ class NotificationService {
   }
 
   /// Creates or renames the Android channels (and iOS action titles) in the
-  /// current language. Called at startup and after the sign-in; call it again
-  /// after the user changes the app language.
+  /// current language. Called by `NotificationLabelSync` once translations are
+  /// loaded and on every language change, and after the sign-in.
   Future<void> syncChannelLabels() async {
     try {
       await _localBackend.createChannels(

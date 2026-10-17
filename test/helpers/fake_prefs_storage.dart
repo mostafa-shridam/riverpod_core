@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_ce/hive_ce.dart';
@@ -13,29 +14,69 @@ typedef TestStorage = ({
   String path,
 });
 
-/// Opens Hive on a fresh temp directory (no platform channel). Without [path]
-/// the directory is created and removed after the test; with [path] the same
-/// data is reopened, for restart tests, and the caller owns the directory.
-/// Closes any boxes already open, so call it once per test and share the
-/// result; [fakePrefsStorage] and [fakeCacheStore] each call it.
+/// A fresh temp directory for a file-backed store, removed after the test.
+/// Pass it to [openTestStorage] when the test must survive a reopen.
+Future<String> testStoragePath() async {
+  final directory = await Directory.systemTemp.createTemp('hive_test_');
+  addTearDown(() async {
+    // Close first: an open box holds lock files inside the directory.
+    await Hive.close();
+    await directory.delete(recursive: true);
+  });
+  return directory.path;
+}
+
+/// Opens Hive for one test. Without [path] the boxes live in memory (no file
+/// I/O, no platform channel) and are closed after the test. With [path] the
+/// boxes are file-backed in that directory, so a restart test can reopen them;
+/// the caller owns the directory.
+/// Within one test, a call without [path] returns the boxes already opened, so
+/// [fakePrefsStorage] and [fakeCacheStore] can be combined freely.
 Future<TestStorage> openTestStorage({String? path}) async {
+  // Without a path, reuse the storage this test already opened, so a helper
+  // that opens its own store cannot close the other one's boxes.
+  if (path == null && _openedPath != null && _bothBoxesOpen) {
+    return (
+      settings: Hive.box<dynamic>(HiveBoxNames.settings),
+      cache: Hive.box<Map<dynamic, dynamic>>(HiveBoxNames.cache),
+      path: _openedPath!,
+    );
+  }
   await Hive.close();
-  final directory = path == null
-      ? await Directory.systemTemp.createTemp('hive_test_')
-      : Directory(path);
   if (path == null) {
+    // In memory: no file I/O, so the boxes work inside testWidgets' fake clock,
+    // where real file writes never complete.
+    _openedPath = '';
     addTearDown(() async {
       await Hive.close();
-      await directory.delete(recursive: true);
+      _openedPath = null;
     });
+    return (
+      settings: await Hive.openBox<dynamic>(
+        HiveBoxNames.settings,
+        bytes: Uint8List(0),
+      ),
+      cache: await Hive.openBox<Map<dynamic, dynamic>>(
+        HiveBoxNames.cache,
+        bytes: Uint8List(0),
+      ),
+      path: '',
+    );
   }
-  Hive.init(directory.path);
+  Hive.init(path);
+  _openedPath = path;
   return (
     settings: await Hive.openBox<dynamic>(HiveBoxNames.settings),
     cache: await Hive.openBox<Map<dynamic, dynamic>>(HiveBoxNames.cache),
-    path: directory.path,
+    path: path,
   );
 }
+
+/// The temp directory of the storage opened for this test, if any.
+String? _openedPath;
+
+bool get _bothBoxesOpen =>
+    Hive.isBoxOpen(HiveBoxNames.settings) && Hive.isBoxOpen(HiveBoxNames.cache);
 
 /// [PrefsStorage] on a fresh settings box seeded with [initial].
 Future<PrefsStorage> fakePrefsStorage([

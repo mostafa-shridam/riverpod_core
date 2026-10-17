@@ -37,11 +37,12 @@ void main() {
     });
 
     test('values survive closing and reopening the box', () async {
-      final first = await openTestStorage();
+      final path = await testStoragePath();
+      final first = await openTestStorage(path: path);
       await PrefsStorage(first.settings).setOnboardingSeen(value: true);
       await Hive.close();
 
-      final reopened = await openTestStorage(path: first.path);
+      final reopened = await openTestStorage(path: path);
       expect(PrefsStorage(reopened.settings).onboardingSeen, isTrue);
     });
   });

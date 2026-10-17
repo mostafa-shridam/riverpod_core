@@ -1,4 +1,3 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:riverpod_core/core/notifications/models/notification_permission_state.dart';
 import 'package:riverpod_core/core/notifications/models/push_message.dart';
@@ -13,14 +12,19 @@ import 'package:riverpod_core/core/notifications/push/push_background_handler.da
 /// kind of identifier than the FCM token that servers send to. They are used
 /// only in this file, so switching later is a one-file change.
 class FirebasePushBackend implements PushBackend {
-  FirebasePushBackend();
+  /// [ensureFirebase] is `FirebaseBootstrap.ensureInitialized`: Firebase is
+  /// started once for the whole app (D-042).
+  FirebasePushBackend({required Future<bool> Function() ensureFirebase})
+    : _ensureFirebase = ensureFirebase;
+
+  final Future<bool> Function() _ensureFirebase;
 
   FirebaseMessaging get _fcm => FirebaseMessaging.instance;
 
   @override
   Future<bool> initialize() async {
     try {
-      if (Firebase.apps.isEmpty) await Firebase.initializeApp();
+      if (!await _ensureFirebase()) return false;
       if (!await _fcm.isSupported()) return false;
       FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
       return true;

@@ -8,12 +8,14 @@ part of 'analytics_service.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// The analytics service chosen by `AppConfig.enableAnalytics`.
+/// The analytics service: Firebase Analytics when `AppConfig.enableAnalytics`
+/// is on AND Firebase is configured, otherwise Noop (D-042).
 
 @ProviderFor(analyticsService)
 final analyticsServiceProvider = AnalyticsServiceProvider._();
 
-/// The analytics service chosen by `AppConfig.enableAnalytics`.
+/// The analytics service: Firebase Analytics when `AppConfig.enableAnalytics`
+/// is on AND Firebase is configured, otherwise Noop (D-042).
 
 final class AnalyticsServiceProvider
     extends
@@ -23,7 +25,8 @@ final class AnalyticsServiceProvider
           AnalyticsService
         >
     with $Provider<AnalyticsService> {
-  /// The analytics service chosen by `AppConfig.enableAnalytics`.
+  /// The analytics service: Firebase Analytics when `AppConfig.enableAnalytics`
+  /// is on AND Firebase is configured, otherwise Noop (D-042).
   AnalyticsServiceProvider._()
     : super(
         from: null,
@@ -57,4 +60,4 @@ final class AnalyticsServiceProvider
   }
 }
 
-String _$analyticsServiceHash() => r'27c5783b98ea59c8ec7569b56445c5707fa64c31';
+String _$analyticsServiceHash() => r'941f3f9ad2ac533077afb9f482b0c322b54fac89';

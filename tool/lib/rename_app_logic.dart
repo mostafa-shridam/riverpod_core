@@ -10,6 +10,7 @@ class RenameRequest {
     required this.name,
     required this.id,
     required this.package,
+    this.host,
   });
 
   /// Display name, e.g. "My App".
@@ -20,6 +21,14 @@ class RenameRequest {
 
   /// Dart package name, snake_case, e.g. my_app.
   final String package;
+
+  /// Host of the https app links, e.g. links.company.com. Null keeps the
+  /// placeholder host (ai-docs/DEEP_LINKS.md).
+  final String? host;
+
+  /// URL scheme of the app: the package with `_` as `-` (a scheme cannot
+  /// contain an underscore).
+  String get scheme => package.replaceAll('_', '-');
 }
 
 /// What the command line asked for.
@@ -54,6 +63,9 @@ final _namePattern = RegExp(r'^[\p{L}\p{N} ._-]+$', unicode: true);
 // Lowercase only, no underscores: iOS bundle ids reject them.
 final _idPattern = RegExp(r'^[a-z][a-z0-9]*(\.[a-z][a-z0-9]*)+$');
 final _packagePattern = RegExp(r'^[a-z][a-z0-9_]*$');
+final _hostPattern = RegExp(
+  r'^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$',
+);
 
 const _kotlinRoot = 'android/app/src/main/kotlin';
 const _ignoredDirs = {'build', '.dart_tool', '.git'};
@@ -83,6 +95,13 @@ List<String> validateRename(RenameRequest request) {
       'got "${request.package}".',
     );
   }
+  final host = request.host;
+  if (host != null && !_hostPattern.hasMatch(host)) {
+    problems.add(
+      '--host must be a lowercase domain name without scheme or path, e.g. '
+      'links.company.com; got "$host".',
+    );
+  }
   return problems;
 }
 
@@ -102,12 +121,13 @@ String defaultPackageName(String name) {
   return package;
 }
 
-/// Parses `--name`, `--id`, `--package` (each as `--x value` or `--x=value`) and `--dry-run`.
+/// Parses `--name`, `--id`, `--package`, `--host` (each as `--x value` or `--x=value`) and `--dry-run`.
 /// The package defaults to [defaultPackageName] of the name.
 RenameOptions parseRenameArgs(List<String> args) {
   String? name;
   String? id;
   String? package;
+  String? host;
   var dryRun = false;
   final problems = <String>[];
 
@@ -119,7 +139,7 @@ RenameOptions parseRenameArgs(List<String> args) {
     }
     final equals = arg.indexOf('=');
     final flag = equals == -1 ? arg : arg.substring(0, equals);
-    if (!const {'--name', '--id', '--package'}.contains(flag)) {
+    if (!const {'--name', '--id', '--package', '--host'}.contains(flag)) {
       problems.add('Unknown option "$arg".');
       continue;
     }
@@ -136,6 +156,8 @@ RenameOptions parseRenameArgs(List<String> args) {
       name = value.trim();
     } else if (flag == '--id') {
       id = value.trim();
+    } else if (flag == '--host') {
+      host = value.trim();
     } else {
       package = value.trim();
     }
@@ -157,7 +179,7 @@ RenameOptions parseRenameArgs(List<String> args) {
     throw RenameException(problems);
   }
   return RenameOptions(
-    request: RenameRequest(name: name!, id: id!, package: package!),
+    request: RenameRequest(name: name!, id: id!, package: package!, host: host),
     dryRun: dryRun,
   );
 }
@@ -191,6 +213,56 @@ String rewriteManifest(String content, String name) => content.replaceAllMapped(
   RegExp(r'(android:label=")[^"]*(")'),
   (m) => '${m[1]!}$name${m[2]!}',
 );
+
+// Deep links (ai-docs/DEEP_LINKS.md). The https host is only rewritten when a
+// request names one; the custom scheme always follows the package.
+
+/// `<data android:scheme="https" android:host="...">` and the custom scheme.
+String rewriteManifestDeepLink(String content, RenameRequest request) {
+  var result = content.replaceAllMapped(
+    RegExp(r'(android:scheme=")(?!https"|http")[^"]*(")'),
+    (m) => '${m[1]!}${request.scheme}${m[2]!}',
+  );
+  final host = request.host;
+  if (host != null) {
+    result = result.replaceAllMapped(
+      RegExp(r'(android:host=")[^"]*(")'),
+      (m) => '${m[1]!}$host${m[2]!}',
+    );
+  }
+  return result;
+}
+
+/// The `CFBundleURLSchemes` entry of Info.plist.
+String rewritePlistDeepLink(String content, RenameRequest request) =>
+    content.replaceAllMapped(
+      RegExp(
+        r'(<key>CFBundleURLSchemes</key>\s*<array>\s*<string>)[^<]*(</string>)',
+      ),
+      (m) => '${m[1]!}${request.scheme}${m[2]!}',
+    );
+
+/// The `applinks:<host>` entry of Runner.entitlements.
+String rewriteEntitlements(String content, String host) =>
+    content.replaceAllMapped(
+      RegExp(r'(<string>applinks:)[^<]*(</string>)'),
+      (m) => '${m[1]!}$host${m[2]!}',
+    );
+
+/// The `deepLinkScheme` and (with a host) `deepLinkHost` constants.
+String rewriteDeepLinkConfig(String content, RenameRequest request) {
+  final result = content.replaceAllMapped(
+    RegExp(r"(const deepLinkScheme = ')[^']*(')"),
+    (m) => '${m[1]!}${request.scheme}${m[2]!}',
+  );
+  final host = request.host;
+  return host == null
+      ? result
+      : result.replaceAllMapped(
+          RegExp(r"(const deepLinkHost = ')[^']*(')"),
+          (m) => '${m[1]!}$host${m[2]!}',
+        );
+}
 
 String rewriteKotlin(String content, String id) => content.replaceFirst(
   RegExp(r'^package .*$', multiLine: true),
@@ -388,7 +460,8 @@ Future<List<RenameChange>> renameApp({
   );
   if (oldPackage == request.package &&
       oldId == request.id &&
-      oldName == request.name) {
+      oldName == request.name &&
+      request.host == null) {
     throw RenameException([
       'The app already has name "$oldName", id "$oldId" and package '
           '"$oldPackage"; nothing to rename.',
@@ -426,13 +499,26 @@ Future<List<RenameChange>> renameApp({
   );
   await rewrite(
     'android/app/src/main/AndroidManifest.xml',
-    (c) => rewriteManifest(c, request.name),
-    'android:label',
+    (c) => rewriteManifestDeepLink(rewriteManifest(c, request.name), request),
+    'android:label, deep-link scheme and host',
   );
   await rewrite(
     'ios/Runner/Info.plist',
-    (c) => rewritePlist(c, request),
-    'CFBundleDisplayName, CFBundleName',
+    (c) => rewritePlistDeepLink(rewritePlist(c, request), request),
+    'CFBundleDisplayName, CFBundleName, URL scheme',
+  );
+  final host = request.host;
+  if (host != null) {
+    await rewrite(
+      'ios/Runner/Runner.entitlements',
+      (c) => rewriteEntitlements(c, host),
+      'associated domain',
+    );
+  }
+  await rewrite(
+    'lib/core/router/deep_link.dart',
+    (c) => rewriteDeepLinkConfig(c, request),
+    'deepLinkScheme, deepLinkHost',
   );
   await rewrite(
     'ios/Runner.xcodeproj/project.pbxproj',

@@ -19,7 +19,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 | status | owner | blocked by |
 |---|---|---|
 | DONE | worker-b | — |
-- Goal: typed config from `--dart-define-from-file` with startup validation and a clear error (D-006, D-018). Not wired into startup here (C-08).
+- Goal (historical: the dart-define loading and `env/*.example.json` were superseded by D-024 / C-37; current files are `env/*.env.example`): typed config from `--dart-define-from-file` with startup validation and a clear error (D-006, D-018). Not wired into startup here (C-08).
 - Files: `lib/core/config/app_config.dart`, `lib/core/config/flavor.dart`, `lib/core/config/config_exception.dart`, `env/dev.example.json`, `env/staging.example.json`, `env/prod.example.json`, `.gitignore` (add `env/*.json` and `!env/*.example.json`), `test/core/config/app_config_test.dart`
 - Done when:
   - `Flavor { dev, staging, prod }`; `AppConfig` has `flavor`, `appName`, `apiBaseUrl`, `connectTimeout`, `receiveTimeout`, `logLevel`, `enableCrashReporting`, `enableAnalytics`, optional `String? crashDsn`. No app-specific values.
@@ -277,7 +277,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-41 — Storage on hive_ce (remove shared_preferences and Drift)
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | Worker B | — |
 - Goal: D-034. One local store.
 - Files: `lib/core/storage/**` (`prefs_storage.dart` re-implemented on a Hive box with the SAME public API and typed keys minus the locale and digits fields; `database/` replaced by `cache_store.dart` over a Hive box with the same operations the C-16 helper uses: read, write(key, payload, savedAt, etag), delete, deleteSavedBefore, clear), `lib/core/storage/cache/**` (adapt the C-16 helper to `CacheStore`), `lib/core/storage/clear_user_data.dart`, `lib/core/bootstrap/bootstrap.dart` (Hive.initFlutter + open boxes before runApp), `pubspec.yaml`, `pubspec.lock` (add `hive_ce`, `hive_ce_flutter`; remove `shared_preferences`, `drift`, `drift_flutter`, `drift_dev`), `test/core/storage/**`, `test/helpers/fake_prefs_storage.dart`, `test/helpers/pump_app.dart` (drop shared_preferences mock), `test/core/bootstrap/bootstrap_test.dart`
 - Done when: no import of shared_preferences or drift remains (grep); boxes are opened once in bootstrap and exposed through keepAlive providers; tests use a temp-dir Hive (`Hive.init(tempDir)`), no platform channel; cache expiry/etag/user-scoping behave exactly as in C-16 tests; `clearUserData` wipes secure storage, cache box and user-scoped prefs; the old Drift generated files are deleted.
@@ -366,7 +366,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-21 — Remote config: force update, maintenance mode, feature flags (D-040)
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| DONE | Worker A | — |
 - Goal: checklist "remote config". The app can be forced to update or put in maintenance from the server, and feature flags can be read anywhere.
 - Files: `lib/core/remote_config/**` (`remote_config.dart` freezed model: `minVersion`, `latestVersion`, `storeUrl`, `maintenance` {enabled, message?}, `flags` map; `remote_config_source.dart` Dio; `remote_config_repository.dart` with ONE fetch method through the cache-first helper if C-44 is merged, otherwise through the existing cache helper with a TODO-free seam; `remote_config_provider.dart` keepAlive; `app_gate.dart` pure function: version compare → `AppGateStatus {ok, updateAvailable, updateRequired, maintenance}`; `feature_flags.dart` `flagProvider(name)`), `lib/core/config/app_config.dart` + `.env.example` files (`REMOTE_CONFIG_PATH`, optional), `lib/core/router/guards/**` + `lib/core/router/app_router.dart` (route to the two gate pages when status is updateRequired/maintenance; pure redirect, tested), `lib/core/startup/**` (fetch with a short timeout, never block startup on failure: use cached or defaults), `lib/features/app_gate/presentation/pages/{force_update_page,maintenance_page}.dart` (one page per file, `static const routeName`, store button via `url_launcher`, retry button), `assets/translations/*.json` (+ generated, D-037), `test/core/remote_config/**`, `test/features/app_gate/**`, `test/goldens/app_gate/**`
 - Done when: version comparison is semver-correct (`1.10.0 > 1.9.0`, build numbers ignored); soft update shows a dismissible banner/dialog once per version (remembered in prefs); forced update and maintenance block navigation until resolved; failure to fetch keeps the app usable; mock/dev override via env; flags default to false and are typed; pages use design_system only, 8 states where applicable, ar/en, tablet.
@@ -390,12 +390,46 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 - Done when: lock screen overlays the app (not a route) and hides content in the app switcher; unavailable biometrics disable the toggle with an explanation; auth failures/cancel are typed results, never exceptions in the UI; the secure-screen channel has a no-op fallback on unsupported platforms and in tests; everything ar/en, tablet.
 - Tests: lock controller (timeout matrix with fake clock, enable/disable persistence), biometric result mapping, secure screen channel calls (mock channel), settings page + goldens.
 
+## C-30 — Crashlytics and Firebase Analytics, optional (D-042)
+| status | owner | blocked by |
+|---|---|---|
+| DONE | worker-x | — |
+- Goal: real crash reporting and analytics that cost nothing when Firebase is not configured.
+- Files: `lib/core/crash/**` (`firebase_crash_reporter.dart` implementing `CrashReporter`: fatal + non-fatal, user id, custom keys, breadcrumbs/log; collection flag), `lib/core/analytics/**` (`firebase_analytics_service.dart`: events, screen views, user id/properties, collection flag; a `RouteObserver`/go_router observer that logs screen views if not present), `lib/core/firebase/firebase_bootstrap.dart` (+ provider: `initFirebaseIfConfigured()` returns bool, never throws, logs once; used by crash, analytics and notifications so Firebase is initialized exactly once; adapt `lib/core/notifications` only if it also calls `Firebase.initializeApp`), `lib/core/bootstrap/bootstrap.dart` (tiny edit: choose implementations after Firebase init; C-41 also edits this file, keep the diff minimal), `lib/core/auth/**` (set/clear user id on sign-in/logout: one line each via the interfaces), `lib/core/config/**` (`CRASH_REPORTING` / `ANALYTICS` optional flags; defaults: on for prod, off for dev/staging), `android/build.gradle.kts`, `android/settings.gradle.kts`, `android/app/build.gradle.kts` (apply `com.google.gms.google-services` and `com.google.firebase.crashlytics` ONLY when `android/app/google-services.json` exists, so a clean clone builds), `ios/Runner.xcodeproj/project.pbxproj` + `ios/Podfile` only for the optional Crashlytics symbol-upload run script (guard: skip when `GoogleService-Info.plist` is missing), `.gitignore` check (google-services.json / GoogleService-Info.plist stay ignored), `pubspec.yaml` + `pubspec.lock` (`firebase_crashlytics`, `firebase_analytics`: latest stable, versions in the report), `ai-docs/FIREBASE.md` (new: what is optional, how an app adds its Firebase files with FlutterFire CLI or by hand, consent toggle, how to switch vendor/Sentry behind the interface, how to verify with a test crash), `test/core/crash/**`, `test/core/analytics/**`, `test/core/firebase/**`, `test/helpers/**` fakes
+- Done when: with NO Firebase config the app starts, logs "Firebase not configured: crash/analytics disabled" once, uses Noop services, and `flutter build apk --debug` + `flutter build ios --no-codesign --debug` succeed on a clean clone; with config present the real implementations are selected; global error handlers (Flutter, PlatformDispatcher, zone) route fatal/non-fatal through `CrashReporter`; no PII beyond the opaque user id; consent switch persists; no `firebase_*` import outside `core/crash`, `core/analytics`, `core/firebase`, `core/notifications`, `core/auth`.
+- Tests: bootstrap selection (configured vs not), each interface method forwards to a fake backend, error handler routing, consent flag, observer logs screen views.
+
+## C-31 — Icons, native splash, deep-link setup (D-043: no native flavors)
+| status | owner | blocked by |
+|---|---|---|
+| DONE | Worker S7 (worker-y) | — |
+- Goal: the last native polish a template needs, all generic and replaceable.
+- Files: `assets/images/app_icon.png` + `app_icon_foreground.png` (generic neutral placeholder icon generated by a script or drawn programmatically, 1024px, no brand), `flutter_launcher_icons` config block in `pubspec.yaml` (adaptive icon, iOS) and generated native icon files, native splash (decide: `flutter_native_splash` dev-dependency, MIT, config in pubspec, generic color/logo from `brand_config` seed; versions in the report; record a DECISION D-044 in the report body for the Lead) and generated native files, Android `AndroidManifest.xml` + iOS `Info.plist` / `Runner.entitlements` deep-link setup: `flutter_deeplinking_enabled`, https intent filter + custom scheme for a placeholder host read from one documented place (placeholder `example.com`, never a real domain; document `assetlinks.json` and `apple-app-site-association` steps), `lib/core/router/**` only to expose the deep-link tests (`routeForDeepLink` from C-20 must resolve app links to typed routes; add missing mappings for existing routes), `tool/lib/rename_app_logic.dart` + `test/tool/rename_app_test.dart` (rename must also update the deep-link host/scheme placeholder and keep icons working), `ai-docs/DEEP_LINKS.md` (new), `ai-docs/HOW_TO_START_A_NEW_APP.md` (steps: icon, splash, deep links, and "how to add native flavors" section for D-043), `test/core/router/**`
+- Done when: `dart run flutter_launcher_icons` and the splash command are documented, committed output builds on both platforms (`flutter build apk --debug`, `flutter build ios --no-codesign --debug`); deep link `https://example.com/videos/abc` and `riverpod_core://videos/abc` map to the video detail route in tests; plain `flutter run` still needs no `--flavor`.
+- Tests: deep-link mapping table, rename script covers the new placeholders.
+
+## C-47 — Notification channels localized after translations are loaded (bug from the owner's first device run)
+| status | owner | blocked by |
+|---|---|---|
+| DONE | — | — |
+- Bug: on `flutter run` the log shows `Localization key [notifications.groupUpdates] not found` (and every `notifications.channel*` key). Cause: `bootstrap.dart` calls `notificationServiceProvider.initialize()` BEFORE `EasyLocalization` has loaded the translations, so `.tr()` returns the raw key; Android channels/groups would be created with key strings as their visible names.
+- Files: `lib/core/notifications/**` (channel/group registration), `lib/core/app/app.dart` or `lib/core/startup/**` (one hook that runs after the first frame, when `context.locale`/translations are ready, and again on locale change), `lib/core/bootstrap/bootstrap.dart` ONLY to remove/defer the early localized call if needed (tiny diff; C-41 and C-30 also edit it), `test/core/notifications/**`
+- Done when: no `Localization key ... not found` warning at startup (verify with a widget test that pumps the app with real translations and a log/`EasyLocalization.logger` check, or a fake translator that fails on empty), channels and groups are created/updated once translations are loaded and re-registered with the new names when the user switches language (same channel ids; Android allows renaming by re-creating), initialization stays non-blocking, tap/permission behaviour unchanged.
+- Tests: channel registration runs after translations (fake translator records order), locale switch re-registers with the translated names, startup without translations loaded does not register with raw keys.
+
+## C-48 — Verify merged main, de-flake timing tests, refresh Podfile.lock
+| status | owner | blocked by |
+|---|---|---|
+| DONE | Worker S10 (worker-v2) | — |
+- Goal: full gate + both debug builds on merged main; make `transfer_controller_test` cancel test deterministic; commit the plugin-only `ios/Podfile.lock` refresh.
+- Files: `test/core/network/transfer/transfer_controller_test.dart`, `ios/Podfile.lock`, `ai-docs/reports/C-48.md`, `ai-docs/TASKS.md`.
+- Report: `ai-docs/reports/C-48.md`.
+
 ---
 
 ## Backlog (full tasks written when dependencies near DONE)
-C-31 Native flavors (Android flavors / iOS schemes) + launcher icons + native splash ·
 C-46 Wire `permissionRationalePresenterProvider` (override with `showPermissionRationale`) in the ProviderScope of bootstrap — after C-41 (same file) ·
-C-26 Integration tests (auth flow + one feature flow) · C-29 README + HOW_TO_START_A_NEW_APP · C-30 Crash/analytics vendor.
+C-26 Integration tests (auth flow + one feature flow) · C-29 README + HOW_TO_START_A_NEW_APP.
 
 ## C-44 — Cache-first policy, retention and pruning (D-038)
 | status | owner | blocked by |

@@ -72,13 +72,14 @@ void main() {
   });
 
   test('entries survive closing and reopening the box', () async {
-    final first = await openTestStorage();
+    final path = await testStoragePath();
+    final first = await openTestStorage(path: path);
     await CacheStore(
       first.cache,
     ).write(key: 'k', payload: '[9]', savedAt: saved, etag: 'e1');
     await Hive.close();
 
-    final reopened = await openTestStorage(path: first.path);
+    final reopened = await openTestStorage(path: path);
     final entry = CacheStore(reopened.cache).read('k');
     expect(entry!.payload, '[9]');
     expect(entry.etag, 'e1');

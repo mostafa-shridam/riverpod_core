@@ -10,6 +10,7 @@ import 'package:riverpod_core/core/auth/session_epoch.dart';
 import 'package:riverpod_core/core/config/app_config.dart';
 import 'package:riverpod_core/core/config/flavor.dart';
 import 'package:riverpod_core/core/config/log_level.dart';
+import 'package:riverpod_core/core/crash/crash_reporter.dart';
 import 'package:riverpod_core/core/errors/app_exception.dart';
 import 'package:riverpod_core/core/network/dio_client.dart';
 import 'package:riverpod_core/core/network/session_events.dart';
@@ -20,6 +21,7 @@ import 'package:riverpod_core/core/storage/prefs_storage.dart';
 import 'package:riverpod_core/core/storage/secure_storage.dart';
 import 'package:riverpod_core/shared/models/auth_user.dart';
 
+import '../../helpers/fake_crash_reporter.dart';
 import '../../helpers/helpers.dart';
 
 const _tokens = AuthTokens(accessToken: 'access-1', refreshToken: 'refresh-1');
@@ -31,6 +33,15 @@ class _RecordingAnalytics implements AnalyticsService {
 
   @override
   Future<void> logEvent(String name, {Map<String, Object?>? params}) async {}
+
+  @override
+  Future<void> logScreenView(String name) async {}
+
+  @override
+  Future<void> setUserProperty(String name, String? value) async {}
+
+  @override
+  Future<void> setCollectionEnabled({required bool enabled}) async {}
 
   @override
   Future<void> setUserId(String? userId) async =>
@@ -75,6 +86,7 @@ class _Harness {
 Future<_Harness> _harness({
   Map<String, String> secure = const {},
   Future<void> Function()? notificationLogout,
+  FakeCrashReporter? crash,
 }) async {
   final storage = await openTestStorage();
   await storage.settings.putAll({PrefKeys.themeMode: 'dark'});
@@ -90,6 +102,7 @@ Future<_Harness> _harness({
       prefsStorageProvider.overrideWith((ref) => Future.value(prefs)),
       cacheStoreProvider.overrideWithValue(cache),
       analyticsServiceProvider.overrideWithValue(analytics),
+      if (crash != null) crashReporterProvider.overrideWithValue(crash),
       httpClientAdapterProvider.overrideWithValue(adapter),
       // Real notification plugins are never touched in these tests.
       notificationLogoutProvider.overrideWith(
@@ -158,6 +171,26 @@ void main() {
       expect(h.secure.values[SecureKeys.accessToken], 'access-1');
       expect(h.secure.values[SecureKeys.refreshToken], 'refresh-1');
       expect(h.secure.values['auth.user'], isNotNull);
+    });
+
+    test('tags analytics and crash reports with the opaque user id', () async {
+      final crash = FakeCrashReporter();
+      final h = await _harness(crash: crash);
+
+      await h.session.signIn(tokens: _tokens, user: _user);
+
+      expect(h.analytics.calls, ['setUserId:u1']);
+      expect(crash.userIds, ['u1']);
+    });
+
+    test('logout clears the crash reporter user', () async {
+      final crash = FakeCrashReporter();
+      final h = await _harness(crash: crash);
+      await h.session.signIn(tokens: _tokens, user: _user);
+
+      await h.session.logout();
+
+      expect(crash.userIds, ['u1', null]);
     });
   });
 
@@ -253,7 +286,7 @@ void main() {
 
       await h.session.logout();
 
-      expect(h.analytics.calls, ['setUserId:null', 'reset']);
+      expect(h.analytics.calls, ['setUserId:u1', 'setUserId:null', 'reset']);
       expect(h.container.read(sessionEpochProvider), epochBefore + 1);
     });
 

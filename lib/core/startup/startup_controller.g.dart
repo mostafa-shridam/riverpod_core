@@ -58,11 +58,61 @@ final class SplashMinimumDisplayProvider
 String _$splashMinimumDisplayHash() =>
     r'3e54fa8b6c4fca254bef2462f279cf74e3e48d21';
 
+/// How long startup waits for the remote config. Past it, the app starts with
+/// the cached copy or the defaults.
+
+@ProviderFor(splashRemoteConfigTimeout)
+final splashRemoteConfigTimeoutProvider = SplashRemoteConfigTimeoutProvider._();
+
+/// How long startup waits for the remote config. Past it, the app starts with
+/// the cached copy or the defaults.
+
+final class SplashRemoteConfigTimeoutProvider
+    extends $FunctionalProvider<Duration, Duration, Duration>
+    with $Provider<Duration> {
+  /// How long startup waits for the remote config. Past it, the app starts with
+  /// the cached copy or the defaults.
+  SplashRemoteConfigTimeoutProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'splashRemoteConfigTimeoutProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$splashRemoteConfigTimeoutHash();
+
+  @$internal
+  @override
+  $ProviderElement<Duration> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  Duration create(Ref ref) {
+    return splashRemoteConfigTimeout(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Duration value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<Duration>(value),
+    );
+  }
+}
+
+String _$splashRemoteConfigTimeoutHash() =>
+    r'078db055fa554db62f9a3c6844a8e746b2735acb';
+
 /// The startup sequence. Config is already validated in bootstrap. Mandatory
 /// steps: the session restore, then the settings read (it carries the
 /// onboarding-seen flag). A failed step leaves the state in error, so the
 /// splash shows retry; retry is `ref.invalidate(startupControllerProvider)`.
-/// Remote flags join this sequence later.
+/// The remote config is optional: it never blocks or fails startup.
 
 @ProviderFor(StartupController)
 final startupControllerProvider = StartupControllerProvider._();
@@ -71,14 +121,14 @@ final startupControllerProvider = StartupControllerProvider._();
 /// steps: the session restore, then the settings read (it carries the
 /// onboarding-seen flag). A failed step leaves the state in error, so the
 /// splash shows retry; retry is `ref.invalidate(startupControllerProvider)`.
-/// Remote flags join this sequence later.
+/// The remote config is optional: it never blocks or fails startup.
 final class StartupControllerProvider
     extends $AsyncNotifierProvider<StartupController, void> {
   /// The startup sequence. Config is already validated in bootstrap. Mandatory
   /// steps: the session restore, then the settings read (it carries the
   /// onboarding-seen flag). A failed step leaves the state in error, so the
   /// splash shows retry; retry is `ref.invalidate(startupControllerProvider)`.
-  /// Remote flags join this sequence later.
+  /// The remote config is optional: it never blocks or fails startup.
   StartupControllerProvider._()
     : super(
         from: null,
@@ -98,13 +148,13 @@ final class StartupControllerProvider
   StartupController create() => StartupController();
 }
 
-String _$startupControllerHash() => r'0452a6a6695a33d0da1b01c4dc55bd2c42ffb33a';
+String _$startupControllerHash() => r'1d1bf8dc9e9df8f50134925e4fee7d8751f7ddbc';
 
 /// The startup sequence. Config is already validated in bootstrap. Mandatory
 /// steps: the session restore, then the settings read (it carries the
 /// onboarding-seen flag). A failed step leaves the state in error, so the
 /// splash shows retry; retry is `ref.invalidate(startupControllerProvider)`.
-/// Remote flags join this sequence later.
+/// The remote config is optional: it never blocks or fails startup.
 
 abstract class _$StartupController extends $AsyncNotifier<void> {
   FutureOr<void> build();

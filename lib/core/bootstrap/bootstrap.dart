@@ -14,6 +14,7 @@ import 'package:riverpod_core/core/config/flavor.dart';
 import 'package:riverpod_core/core/config/log_level.dart';
 import 'package:riverpod_core/core/constants.dart';
 import 'package:riverpod_core/core/crash/crash_reporter.dart';
+import 'package:riverpod_core/core/firebase/observability_init.dart';
 import 'package:riverpod_core/core/logger/app_logger.dart';
 import 'package:riverpod_core/core/notifications/notification_service_provider.dart';
 import 'package:riverpod_core/core/storage/hive_boxes.dart';
@@ -81,6 +82,7 @@ Future<void> bootstrap(
           ],
         );
         logger = container.read(loggerProvider);
+        await initObservability(container);
         crashReporter = container.read(crashReporterProvider);
         installErrorHandlers(logger: logger, crashReporter: crashReporter);
 

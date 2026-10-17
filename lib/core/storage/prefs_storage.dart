@@ -11,6 +11,10 @@ abstract final class PrefKeys {
   static const themeMode = 'settings.themeMode';
   static const onboardingSeen = 'settings.onboardingSeen';
   static const appLock = 'settings.appLock';
+  static const collectionConsent = 'settings.collectionConsent';
+
+  /// Same slot the app gate's `DismissedUpdates` already reads and writes.
+  static const dismissedUpdateVersions = 'app.remoteConfig.dismissedUpdates';
 
   static const userPrefix = 'user.';
   static const notificationsEnabled = 'user.notificationsEnabled';
@@ -47,6 +51,20 @@ class PrefsStorage {
 
   Future<bool> setAppLockEnabled({required bool value}) =>
       setStringList(PrefKeys.appLock, value ? const ['1'] : const []);
+
+  /// The crash and analytics collection switch. Null until the user chooses, so
+  /// the caller applies its default. Device-level: it survives logout.
+  bool? get collectionConsent => _box.get(PrefKeys.collectionConsent) as bool?;
+
+  Future<bool> setCollectionConsent({required bool value}) =>
+      _put(PrefKeys.collectionConsent, value);
+
+  /// Versions whose soft update notice the user dismissed.
+  List<String> get dismissedUpdateVersions =>
+      getStringList(PrefKeys.dismissedUpdateVersions);
+
+  Future<bool> setDismissedUpdateVersions(List<String> value) =>
+      setStringList(PrefKeys.dismissedUpdateVersions, value);
 
   /// Notification channel ids the user turned off.
   List<String> get disabledNotificationChannels =>

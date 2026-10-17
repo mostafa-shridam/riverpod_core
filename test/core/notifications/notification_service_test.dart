@@ -96,15 +96,16 @@ void main() {
 
   group('initialize', () {
     test(
-      'sets up local and push, creates channels, reports availability',
+      'sets up local and push, defers channels, reports availability',
       () async {
         final h = await _Harness.create();
 
         await h.service.initialize();
 
         expect(h.local.timezoneName, 'Africa/Cairo');
-        expect(h.local.createChannelsCalls, greaterThan(0));
-        expect(h.local.channels, hasLength(4));
+        // C-47: channels are created later by NotificationLabelSync, once
+        // translations are loaded (initialize used to create them early).
+        expect(h.local.createChannelsCalls, 0);
         expect(h.push.initializeCalls, 1);
         expect(h.container.read(pushAvailableProvider), isTrue);
       },

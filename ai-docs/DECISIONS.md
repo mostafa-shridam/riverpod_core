@@ -22,7 +22,7 @@ at implementation time and record them in its report.
 - Why: works for every folder, including `.fttemplates`-generated features; zero custom config.
 - Rejected: keeping per-folder redirects (needs a build.yaml edit for each new feature).
 
-## D-004 — Local database: Drift
+## D-004 — Local database: Drift (superseded by D-034)
 - Context: checklist requires one local DB; current code uses Hive (`hive_flutter 1.1.0`, effectively unmaintained).
 - Decision: Drift (SQLite) for structured data and the HTTP/SWR cache; `shared_preferences` for settings; `flutter_secure_storage` for secrets. Hive is removed in C-06.
 - Why: actively maintained, typed queries, migrations, streams that fit Riverpod, works on all platforms.
@@ -34,7 +34,7 @@ at implementation time and record them in its report.
 - Why: routes must not diverge by device; deep links and notification taps need one source of truth.
 - Rejected: separate routers per device class.
 
-## D-006 — Flavors via `--dart-define-from-file`
+## D-006 — Flavors via `--dart-define-from-file` (superseded by D-024)
 - Decision: `env/dev.json`, `env/staging.json`, `env/prod.json` (git-ignored) with committed `env/*.example.json`; `AppConfig.fromEnvironment()` validates required keys at startup and shows/throws a clear error. Native flavor wiring (Android flavors / iOS schemes) is added by its own task.
 - Why: no extra package, works with `flutter run/build --dart-define-from-file=env/dev.json`.
 - Rejected: `flutter_flavorizr` (heavy, rewrites native files), `.env` asset (ships secrets in the bundle).
@@ -97,11 +97,11 @@ at implementation time and record them in its report.
 - Decision: not used. Our Riverpod rules are enforced by review + the checks in review-task. Revisit when versions align.
 - Rejected: pinning old versions of uuid/freezed just for the linter.
 
-## D-018 — Flavor entrypoints (adjusts D-006)
+## D-018 — Flavor entrypoints (adjusts D-006; superseded by D-024)
 - Decision: `lib/main_dev.dart`, `main_staging.dart`, `main_prod.dart` each call `bootstrap(Flavor.x)`. `AppConfig` is still loaded from `--dart-define-from-file=env/<flavor>.json`; the flavor passed by the entrypoint must match the file's `FLAVOR` value, otherwise startup fails with a clear error.
 - Why: IDE run configs and native flavors can target an entrypoint; mismatch protection avoids running prod config in a dev build.
 
-## D-019 — design_system/ replaces core/widgets and core/themes
+## D-019 — design_system/ replaces core/widgets and core/themes (location superseded by D-026)
 - Decision: tokens, theme, responsive helpers and all shared widgets move to `lib/design_system/` (C-05, C-09, C-10). `core/` has no UI.
 - Why: one obvious home for every UI primitive (hard rule 8).
 
@@ -121,7 +121,7 @@ at implementation time and record them in its report.
 - Why: every checklist item (FCM, permissions, biometrics, deep links, store releases) is mobile; fewer native folders to maintain.
 - Rejected: all six platforms.
 
-## D-023 — Strings in design_system widgets (avoids shared generated files)
+## D-023 — Strings in design_system widgets (avoids shared generated files) (superseded by D-037)
 - Context: C-09, C-32, C-33, C-34 all need a few localized labels (close, cancel, confirm, show password…) and would all edit `assets/translations/*.json` and the generated `lib/generated/*.g.dart`.
 - Decision: every widget family keeps its key constants in its own `*_strings.dart` (e.g. `overlays_strings.dart`: `const closeKey = 'ds_overlays.close';`) and resolves them with `.tr()`; widgets also accept an optional override parameter for each label. Each task adds its keys to BOTH `ar.json` and `en.json` under ONE distinct top-level object (`ds_buttons`, `ds_inputs`, `ds_selection`, `ds_overlays`, `ds_feedback`, `ds_display`, `ds_layout`) appended at the end of the file. These tasks do NOT regenerate or commit `lib/generated/*.g.dart`; the Lead regenerates them once after merging (conflicts in the JSON tails are trivially resolved by the Lead).
 - Why: no two in-progress tasks edit the same generated file; a merge conflict can only occur in the JSON tail.
@@ -215,3 +215,12 @@ at implementation time and record them in its report.
 ## D-041 — Packages for share, review, app info and biometrics; no root/jailbreak check
 - Decision: add `share_plus` (BSD-3), `in_app_review` (MIT), `package_info_plus` (BSD-3), `local_auth` (BSD-3), each behind one core service; latest stable versions resolved by the task and recorded in its report. Screenshot blocking is our own small MethodChannel (Android `FLAG_SECURE`; iOS cover view when the app resigns active), not a package. Root/jailbreak detection is NOT built: client-side checks are unreliable and give false confidence; apps needing it add a vetted attestation service through a new DECISION.
 - Why: each is the standard maintained plugin for a native capability; 30 lines of channel code beat a heavy dependency (rule 11).
+
+## D-042 — Crashlytics + Firebase Analytics, strictly optional; the template runs with ZERO project data (owner rules)
+- Owner rule: this repo is a TEMPLATE. It must behave like a real app but contain no project data: no Firebase files, no keys, no endpoints. Every service is ready; an app only drops in its own config. A fresh clone must build and run with `flutter run` after copying `env/*.env.example`.
+- Decision: crash reporting = Firebase Crashlytics (`firebase_crashlytics`, BSD-3), analytics = `firebase_analytics` (BSD-3), each behind the existing `CrashReporter` / `AnalyticsService` interfaces in `core/crash` and `core/analytics`. Firebase init is optional: `Firebase.initializeApp()` failure or missing config → the Noop implementations, one log line, app unaffected. Collection is OFF in debug/dev, ON in release, with a runtime consent switch. Native builds must not need `google-services.json`: the Google Services and Crashlytics Gradle plugins are applied only when the file exists; the iOS Crashlytics run-script phase skips when `GoogleService-Info.plist` is absent. `firebase_core` already present.
+- Why: owner chose Crashlytics (Firebase is already in the project for auth/push). Sentry stays a documented alternative behind the same interface.
+
+## D-043 — No native flavors by default; mobile only; QR scanner not included
+- Decision: no Android `productFlavors` / iOS schemes in the template, because they make plain `flutter run` fail without `--flavor`. Environments stay `Flavor.current` (debug=dev, release=prod) + `main_staging.dart` (D-024). `HOW_TO_START_A_NEW_APP.md` explains how an app adds native flavors if it needs different bundle ids per environment. Platforms are android + ios only (no web/desktop folders). QR scanning (`mobile_scanner`) is not included (optional, app-specific, heavy native dependency); apps add it through a DECISION.
+- Why: zero-friction start is the point of the template.

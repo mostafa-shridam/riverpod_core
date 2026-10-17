@@ -5,6 +5,7 @@ import 'package:riverpod_core/core/analytics/analytics_service.dart';
 import 'package:riverpod_core/core/auth/auth_endpoints.dart';
 import 'package:riverpod_core/core/auth/auth_tokens.dart';
 import 'package:riverpod_core/core/auth/session_epoch.dart';
+import 'package:riverpod_core/core/crash/crash_reporter.dart';
 import 'package:riverpod_core/core/errors/app_exception.dart';
 import 'package:riverpod_core/core/logger/app_logger.dart';
 import 'package:riverpod_core/core/network/dio_client.dart';
@@ -63,9 +64,9 @@ class SessionController extends _$SessionController
       state = SessionStatus.signedOut;
       return;
     }
-    ref
-        .read(sessionUserProvider.notifier)
-        .update(_decodeUser(await _secure.read(_userKey)));
+    final user = _decodeUser(await _secure.read(_userKey));
+    ref.read(sessionUserProvider.notifier).update(user);
+    if (user != null) await _tagUser(user.id);
     state = SessionStatus.signedIn;
   }
 
@@ -78,8 +79,15 @@ class SessionController extends _$SessionController
     await _secure.write(_userKey, jsonEncode(user.toJson()));
     ref.read(sessionEventsProvider).markSignedIn();
     ref.read(sessionUserProvider.notifier).update(user);
+    await _tagUser(user.id);
     state = SessionStatus.signedIn;
   }
+
+  /// Opaque user id only (no email, no name) for analytics and crash reports.
+  Future<void> _tagUser(String id) => _bestEffort(() async {
+    await ref.read(analyticsServiceProvider).setUserId(id);
+    await ref.read(crashReporterProvider).setUserId(id);
+  }, 'Could not tag the user for analytics/crash');
 
   /// Renews the access token with the stored refresh token. Called by the Dio
   /// refresh interceptor (single-flight).
@@ -124,6 +132,10 @@ class SessionController extends _$SessionController
     final analytics = ref.read(analyticsServiceProvider);
     await analytics.setUserId(null);
     await analytics.reset();
+    await _bestEffort(
+      () => ref.read(crashReporterProvider).setUserId(null),
+      'Could not clear the crash reporter user',
+    );
     ref.read(sessionEpochProvider.notifier).bump();
     ref.read(sessionUserProvider.notifier).update(null);
     state = SessionStatus.signedOut;

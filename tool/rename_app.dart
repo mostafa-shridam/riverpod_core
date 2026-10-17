@@ -13,6 +13,8 @@ Options:
   --name <text>     display name, e.g. "My App" (required)
   --id <id>         reverse-DNS application id, e.g. com.company.myapp (required)
   --package <name> Dart package name, snake_case (default: derived from --name)
+  --host <domain>   host of the https app links, e.g. links.company.com
+                    (default: keep the placeholder example.com)
   --dry-run         print the changes without writing anything
   --help            show this text
 ''';
