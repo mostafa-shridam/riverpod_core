@@ -29,9 +29,9 @@ void main() {
       await capture.shot(name);
     }
 
+    // The splash is not captured: startApp already runs past it, and the
+    // native launch screen is only the placeholder icon.
     await startApp(tester);
-    await tester.pump(const Duration(milliseconds: 200));
-    await shot('splash');
 
     await pumpUntilFound(tester, find.text(LocaleKeys.onboarding_next.tr()));
     await shot('onboarding');
