@@ -1,4 +1,4 @@
-# NOTIFICATIONS (C-20)
+# NOTIFICATIONS
 
 Push (FCM) and local notifications, one system, no singletons, no Firestore. Code: `lib/core/notifications/`, `lib/core/device/`.
 
@@ -70,7 +70,7 @@ iOS categories/actions: `NotificationCategories.message` (inline reply + mark as
 ## Permission
 `service.ensurePermission(context)` (through the shared `PermissionService`): granted/provisional returns; denied shows the rationale first when Android advises it, then the system prompt (Android 13 `POST_NOTIFICATIONS`; iOS alert + badge + sound); permanently denied shows the rationale with "open settings". `service.requestProvisionalPermission()` (iOS quiet delivery, no prompt, needs push). OS state for the UI: `notificationPermissionStateProvider` (invalidate it when the app resumes from settings). `service.openSystemSettings()` opens the app's settings page.
 
-Rationale UI: the flow takes a `NotificationRationalePresenter` from `notificationRationalePresenterProvider` (null = no explanation step). The shared design-system dialog is keyed by `AppPermission`, which has no `notifications` value yet (see the C-20 report follow-ups).
+Rationale UI: the flow takes a `NotificationRationalePresenter` from `notificationRationalePresenterProvider` (null = no explanation step). The shared design-system dialog is keyed by `AppPermission`, which has no `notifications` value yet (D-039).
 
 ## User settings
 `notificationSettingsControllerProvider` (`NotificationSettings`): master switch = `PrefsStorage.notificationsEnabled`; per-channel switches = the list of disabled channel ids at `user.notifications.disabledChannels` (user-scoped: logout clears them). `service.setEnabled(enabled:, context:)` and `service.setChannelEnabled(id, enabled:)` persist and apply: master off cancels scheduled notifications, unregisters the token from your backend and stops iOS foreground presentation; master on (with a context) asks for the permission first and stays off if declined.
@@ -95,10 +95,10 @@ Topics: `service.push.subscribeToTopic('news')` / `unsubscribeFromTopic`. Topic 
 Firebase (once per app; the template builds without it):
 1. Create the Firebase project; add the Android app (package name = `applicationId`) and the iOS app (bundle id).
 2. Download `google-services.json` to `android/app/` and `GoogleService-Info.plist` to `ios/Runner/` (add it to the Runner target in Xcode). Both are git-ignored: NEVER commit them. Keep `*.example` files only.
-3. Android: the Google Services Gradle plugin must be applied (`com.google.gms.google-services`) once the json exists; DONE by C-30: `android/app/build.gradle.kts` applies it automatically when the json exists (see FIREBASE.md).
+3. Android: the Google Services Gradle plugin must be applied (`com.google.gms.google-services`) once the json exists; `android/app/build.gradle.kts` applies it automatically when the json exists (see FIREBASE.md).
 4. iOS: Apple Developer, Keys, create an APNs Auth Key (`.p8`); in Firebase, Project settings, Cloud Messaging, upload the key with the Key ID and Team ID.
 5. iOS capabilities: Runner target, Signing & Capabilities: "Push Notifications" and "Background Modes" with "Remote notifications". The repo already has `Runner.entitlements` (`aps-environment` = `development`, referenced in the project) and `UIBackgroundModes` = `remote-notification`. For App Store/TestFlight builds the value must be `production` (Xcode switches it at archive time when the capability is enabled; verify).
-6. iOS: the Podfile needs the permission_handler macro `PERMISSION_NOTIFICATIONS=1` (C-43).
+6. iOS: the Podfile needs the permission_handler macro `PERMISSION_NOTIFICATIONS=1`.
 7. Run on a REAL iPhone: the simulator does not receive remote pushes reliably and has no APNs token.
 
 Already in the repo: Android manifest (`POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALARM`, boot/scheduled/action receivers, default channel id `general`, default icon `ic_notification`), `AppDelegate` sets the `UNUserNotificationCenter` delegate (foreground and taps of local notifications), core library desugaring (required by flutter_local_notifications).

@@ -15,7 +15,7 @@ All tokens are `ThemeExtension`s read via `context.tokens` (and `Theme.of(contex
 | Motion | `fast 150ms, normal 250ms, slow 400ms` + standard curves. |
 | Sizes | Component sizes: button height `sm 40, md 48, lg 56`; icons `18/20/24`; `minTouchTarget 48`; OTP box `48×56`; outline `1`, focused outline `2`, spinner stroke `2`. Search debounce `300ms` (in Motion). |
 
-The resolved light/dark color role table (seed `#4A6FA5`, success/warning/info accents) is in `ai-docs/reports/C-05.md`. Dark mode uses the dark tonal palette (surfaces `#111318` → `#32353A`), not an inverted light scheme.
+The resolved light/dark color role table (seed `#4A6FA5`, success/warning/info accents) is defined in `lib/core/design_system/tokens/` (seed `#4A6FA5` in `brand_config.dart`). Dark mode uses the dark tonal palette (surfaces `#111318` → `#32353A`), not an inverted light scheme.
 
 ## Modes
 Light, dark, system. Persisted in prefs, switchable at runtime. Every widget must be checked in both.
@@ -25,21 +25,21 @@ Light, dark, system. Persisted in prefs, switchable at runtime. Every widget mus
 Use layout builders/adaptive widgets — never fork a whole router per device. Content max width on large screens: 720 dp for forms/lists.
 
 ## Shared widgets catalog (`core/design_system/widgets/`)
-Folder rule: one folder per widget family, one file per widget (`app_button.dart`, not a mega-file), so anyone can find a widget by browsing. Each primitive has ONE implementation here. A feature that needs something missing asks the Lead for a task.
-| Folder | Widgets | Task |
-|---|---|---|
-| `buttons/` | `AppButton` (primary, secondary, tonal, outlined, text, destructive; sizes; loading; icons; full width), `AppIconButton`, `AppFab` | C-09 |
-| `inputs/` | `AppTextField`, `AppPasswordField`, `AppSearchField`, `AppOtpField`, `AppPhoneField` | C-09 |
-| `selection/` | `AppCheckbox`, `AppRadioGroup`, `AppSwitch`, `AppDropdown`, `AppSegmentedControl`, `AppSlider`, `AppDateField`, `AppTimeField`, `AppRating`, `AppChipGroup`, `AppFormField` | C-32 |
-| `bottom_sheets/` | `showAppBottomSheet` (+ `AppActionSheet`, `AppSelectionSheet`, `AppFormSheet`) | C-33 |
-| `dialogs/` | `showAppDialog` (+ `AppAlertDialog`, `AppConfirmDialog`, `AppInputDialog`, `AppLoadingDialog`/`AppLoadingOverlay`) | C-33 |
-| `feedback/snackbar/`, `feedback/progress/`, `feedback/banner/`, `feedback/tooltip/` | `showAppSnackbar`/`showAppToast`, `AppMessenger`; `AppProgressBar`, `AppProgressIndicator`; `AppBanner`; `AppTooltip` | C-33 |
-| `display/` | `AppCard`, `AppListTile`, `AppSectionHeader`, `AppDivider`, `AppAvatar`, `AppBadge`, `AppChip`, `AppImage`, `AppAccordion` | C-34 |
-| `layout/` | `AppScaffold`, `AppAppBar`, `AppTabBar`, `AppBottomNavBar`, `AppStepper` | C-34 |
-| `async/` | `AsyncValueView`, `EmptyState`, `ErrorState`, `Skeleton`, `OfflineBanner` | C-10 |
-| `lists/` | `PaginatedListView`, pagination footer | C-14 |
-| `media/` | `AppVideoPlayer` (+ controller, controls) | C-38 |
-The gallery page (`/showcase`, dev/staging only, C-35) shows every widget live in light/dark, ar/en and any text scale.
+Folder rule: one folder per widget family, one file per widget (`app_button.dart`, not a mega-file), so anyone can find a widget by browsing. Each primitive has ONE implementation here. A feature that needs something missing extends the shared primitive (ask the owner if unsure).
+| Folder | Widgets |
+|---|---|
+| `buttons/` | `AppButton` (primary, secondary, tonal, outlined, text, destructive; sizes; loading; icons; full width), `AppIconButton`, `AppFab` |
+| `inputs/` | `AppTextField`, `AppPasswordField`, `AppSearchField`, `AppOtpField`, `AppPhoneField` |
+| `selection/` | `AppCheckbox`, `AppRadioGroup`, `AppSwitch`, `AppDropdown`, `AppSegmentedControl`, `AppSlider`, `AppDateField`, `AppTimeField`, `AppRating`, `AppChipGroup`, `AppFormField` |
+| `bottom_sheets/` | `showAppBottomSheet` (+ `AppActionSheet`, `AppSelectionSheet`, `AppFormSheet`) |
+| `dialogs/` | `showAppDialog` (+ `AppAlertDialog`, `AppConfirmDialog`, `AppInputDialog`, `AppLoadingDialog`/`AppLoadingOverlay`) |
+| `feedback/snackbar/`, `feedback/progress/`, `feedback/banner/`, `feedback/tooltip/` | `showAppSnackbar`/`showAppToast`, `AppMessenger`; `AppProgressBar`, `AppProgressIndicator`; `AppBanner`; `AppTooltip` |
+| `display/` | `AppCard`, `AppListTile`, `AppSectionHeader`, `AppDivider`, `AppAvatar`, `AppBadge`, `AppChip`, `AppImage`, `AppAccordion` |
+| `layout/` | `AppScaffold`, `AppAppBar`, `AppTabBar`, `AppBottomNavBar`, `AppStepper` |
+| `async/` | `AsyncValueView`, `EmptyState`, `ErrorState`, `Skeleton`, `OfflineBanner` |
+| `lists/` | `PaginatedListView`, pagination footer |
+| `media/` | `AppVideoPlayer` (+ controller, controls) |
+The gallery page (`/showcase`, dev/staging only) shows every widget live in light/dark, ar/en and any text scale.
 
 ### Look and feel (why it looks like this)
 - Material 3 base, softened: radius `md 12` for controls, `lg 16` for cards, `xl 24` for sheets and dialogs; low elevation, surface-tint instead of heavy shadows.
@@ -50,7 +50,7 @@ The gallery page (`/showcase`, dev/staging only, C-35) shows every widget live i
 
 ## The 8 data states (every page that loads data)
 | State | Meaning | UI |
-|---|---|---|
+|---|---|
 | loading | first load, no data | skeleton matching final layout |
 | empty | success with zero items | `EmptyState` with message + optional action |
 | error | failed, no data | `ErrorState` with localized message + retry |

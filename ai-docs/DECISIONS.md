@@ -1,18 +1,17 @@
 # DECISIONS (append-only)
 
-Format: context · decision · why · alternatives rejected. Never edit an old entry; supersede it with a new one.
-Package versions below are "to verify": the implementing task must check pub.dev for the latest stable version and license
-at implementation time and record them in its report.
+Format: context · decision · why · alternatives rejected. Never change the meaning of an old entry; supersede it with a new one.
+A new package entry records the latest stable version and licence at the time it is added (exact versions live in `pubspec.lock` and the README packages table).
 
 ## D-001 — ai-docs and CLAUDE.md are the binding source of truth
-- Context: several AI sessions will work on the template in parallel.
-- Decision: CLAUDE.md + ai-docs/ define all rules; nothing outside may be invented; the Lead controls them.
+- Context: several AI sessions work on the template.
+- Decision: CLAUDE.md + ai-docs/ define all rules; nothing outside may be invented; the owner controls them.
 - Why: prevents drift and contradictory patterns between sessions.
 - Rejected: per-session conventions; rules scattered in code comments.
 
 ## D-002 — Codegen toolchain
 - Context: pubspec has `riverpod_annotation` and a generated `local_storage.g.dart`, but no `riverpod_generator`, `freezed`, `json_serializable`; `build_runner` cannot regenerate today.
-- Decision: add dev deps `riverpod_generator`, `freezed` (+ `freezed_annotation`), `json_serializable` (+ `json_annotation`), `custom_lint` + `riverpod_lint`. Versions: latest stable compatible with `flutter_riverpod ^3`, verified in C-01.
+- Decision: add dev deps `riverpod_generator`, `freezed` (+ `freezed_annotation`), `json_serializable` (+ `json_annotation`), `custom_lint` + `riverpod_lint`. Versions: latest stable compatible with `flutter_riverpod ^3`, verified when added.
 - Why: required by the Foundation checklist; lints enforce our Riverpod rules automatically.
 - Rejected: hand-written providers (legacy, error-prone); `built_value` (heavier); `dart_mappable` (smaller ecosystem).
 
@@ -24,7 +23,7 @@ at implementation time and record them in its report.
 
 ## D-004 — Local database: Drift (superseded by D-034)
 - Context: checklist requires one local DB; current code uses Hive (`hive_flutter 1.1.0`, effectively unmaintained).
-- Decision: Drift (SQLite) for structured data and the HTTP/SWR cache; `shared_preferences` for settings; `flutter_secure_storage` for secrets. Hive is removed in C-06.
+- Decision: Drift (SQLite) for structured data and the HTTP/SWR cache; `shared_preferences` for settings; `flutter_secure_storage` for secrets. Hive is removed.
 - Why: actively maintained, typed queries, migrations, streams that fit Riverpod, works on all platforms.
 - Rejected: Isar (maintenance uncertain), Hive (unmaintained, no migrations/relations), sqflite raw (no typing).
 
@@ -35,7 +34,7 @@ at implementation time and record them in its report.
 - Rejected: separate routers per device class.
 
 ## D-006 — Flavors via `--dart-define-from-file` (superseded by D-024)
-- Decision: `env/dev.json`, `env/staging.json`, `env/prod.json` (git-ignored) with committed `env/*.example.json`; `AppConfig.fromEnvironment()` validates required keys at startup and shows/throws a clear error. Native flavor wiring (Android flavors / iOS schemes) is added by its own task.
+- Decision: `env/dev.json`, `env/staging.json`, `env/prod.json` (git-ignored) with committed `env/*.example.json`; `AppConfig.fromEnvironment()` validates required keys at startup and shows/throws a clear error. Native flavor wiring is out of scope (see D-043).
 - Why: no extra package, works with `flutter run/build --dart-define-from-file=env/dev.json`.
 - Rejected: `flutter_flavorizr` (heavy, rewrites native files), `.env` asset (ships secrets in the bundle).
 
@@ -47,25 +46,25 @@ at implementation time and record them in its report.
 
 ## D-008 — Repositories throw `AppException`; no `ApiResult` wrapper
 - Context: current `ApiService` returns `ApiResult<T>` with `Exception` payloads and English hard-coded messages.
-- Decision: sealed `AppException` hierarchy thrown by repositories, held in `AsyncError` by notifiers; `ApiResult`, `ApiService`, `ErrorHandler`, `FailureMessages` are deleted by C-07 after migration.
+- Decision: sealed `AppException` hierarchy thrown by repositories, held in `AsyncError` by notifiers; `ApiResult`, `ApiService`, `ErrorHandler`, `FailureMessages` are deleted.
 - Why: matches `AsyncValue` idiom; one error type end-to-end; localized messages from keys.
 - Rejected: `Either`/`Result` types (extra dependency, double handling next to `AsyncValue`).
 
 ## D-009 — Template dependency hygiene
 - Context: pubspec contains app-specific or unused packages (`cloud_firestore`, `firebase_auth`, `google_sign_in`, `googleapis_auth`, `android_intent_plus`, `hive_flutter`), and `rename_app` sits in `dependencies`.
-- Decision: C-01 removes anything that is unused or app-specific (rule 10) and moves `rename_app` to `dev_dependencies`. Firebase Core + Messaging stay (notifications are in the checklist). Social sign-in is an optional recipe, not core.
+- Decision: remove anything that is unused or app-specific (rule 10) and moves `rename_app` to `dev_dependencies`. Firebase Core + Messaging stay (notifications are in the checklist). Social sign-in is an optional recipe, not core.
 - Why: a template must not force Firestore/Google sign-in onto every app; fewer dependencies = faster builds, fewer upgrades.
 - Rejected: keeping them "in case".
 
 ## D-010 — Repository singletons → providers
 - Context: `LocalStorage.instance`, `NetworkService.instance`, `Routes.instance`, `LocalNotificationsService.instance`, etc. hold state globally.
-- Decision: new and migrated code wraps services in Riverpod providers (ARCHITECTURE.md "Forbidden"). Existing singletons are migrated by the task that owns their area (storage C-06, connectivity C-10, router C-11, notifications later).
+- Decision: new and migrated code wraps services in Riverpod providers (ARCHITECTURE.md "Forbidden"). Existing singletons are migrated when their area is touched.
 - Why: testability and overrides; no hidden global state.
-- Rejected: big-bang refactor in one task.
+- Rejected: big-bang refactor in one change.
 
 ## D-011 — Decision authority (owner standing instruction, 2026-10-16)
 - Context: the owner does not want to approve every technical choice.
-- Decision: the Lead decides all technical choices (packages, patterns, structure, versions) and records them here. The owner is asked only about taste/product (brand, names), paid services and accounts. The owner has granted the Lead and its agents full tool permissions in this repo.
+- Decision: technical choices (packages, patterns, structure, versions) are decided and recorded here. The owner is asked only about taste/product (brand, names), paid services and accounts.
 - Why: speed; the decision log keeps everything reviewable and reversible.
 - Rejected: asking before each decision.
 
@@ -74,12 +73,12 @@ at implementation time and record them in its report.
 - Why: owner's apps use login; unused ones add build weight.
 
 ## D-013 — Latest stable packages
-- Decision: upgrade every dependency to the latest stable version that resolves together (`flutter pub upgrade --major-versions`), fixing resulting breakage inside C-01. Exact versions are recorded in README.md (packages table) from pubspec.lock.
+- Decision: upgrade every dependency to the latest stable version that resolves together (`flutter pub upgrade --major-versions`), fixing resulting breakage. Exact versions are recorded in README.md (packages table) from pubspec.lock.
 - Why: owner request; a template should start current.
 
 ## D-014 — Work mode without workers
-- Decision: with no worker sessions open, the Lead implements tasks directly on `main`, one task per commit `C-xx: …` by explicit path, running the full gate before each commit.
-- Why: owner asked for all tasks to be executed; worktree/branch rules (RULES.md) apply when workers exist.
+- Decision: superseded by D-044 (no worker/task workflow remains; changes go through small branches, see `CLAUDE.md`).
+- Why: the project-management process was retired.
 
 ## D-015 — Target architecture: no domain layer (supersedes the layered tree first written in ARCHITECTURE.md)
 - Context: owner specified the final architecture (see ARCHITECTURE.md). First draft had domain/entities/abstract repositories.
@@ -88,13 +87,13 @@ at implementation time and record them in its report.
 - Rejected: Clean Architecture with domain layer.
 
 ## D-016 — Typed routes with go_router_builder (supersedes routing details of D-005)
-- Decision: add dev dependency `go_router_builder` (BSD-3, latest stable resolved in C-11); all route paths in `lib/core/router/routes.dart`; `appRouterProvider` in `app_router.dart`; guards in `app/router/guards/`. Single router, responsive pages.
+- Decision: add dev dependency `go_router_builder` (BSD-3, latest stable at the time); all route paths in `lib/core/router/routes.dart`; `appRouterProvider` in `app_router.dart`; guards in `app/router/guards/`. Single router, responsive pages.
 - Why: compile-time-safe navigation; deep links and notification taps resolve through the same routes.
 - Rejected: string paths scattered in widgets; `auto_route` (second routing ecosystem).
 
 ## D-017 — No riverpod_lint / custom_lint
-- Context: tried in C-01; `riverpod_lint`/`custom_lint` cannot resolve with the current riverpod 3 / freezed 4 / uuid 4 stack.
-- Decision: not used. Our Riverpod rules are enforced by review + the checks in review-task. Revisit when versions align.
+- Context: tried once; `riverpod_lint`/`custom_lint` cannot resolve with the current riverpod 3 / freezed 4 / uuid 4 stack.
+- Decision: not used. Our Riverpod rules are enforced by review (`.claude/skills/review-task/SKILL.md`). Revisit when versions align.
 - Rejected: pinning old versions of uuid/freezed just for the linter.
 
 ## D-018 — Flavor entrypoints (adjusts D-006; superseded by D-024)
@@ -102,34 +101,34 @@ at implementation time and record them in its report.
 - Why: IDE run configs and native flavors can target an entrypoint; mismatch protection avoids running prod config in a dev build.
 
 ## D-019 — design_system/ replaces core/widgets and core/themes (location superseded by D-026)
-- Decision: tokens, theme, responsive helpers and all shared widgets move to `lib/design_system/` (C-05, C-09, C-10). `core/` has no UI.
+- Decision: tokens, theme, responsive helpers and all shared widgets move to `lib/design_system/` (later moved, see D-026). `core/` has no UI.
 - Why: one obvious home for every UI primitive (hard rule 8).
 
 ## D-020 — Broad widget library + live showcase page
 - Context: owner wants a rich set of custom widgets covering what apps typically need, good-looking by default, and one page to try them all quickly.
-- Decision: the design_system catalog is expanded and split into disjoint folders/tasks (C-09, C-32, C-33, C-34, C-10); `lib/features/showcase/` hosts the gallery (C-35), registered only in dev/staging. A barrel `design_system/widgets/widgets.dart` is owned by C-35 only (tasks never edit the barrel; they import by file path).
-- Why: parallelizable without file conflicts; features get one import and one look.
-- Rejected: one giant widgets task; third-party UI kits (inconsistent look, lock-in).
+- Decision: the design_system catalog is expanded and split into disjoint folders; `lib/features/showcase/` hosts the gallery, registered only in dev/staging. A barrel `design_system/widgets/widgets.dart` exists for the showcase only (widgets import each other by file path).
+- Why: features get one import and one look.
+- Rejected: one giant monolithic widget file; third-party UI kits (inconsistent look, lock-in).
 
 ## D-021 — cached_network_image for AppImage
-- Decision: add `cached_network_image` (MIT; latest stable resolved in C-34) behind `AppImage`; features never use it directly.
+- Decision: add `cached_network_image` (MIT; latest stable at the time) behind `AppImage`; features never use it directly.
 - Why: disk + memory cache, placeholders, error handling; writing our own disk cache is far more than 30 lines.
 - Rejected: `Image.network` (no disk cache), own implementation.
 
 ## D-022 — Platforms: Android and iOS only
-- Decision: the template is a mobile app: `android/` and `ios/` are tracked (ios generated with `flutter create --platforms=ios`, org `com.example`, renamed by `tool/rename_app` / C-13). Web, macOS, Windows, Linux are not part of the template.
+- Decision: the template is a mobile app: `android/` and `ios/` are tracked (ios generated with `flutter create --platforms=ios`, org `com.example`, renamed by `tool/rename_app`). Web, macOS, Windows, Linux are not part of the template.
 - Why: every checklist item (FCM, permissions, biometrics, deep links, store releases) is mobile; fewer native folders to maintain.
 - Rejected: all six platforms.
 
 ## D-023 — Strings in design_system widgets (avoids shared generated files) (superseded by D-037)
-- Context: C-09, C-32, C-33, C-34 all need a few localized labels (close, cancel, confirm, show password…) and would all edit `assets/translations/*.json` and the generated `lib/generated/*.g.dart`.
-- Decision: every widget family keeps its key constants in its own `*_strings.dart` (e.g. `overlays_strings.dart`: `const closeKey = 'ds_overlays.close';`) and resolves them with `.tr()`; widgets also accept an optional override parameter for each label. Each task adds its keys to BOTH `ar.json` and `en.json` under ONE distinct top-level object (`ds_buttons`, `ds_inputs`, `ds_selection`, `ds_overlays`, `ds_feedback`, `ds_display`, `ds_layout`) appended at the end of the file. These tasks do NOT regenerate or commit `lib/generated/*.g.dart`; the Lead regenerates them once after merging (conflicts in the JSON tails are trivially resolved by the Lead).
-- Why: no two in-progress tasks edit the same generated file; a merge conflict can only occur in the JSON tail.
-- Rejected: one central strings task blocking all widgets.
+- Context: several widget families need a few localized labels (close, cancel, confirm, show password…) and would all edit `assets/translations/*.json` and the generated `lib/generated/*.g.dart`.
+- Decision: every widget family keeps its key constants in its own `*_strings.dart` (e.g. `overlays_strings.dart`: `const closeKey = 'ds_overlays.close';`) and resolves them with `.tr()`; widgets also accept an optional override parameter for each label. Each family adds its keys to BOTH `ar.json` and `en.json` under ONE distinct top-level object (`ds_buttons`, `ds_inputs`, `ds_selection`, `ds_overlays`, `ds_feedback`, `ds_display`, `ds_layout`) appended at the end of the file. Generated files are regenerated once after merging.
+- Why: no two branches edit the same generated file; a merge conflict can only occur in the JSON tail.
+- Rejected: one central strings change blocking all widgets.
 
 ## D-024 — dotenv config and automatic debug/release flavor (supersedes D-006 and D-018)
 - Context: owner finds `--dart-define-from-file` + three entrypoints too heavy; wants plain `flutter run` and a clear debug/release split.
-- Decision: use `flutter_dotenv` (MIT; latest stable resolved in C-37). Files `env/dev.env`, `env/staging.env`, `env/prod.env` are real (git-ignored, bundled as assets) and `env/*.env.example` are committed; first setup step is copying the examples. The flavor is chosen in code in ONE place (`Flavor.current`): `kReleaseMode ? Flavor.prod : Flavor.dev`. Staging is the only explicit case: `lib/main_staging.dart` calls `bootstrap(Flavor.staging)`. `lib/main.dart` calls `bootstrap(Flavor.current)`. `bootstrap` loads `env/<flavor>.env` via dotenv and passes the map to `AppConfig.fromMap` (validation unchanged). The `FLAVOR` key disappears from env files; `AppConfig.ensureFlavor` is removed. Only `core/config` may touch `dotenv`/`fromEnvironment`.
+- Decision: use `flutter_dotenv` (MIT; latest stable at the time). Files `env/dev.env`, `env/staging.env`, `env/prod.env` are real (git-ignored, bundled as assets) and `env/*.env.example` are committed; first setup step is copying the examples. The flavor is chosen in code in ONE place (`Flavor.current`): `kReleaseMode ? Flavor.prod : Flavor.dev`. Staging is the only explicit case: `lib/main_staging.dart` calls `bootstrap(Flavor.staging)`. `lib/main.dart` calls `bootstrap(Flavor.current)`. `bootstrap` loads `env/<flavor>.env` via dotenv and passes the map to `AppConfig.fromMap` (validation unchanged). The `FLAVOR` key disappears from env files; `AppConfig.ensureFlavor` is removed. Only `core/config` may touch `dotenv`/`fromEnvironment`.
 - Why: simplest developer experience; debug builds can never accidentally use prod config and release builds can never use dev config.
 - Trade-off recorded: dotenv values are bundled in the app, so they must never be real secrets (a client app cannot keep secrets anyway: API keys that must stay private belong on the server). Real secrets are still never committed (hard rule 5: real env files are git-ignored).
 - Rejected: keeping dart-define (friction); committing real env files (rule 5).
@@ -144,12 +143,12 @@ at implementation time and record them in its report.
 - Rejected: top-level `lib/design_system/`.
 
 ## D-027 — video_player for AppVideoPlayer
-- Decision (owner request: a video controller playing a video): add `video_player` (official flutter.dev plugin, BSD-3; latest stable resolved in C-38) behind `AppVideoPlayer` in `core/design_system/widgets/media/`. Features never use `video_player` directly. Custom controls (not Chewie): play/pause, seek bar, elapsed/total time, mute, speed, fullscreen toggle, buffering/error states, auto-hide.
+- Decision (owner request: a video controller playing a video): add `video_player` (official flutter.dev plugin, BSD-3; latest stable at the time) behind `AppVideoPlayer` in `core/design_system/widgets/media/`. Features never use `video_player` directly. Custom controls (not Chewie): play/pause, seek bar, elapsed/total time, mute, speed, fullscreen toggle, buffering/error states, auto-hide.
 - Why: official, maintained, covers Android/iOS; controls are ~300 lines of our own and match the design system.
 - Rejected: `chewie` (extra dependency with its own look), `better_player` (unmaintained).
 
 ## D-028 — Reference (demo) features
-- Decision: two generic demo features ship with the template and double as the source for the `.fttemplates/feature` scaffold (C-25): `features/showcase` (C-35, the component gallery) and `features/videos` (C-39, a complete feature: model, mock remote source, repository, providers, list page + player page, all 8 data states, tests). Both are registered only in dev/staging flavors, contain no app-specific names, and can be deleted without touching anything else (nothing imports them).
+- Decision: two generic demo features ship with the template and double as the source for the `.fttemplates/feature` scaffold (`tool/new_feature.dart`): `features/showcase` (the component gallery) and `features/videos` (a complete feature: model, mock remote source, repository, providers, list page + player page, all 8 data states, tests). Both are registered only in dev/staging flavors, contain no app-specific names, and can be deleted without touching anything else (nothing imports them).
 - Why: a complete working example is the best documentation of ARCHITECTURE.md; the mock source lets every data state be demonstrated without a backend.
 - Rejected: documentation-only examples (drift from code).
 
@@ -160,52 +159,51 @@ at implementation time and record them in its report.
 - Rejected: embedding YouTube via WebView in the core player.
 
 ## D-030 — Digit policy
-- Decision: numbers, dates and percentages use Latin digits and ASCII separators in both languages by default (`AppFormatters` normalises intl output). A persisted flag `useArabicIndicDigits` switches Arabic-locale output to Arabic-Indic digits and never affects English (C-40 adds the pref and wiring).
+- Decision: numbers, dates and percentages use Latin digits and ASCII separators in both languages by default (`AppFormatters` normalises intl output). A persisted flag `useArabicIndicDigits` switches Arabic-locale output to Arabic-Indic digits and never affects English (with the preference and wiring in `PrefsStorage`).
 - Why: consistent prices, IDs and phone numbers; apps that want Arabic-Indic digits opt in.
 - Rejected: always Arabic-Indic.
 
 ## D-031 — core/design_system may import core/connectivity and core/errors
 - Decision: `AsyncValueView`/`OfflineBanner` read `connectivityProvider`; error widgets read `AppException`. So `core/design_system` may import `core/connectivity`, `core/errors`, `core/utils` (supersedes the narrower rule in ARCHITECTURE.md). `copyWithPrevious` is internal in riverpod 3.4.x: STATE_AND_DATA.md examples use `AsyncLoading<T>().copyWithPrevious(state)` only through the helper in `core/utils` created when first needed, or the notifier keeps `state` and flags `isRefreshing` itself.
-- Why: the task requires them; keeps the data-state logic in one widget.
+- Why: the widgets need them; keeps the data-state logic in one widget.
 
 ## D-032 — No silent provider retries
 - Decision: the root container disables Riverpod's automatic retry of failing provider builds (`retry: (_, _) => null`). Network retries are done only by the Dio retry interceptor (idempotent requests, backoff); user-visible retry is an explicit action (ErrorState retry button / `ref.invalidate`).
 - Why: double retry layers hide errors, delay error states and repeat non-idempotent work.
 
 ## D-033 — image_cropper and file_picker
-- Decision: add `image_cropper` (BSD-3, active, native UCrop/TOCropViewController, themed from the design system) and `file_picker` (MIT) behind `MediaService` (C-23); features never import them. Latest stable versions resolved and recorded in the C-23 report. `image_picker`, `flutter_image_compress`, `permission_handler` are already dependencies. QR scanning (`mobile_scanner`) stays optional/backlog.
+- Decision: add `image_cropper` (BSD-3, active, native UCrop/TOCropViewController, themed from the design system) and `file_picker` (MIT) behind `MediaService`; features never import them. Latest stable versions are recorded in `pubspec.lock`. `image_picker`, `flutter_image_compress`, `permission_handler` are already dependencies. QR scanning (`mobile_scanner`) stays optional/backlog.
 - Why: crop and file picking are checklist items and need native UIs; each is a small, standard plugin.
 - Rejected: `crop_your_image` (pure Dart, heavy on the UI thread), own file picking.
 
 ## D-034 — hive_ce is the only local store (owner instruction; supersedes D-004)
-- Decision: `hive_ce` + `hive_ce_flutter` (maintained community fork of Hive; permissive licence, BSD-3 / Apache-2.0 as shipped in its LICENSE file; latest stable resolved in C-41) replaces BOTH `shared_preferences` and Drift: settings (theme, locale-independent flags, onboarding), the stale-while-revalidate cache and any structured offline data live in Hive boxes. `flutter_secure_storage` stays for tokens/secrets only. `shared_preferences`, `drift`, `drift_flutter`, `drift_dev` are removed from pubspec. The locale is NOT stored by us: `easy_localization` already persists and switches it.
+- Decision: `hive_ce` + `hive_ce_flutter` (maintained community fork of Hive; permissive licence, BSD-3 / Apache-2.0 as shipped in its LICENSE file; latest stable at the time) replaces BOTH `shared_preferences` and Drift: settings (theme, locale-independent flags, onboarding), the stale-while-revalidate cache and any structured offline data live in Hive boxes. `flutter_secure_storage` stays for tokens/secrets only. `shared_preferences`, `drift`, `drift_flutter`, `drift_dev` are removed from pubspec. The locale is NOT stored by us: `easy_localization` already persists and switches it.
 - Why: owner wants one simple store already familiar to the team; no SQL layer or codegen for a key-value/cache workload.
 - Trade-offs recorded: no relational queries or migrations framework (acceptable for settings and cache; revisit with a new DECISION if an app needs SQL).
 - Rejected: keeping Drift for the cache (second store), shared_preferences (second store).
 
-## D-035 — Localization is easy_localization only (supersedes the C-12 locale controller and D-030 persistence)
-- Context: C-12 added `lib/l10n/` with a `LocaleController` and prefs persistence that duplicated easy_localization (which already persists with `saveLocale: true`, switches with `context.setLocale` and supports plurals). Owner objected.
+## D-035 — Localization is easy_localization only (supersedes an earlier locale controller and the D-030 persistence)
+- Context: an earlier change added `lib/l10n/` with a `LocaleController` and prefs persistence that duplicated easy_localization (which already persists with `saveLocale: true`, switches with `context.setLocale` and supports plurals). Owner objected.
 - Decision: no `lib/l10n/` folder and no locale controller. Locale = `context.locale` / `context.setLocale` from easy_localization. Only pure formatting helpers remain, in `lib/core/utils/formatting/` (`AppFormatters` via `context.formatters`, `pluralText`, `relativeTime`); their translation keys live under the top-level `common` object. The digit flag stays a constructor parameter (Latin digits by default, D-030) with no persistence.
 - Why: one localization mechanism; less code.
 
-## D-036 — Everything under core; pages own their routeName (owner instructions; supersedes the app/ folder of D-015 and AppPaths of C-11)
+## D-036 — Everything under core; pages own their routeName (owner instructions; supersedes the app/ folder of D-015 and the former `AppPaths` class)
 - Decision: there is no `lib/app/` folder. App wiring lives in `lib/core/`: `core/bootstrap/`, `core/app/`, `core/router/` (appRouterProvider, typed routes, guards, shell), `core/startup/` (splash). `lib/` root only has `main.dart`, `main_staging.dart`, `features/` and generated folders. Every page file contains ONE page and declares `static const routeName = '/page-name'`; no `AppPaths` class. Pages live in their feature (`features/<f>/presentation/pages/`), never grouped in a shared file.
 - Why: owner wants one `core` root and the page, its route and its file together.
 
 ## D-037 — Translations: ONLY generated LocaleKeys (owner rule; supersedes the per-family string-constant files of D-023)
-- Decision: user text is always `LocaleKeys.some_key.tr()` (or `.plural`) from `lib/generated/locale_keys.g.dart`. Never `'a.b'.tr()` with a string literal and never hand-written key-constant files (`*_strings.dart`). Agents add keys to BOTH JSON files, run the two easy_localization generation commands from `build.sh`, `dart format lib/generated`, and COMMIT the regenerated files with their task. When several branches touch `lib/generated/*.g.dart`, the Lead resolves the conflict by regenerating after the merge. A guard test (`test/translations/no_literal_keys_test.dart`, C-42) fails when `.tr()` is called on a string literal anywhere under `lib/`.
+- Decision: user text is always `LocaleKeys.some_key.tr()` (or `.plural`) from `lib/generated/locale_keys.g.dart`. Never `'a.b'.tr()` with a string literal and never hand-written key-constant files (`*_strings.dart`). Agents add keys to BOTH JSON files, run the two easy_localization generation commands from `build.sh`, `dart format lib/generated`, and COMMIT the regenerated files with their change. When several branches touch `lib/generated/*.g.dart`, resolve the conflict by regenerating after the merge. A guard test (`test/translations/no_literal_keys_test.dart`) fails when `.tr()` is called on a string literal anywhere under `lib/`.
 - Why: compile-time-checked keys, rename-safe, one mechanism.
-- Existing violations (the `*_strings.dart` files of the design-system widgets, `'app_nav.continue'.tr()`) are migrated by C-42.
 
 ## D-038 — Cache-first for every read feature, with retention (owner rule)
 - Decision: every feature that reads data is cache-first through the ONE helper in `core/storage/cache/` (Hive box, D-034): (1) emit the cached value immediately (if any), flagged `stale` when older than the entry `ttl`; (2) revalidate in the background (conditional request with `etag`/`If-None-Match` when the API supports it); (3) if the server data is unchanged (304 or identical payload hash) keep serving the cache and do NOT re-emit or rewrite the value; if it changed, write the cache and emit the fresh value; (4) on failure keep serving the cache (`stale`/`offline` state), show an error only when there is no cache. Writes (create/update/delete) update or invalidate the affected cache keys. User-scoped keys include the user id; logout clears the box.
 - Retention (performance): each entry stores `savedAt`, `lastAccessedAt`, `ttl` (freshness) and `maxAge` (eviction age, days). The cache is pruned (a) at startup, off the critical path, (b) when the app resumes after more than 24h, (c) when the box exceeds a configurable entry/size cap (least recently accessed first). Defaults live in one `CachePolicy` (per-data-type presets: `short` minutes, `medium` hours, `long` days, `static` weeks) so an app tunes them in one place; features pick a preset and never hand-roll expiry.
 - Why: instant screens, offline resilience, fewer requests, and a bounded cache so big apps do not slow down or fill the disk.
-- Applies to: C-39 videos (reference feature), C-17 auth profile data, every future feature scaffolded by C-25. Implementation task: C-44.
+- Applies to: the videos reference feature, auth profile data, and every feature scaffolded by `tool/new_feature.dart`.
 
-## D-039 — Notifications: accepted deviations of C-20
-- Decision: (1) `firebase_push_backend.dart` may keep the deprecated `getToken`/`onTokenRefresh`/`deleteToken` of firebase_messaging 17, because the replacement `register()` returns an installation id, not the FCM token servers need; revisit when Firebase offers a token-returning replacement. (2) Channel switches stay stored as the string list `user.notifications.disabledChannels`. (3) The notification permission flow uses its own presenter provider for now; unifying it with `PermissionService` (adding `AppPermission.notifications` + the shared rationale dialog) is a follow-up inside C-42. (4) The auth feature (C-17) must call and await `notificationLogoutProvider` before `clearUserData`.
-- Why: documented limits of the platform API and files outside the task list.
+## D-039 — Notifications: accepted deviations
+- Decision: (1) `firebase_push_backend.dart` may keep the deprecated `getToken`/`onTokenRefresh`/`deleteToken` of firebase_messaging 17, because the replacement `register()` returns an installation id, not the FCM token servers need; revisit when Firebase offers a token-returning replacement. (2) Channel switches stay stored as the string list `user.notifications.disabledChannels`. (3) The notification permission flow uses its own presenter provider for now; unifying it with `PermissionService` (adding `AppPermission.notifications` + the shared rationale dialog) is a possible follow-up. (4) The auth feature must call and await `notificationLogoutProvider` before `clearUserData`.
+- Why: documented limits of the platform API.
 
 ## D-040 — Remote config is our own endpoint, not firebase_remote_config
 - Decision: force update / maintenance / feature flags come from ONE JSON endpoint (`AppConfig.remoteConfigPath`, default `/app/config`) read through Dio with the cache-first helper (D-038, `static` preset fallback so the app still starts offline). No `firebase_remote_config` package.
@@ -213,7 +211,7 @@ at implementation time and record them in its report.
 - Rejected: firebase_remote_config (ties every app to Firebase and fetch throttling).
 
 ## D-041 — Packages for share, review, app info and biometrics; no root/jailbreak check
-- Decision: add `share_plus` (BSD-3), `in_app_review` (MIT), `package_info_plus` (BSD-3), `local_auth` (BSD-3), each behind one core service; latest stable versions resolved by the task and recorded in its report. Screenshot blocking is our own small MethodChannel (Android `FLAG_SECURE`; iOS cover view when the app resigns active), not a package. Root/jailbreak detection is NOT built: client-side checks are unreliable and give false confidence; apps needing it add a vetted attestation service through a new DECISION.
+- Decision: add `share_plus` (BSD-3), `in_app_review` (MIT), `package_info_plus` (BSD-3), `local_auth` (BSD-3), each behind one core service; latest stable versions are recorded in `pubspec.lock`. Screenshot blocking is our own small MethodChannel (Android `FLAG_SECURE`; iOS cover view when the app resigns active), not a package. Root/jailbreak detection is NOT built: client-side checks are unreliable and give false confidence; apps needing it add a vetted attestation service through a new DECISION.
 - Why: each is the standard maintained plugin for a native capability; 30 lines of channel code beat a heavy dependency (rule 11).
 
 ## D-042 — Crashlytics + Firebase Analytics, strictly optional; the template runs with ZERO project data (owner rules)
@@ -222,5 +220,11 @@ at implementation time and record them in its report.
 - Why: owner chose Crashlytics (Firebase is already in the project for auth/push). Sentry stays a documented alternative behind the same interface.
 
 ## D-043 — No native flavors by default; mobile only; QR scanner not included
-- Decision: no Android `productFlavors` / iOS schemes in the template, because they make plain `flutter run` fail without `--flavor`. Environments stay `Flavor.current` (debug=dev, release=prod) + `main_staging.dart` (D-024). `HOW_TO_START_A_NEW_APP.md` explains how an app adds native flavors if it needs different bundle ids per environment. Platforms are android + ios only (no web/desktop folders). QR scanning (`mobile_scanner`) is not included (optional, app-specific, heavy native dependency); apps add it through a DECISION.
+- Decision: no Android `productFlavors` / iOS schemes in the template, because they make plain `flutter run` fail without `--flavor`. Environments stay `Flavor.current` (debug=dev, release=prod) + `main_staging.dart` (D-024). The root `README.md` ("Start a new app from this template") explains how an app adds native flavors if it needs different bundle ids per environment. Platforms are android + ios only (no web/desktop folders). QR scanning (`mobile_scanner`) is not included (optional, app-specific, heavy native dependency); apps add it through a DECISION.
 - Why: zero-friction start is the point of the template.
+
+## D-044 — Retire the project-management process; keep only binding docs (owner instruction)
+- Context: the template is complete. The task list, per-task reports, completeness checklist, Lead/worker/worktree workflow and the new-app guide were project management, not rules.
+- Decision: `ai-docs/` keeps only architecture, rules, conventions, design system, networking, state/data, testing, notifications, Firebase, deep links and this log. The new-app steps live in the root `README.md` ("Start a new app from this template"). Changes are made on a small branch off `main`, run the gate from `CLAUDE.md`, and update the doc that owns the rule when behaviour changes. Questions go to the owner. This supersedes D-014 and the Lead/worker parts of D-001 and D-011.
+- Why: an AI or engineer should read only what it must follow; history lives in version control.
+- Rejected: keeping the task list and reports as an archive (they drift and cite files that no longer exist).
