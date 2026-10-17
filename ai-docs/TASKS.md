@@ -277,7 +277,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-41 — Storage on hive_ce (remove shared_preferences and Drift)
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | — |
+| REVIEW | Worker B | — |
 - Goal: D-034. One local store.
 - Files: `lib/core/storage/**` (`prefs_storage.dart` re-implemented on a Hive box with the SAME public API and typed keys minus the locale and digits fields; `database/` replaced by `cache_store.dart` over a Hive box with the same operations the C-16 helper uses: read, write(key, payload, savedAt, etag), delete, deleteSavedBefore, clear), `lib/core/storage/cache/**` (adapt the C-16 helper to `CacheStore`), `lib/core/storage/clear_user_data.dart`, `lib/core/bootstrap/bootstrap.dart` (Hive.initFlutter + open boxes before runApp), `pubspec.yaml`, `pubspec.lock` (add `hive_ce`, `hive_ce_flutter`; remove `shared_preferences`, `drift`, `drift_flutter`, `drift_dev`), `test/core/storage/**`, `test/helpers/fake_prefs_storage.dart`, `test/helpers/pump_app.dart` (drop shared_preferences mock), `test/core/bootstrap/bootstrap_test.dart`
 - Done when: no import of shared_preferences or drift remains (grep); boxes are opened once in bootstrap and exposed through keepAlive providers; tests use a temp-dir Hive (`Hive.init(tempDir)`), no platform channel; cache expiry/etag/user-scoping behave exactly as in C-16 tests; `clearUserData` wipes secure storage, cache box and user-scoped prefs; the old Drift generated files are deleted.

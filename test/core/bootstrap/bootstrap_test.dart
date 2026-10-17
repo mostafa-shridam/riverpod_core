@@ -9,13 +9,15 @@ import 'package:riverpod_core/core/bootstrap/bootstrap.dart';
 import 'package:riverpod_core/core/config/app_config.dart';
 import 'package:riverpod_core/core/config/flavor.dart';
 import 'package:riverpod_core/core/crash/crash_reporter.dart';
+import 'package:riverpod_core/core/storage/cache/cache_store.dart';
+import 'package:riverpod_core/core/storage/hive_boxes.dart';
+import 'package:riverpod_core/core/storage/prefs_storage.dart';
 import 'package:riverpod_core/core/utils/formatting/app_formatters.dart';
 import 'package:riverpod_core/core/utils/formatting/localized_text.dart';
 import 'package:riverpod_core/generated/locale_keys.g.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../helpers/fake_crash_reporter.dart';
-import '../../helpers/pump_app.dart';
+import '../../helpers/helpers.dart';
 
 const _validEnv = '''
 APP_NAME=Test
@@ -31,7 +33,6 @@ void main() {
   late bool Function(Object, StackTrace)? savedPlatformHandler;
 
   setUp(() {
-    SharedPreferences.setMockInitialValues({});
     savedFlutterHandler = FlutterError.onError;
     savedPlatformHandler = PlatformDispatcher.instance.onError;
   });
@@ -49,12 +50,15 @@ void main() {
     List<String>? readPaths,
   }) async {
     Widget? app;
+    final storage = await openTestStorage();
     await bootstrap(
       flavor,
       envReader: (path) async {
         readPaths?.add(path);
         return env;
       },
+      openStorage: () async =>
+          storageOverrides(settings: storage.settings, cache: storage.cache),
       runner: (widget) {
         app = widget;
         onRun?.call(widget);
@@ -88,6 +92,7 @@ void main() {
       Flavor.dev,
       envReader: (_) async => throw StateError('no file'),
       runner: (w) => app = w,
+      openStorage: () async => throw StateError('storage must not open'),
       initNotifications: () async {},
     );
     expect(app, isA<ConfigErrorApp>());
@@ -151,6 +156,29 @@ void main() {
       expect(localization.fallbackLocale, const Locale('en'));
     },
   );
+
+  test('the stores are exposed through providers after bootstrap', () async {
+    final app = await run(flavor: Flavor.dev);
+    final container = (app! as UncontrolledProviderScope).container;
+
+    expect(
+      await container.read(prefsStorageProvider.future),
+      isA<PrefsStorage>(),
+    );
+    expect(container.read(cacheStoreProvider), isA<CacheStore>());
+  });
+
+  test('a storage failure stops the app before it runs', () async {
+    Widget? app;
+    await bootstrap(
+      Flavor.dev,
+      envReader: (_) async => _validEnv,
+      runner: (w) => app = w,
+      openStorage: () async => throw StateError('hive could not open'),
+      initNotifications: () async {},
+    );
+    expect(app, isNull);
+  });
 
   test('a failing provider build is not retried (D-032)', () async {
     var builds = 0;

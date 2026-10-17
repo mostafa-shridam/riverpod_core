@@ -11,8 +11,8 @@ import 'package:riverpod_core/core/remote_config/remote_config.dart';
 import 'package:riverpod_core/core/remote_config/remote_config_provider.dart';
 import 'package:riverpod_core/core/remote_config/remote_config_source.dart';
 import 'package:riverpod_core/core/startup/startup_controller.dart';
+import 'package:riverpod_core/core/storage/cache/cache_store.dart';
 import 'package:riverpod_core/core/storage/cache/cached_repository_helper.dart';
-import 'package:riverpod_core/core/storage/database/app_database.dart';
 import 'package:riverpod_core/core/storage/prefs_storage.dart';
 import 'package:riverpod_core/core/storage/secure_storage.dart';
 
@@ -47,22 +47,22 @@ Future<ProviderContainer> _container({
   RemoteConfigSource? remote,
   Duration remoteTimeout = const Duration(seconds: 3),
 }) async {
-  final prefs = await fakePrefsStorage();
-  final database = AppDatabase.inMemory();
+  final storage = await openTestStorage();
+  final prefs = PrefsStorage(storage.settings);
+  final cache = CacheStore(storage.cache);
   final container = createContainer(
     overrides: [
       appConfigProvider.overrideWithValue(_appConfig),
       secureStorageProvider.overrideWithValue(secure ?? FakeSecureStorage()),
       prefsStorageProvider.overrideWith((ref) => Future.value(prefs)),
       splashMinimumDisplayProvider.overrideWithValue(minimum),
-      appDatabaseProvider.overrideWithValue(database),
+      cacheStoreProvider.overrideWithValue(cache),
       remoteConfigSourceProvider.overrideWithValue(
         remote ?? const MockRemoteConfigSource(),
       ),
       splashRemoteConfigTimeoutProvider.overrideWithValue(remoteTimeout),
     ],
   );
-  addTearDown(database.close);
   return container;
 }
 

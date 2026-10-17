@@ -14,11 +14,13 @@ import 'package:riverpod_core/core/crash/firebase_crash_reporter.dart';
 import 'package:riverpod_core/core/firebase/collection_consent.dart';
 import 'package:riverpod_core/core/firebase/firebase_bootstrap.dart';
 import 'package:riverpod_core/core/logger/app_logger.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:riverpod_core/core/storage/hive_boxes.dart';
+import 'package:riverpod_core/core/storage/prefs_storage.dart';
 
 import '../../helpers/create_container.dart';
 import '../../helpers/fake_analytics.dart';
 import '../../helpers/fake_crash_reporter.dart';
+import '../../helpers/fake_prefs_storage.dart';
 
 const _env = '''
 APP_NAME=Test
@@ -38,11 +40,12 @@ AppLogger _recordingLogger(List<String> messages) => AppLogger(
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  late TestStorage storage;
   late FlutterExceptionHandler? savedFlutterHandler;
   late bool Function(Object, StackTrace)? savedPlatformHandler;
 
-  setUp(() {
-    SharedPreferences.setMockInitialValues({});
+  setUp(() async {
+    storage = await openTestStorage();
     savedFlutterHandler = FlutterError.onError;
     savedPlatformHandler = PlatformDispatcher.instance.onError;
   });
@@ -93,6 +96,8 @@ void main() {
         Flavor.prod,
         envReader: (_) async => _env,
         runner: (widget) => app = widget,
+        openStorage: () async =>
+            storageOverrides(settings: storage.settings, cache: storage.cache),
         overrides: [
           firebaseInitializerProvider.overrideWithValue(initializer),
           crashBackendProvider.overrideWithValue(crash ?? FakeCrashBackend()),
@@ -145,7 +150,7 @@ void main() {
     });
 
     test('saved consent is applied to both vendors at startup', () async {
-      SharedPreferences.setMockInitialValues({collectionConsentKey: false});
+      await storage.settings.put(PrefKeys.collectionConsent, false);
       final crash = FakeCrashBackend();
       final analytics = FakeAnalyticsBackend();
       await run(initializer: () async {}, crash: crash, analytics: analytics);
@@ -158,10 +163,12 @@ void main() {
     test('defaults to on, applies it, and persists a change', () async {
       final crash = FakeCrashReporter();
       final analytics = FakeAnalytics();
+      final prefs = PrefsStorage(storage.settings);
       final container = createContainer(
         overrides: [
           crashReporterProvider.overrideWithValue(crash),
           analyticsServiceProvider.overrideWithValue(analytics),
+          prefsStorageProvider.overrideWith((ref) => Future.value(prefs)),
         ],
       );
       expect(await container.read(collectionConsentProvider.future), isTrue);
@@ -173,16 +180,16 @@ void main() {
       expect(container.read(collectionConsentProvider).value, isFalse);
       expect(crash.collection, [true, false]);
       expect(analytics.collection, [true, false]);
-      expect(
-        (await SharedPreferences.getInstance()).getBool(collectionConsentKey),
-        isFalse,
-      );
+      expect(storage.settings.get(PrefKeys.collectionConsent), isFalse);
 
       // A new app start reads the saved choice.
       final next = createContainer(
         overrides: [
           crashReporterProvider.overrideWithValue(crash),
           analyticsServiceProvider.overrideWithValue(analytics),
+          prefsStorageProvider.overrideWith(
+            (ref) => Future.value(PrefsStorage(storage.settings)),
+          ),
         ],
       );
       expect(await next.read(collectionConsentProvider.future), isFalse);

@@ -5,7 +5,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod_core/core/design_system/theme/app_theme.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Reads the real translation files from disk, so widget tests resolve the
 /// same ar/en strings as the app without the asset bundle. Reads
@@ -42,7 +41,6 @@ Future<void> pumpDs(
   bool disableAnimations = true,
   bool scaffold = true,
 }) async {
-  SharedPreferences.setMockInitialValues({});
   await EasyLocalization.ensureInitialized();
   EasyLocalization.logger.enableBuildModes = [];
   tester.view.devicePixelRatio = 1;

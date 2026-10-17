@@ -1,7 +1,9 @@
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive_ce/hive_ce.dart';
 import 'package:riverpod_core/core/device/device_info_provider.dart';
 import 'package:riverpod_core/core/storage/prefs_storage.dart';
 
@@ -58,8 +60,12 @@ void main() {
     final a = await _containerFor(
       await fakePrefsStorage(),
     ).read(deviceInfoProvider.future);
+    // A second install has its own store; fakePrefsStorage would share the first.
+    final second = PrefsStorage(
+      await Hive.openBox<dynamic>('second_install', bytes: Uint8List(0)),
+    );
     final b = await _containerFor(
-      await fakePrefsStorage(),
+      second,
       seed: 2,
     ).read(deviceInfoProvider.future);
 

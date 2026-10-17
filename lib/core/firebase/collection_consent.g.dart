@@ -10,19 +10,22 @@ part of 'collection_consent.dart';
 // ignore_for_file: type=lint, type=warning
 /// The runtime consent switch for crash and analytics collection. The
 /// per-flavor `ENABLE_*` flags still decide whether a vendor runs at all; an
-/// app shows a switch bound to [setEnabled].
+/// app shows a switch bound to [setEnabled]. The choice is device-level, so it
+/// survives logout (see [PrefsStorage.collectionConsent]).
 
 @ProviderFor(CollectionConsent)
 final collectionConsentProvider = CollectionConsentProvider._();
 
 /// The runtime consent switch for crash and analytics collection. The
 /// per-flavor `ENABLE_*` flags still decide whether a vendor runs at all; an
-/// app shows a switch bound to [setEnabled].
+/// app shows a switch bound to [setEnabled]. The choice is device-level, so it
+/// survives logout (see [PrefsStorage.collectionConsent]).
 final class CollectionConsentProvider
     extends $AsyncNotifierProvider<CollectionConsent, bool> {
   /// The runtime consent switch for crash and analytics collection. The
   /// per-flavor `ENABLE_*` flags still decide whether a vendor runs at all; an
-  /// app shows a switch bound to [setEnabled].
+  /// app shows a switch bound to [setEnabled]. The choice is device-level, so it
+  /// survives logout (see [PrefsStorage.collectionConsent]).
   CollectionConsentProvider._()
     : super(
         from: null,
@@ -42,11 +45,12 @@ final class CollectionConsentProvider
   CollectionConsent create() => CollectionConsent();
 }
 
-String _$collectionConsentHash() => r'040d82b210512d1bf4b805f16cb9f4ca7fd92f19';
+String _$collectionConsentHash() => r'78354608a225f4aa9ddae38c5a861cd59fccb408';
 
 /// The runtime consent switch for crash and analytics collection. The
 /// per-flavor `ENABLE_*` flags still decide whether a vendor runs at all; an
-/// app shows a switch bound to [setEnabled].
+/// app shows a switch bound to [setEnabled]. The choice is device-level, so it
+/// survives logout (see [PrefsStorage.collectionConsent]).
 
 abstract class _$CollectionConsent extends $AsyncNotifier<bool> {
   FutureOr<bool> build();

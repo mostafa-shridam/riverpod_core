@@ -12,7 +12,7 @@ import 'package:riverpod_core/core/notifications/notification_label_sync.dart';
 import 'package:riverpod_core/core/notifications/notification_providers.dart';
 import 'package:riverpod_core/core/notifications/notification_service_provider.dart';
 import 'package:riverpod_core/core/permissions/permission_service.dart';
-import 'package:riverpod_core/core/storage/database/app_database.dart';
+import 'package:riverpod_core/core/storage/cache/cache_store.dart';
 import 'package:riverpod_core/core/storage/prefs_storage.dart';
 import 'package:riverpod_core/core/storage/secure_storage.dart';
 import 'package:riverpod_core/generated/locale_keys.g.dart';
@@ -58,11 +58,12 @@ Future<List<Override>> _overrides(
   _RecordingBackend local,
   List<String> unresolved,
 ) async {
-  final prefs = await fakePrefsStorage();
+  final storage = await openTestStorage();
+  final prefs = PrefsStorage(storage.settings);
   return [
     prefsStorageProvider.overrideWith((ref) => Future.value(prefs)),
     secureStorageProvider.overrideWithValue(FakeSecureStorage()),
-    appDatabaseProvider.overrideWithValue(AppDatabase.inMemory()),
+    cacheStoreProvider.overrideWithValue(CacheStore(storage.cache)),
     analyticsServiceProvider.overrideWithValue(const NoopAnalyticsService()),
     loggerProvider.overrideWithValue(recordingLogger(<String>[])),
     localNotificationBackendProvider.overrideWithValue(local),

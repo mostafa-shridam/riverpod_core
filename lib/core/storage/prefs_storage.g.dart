@@ -8,12 +8,14 @@ part of 'prefs_storage.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Settings store for the whole app. Awaits `SharedPreferences` once.
+/// Settings store for the whole app, on the box bootstrap opened. Async so
+/// callers keep the same `.future` and `.value` API as before the Hive port.
 
 @ProviderFor(prefsStorage)
 final prefsStorageProvider = PrefsStorageProvider._();
 
-/// Settings store for the whole app. Awaits `SharedPreferences` once.
+/// Settings store for the whole app, on the box bootstrap opened. Async so
+/// callers keep the same `.future` and `.value` API as before the Hive port.
 
 final class PrefsStorageProvider
     extends
@@ -23,7 +25,8 @@ final class PrefsStorageProvider
           FutureOr<PrefsStorage>
         >
     with $FutureModifier<PrefsStorage>, $FutureProvider<PrefsStorage> {
-  /// Settings store for the whole app. Awaits `SharedPreferences` once.
+  /// Settings store for the whole app, on the box bootstrap opened. Async so
+  /// callers keep the same `.future` and `.value` API as before the Hive port.
   PrefsStorageProvider._()
     : super(
         from: null,
@@ -50,4 +53,4 @@ final class PrefsStorageProvider
   }
 }
 
-String _$prefsStorageHash() => r'c345a51e4d6b85b2bd9f759559c0af6019708151';
+String _$prefsStorageHash() => r'e025b6589c4a1ee03dbf02c58a8f74ec41850892';

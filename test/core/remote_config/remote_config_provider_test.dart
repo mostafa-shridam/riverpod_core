@@ -9,8 +9,8 @@ import 'package:riverpod_core/core/remote_config/app_gate.dart';
 import 'package:riverpod_core/core/remote_config/remote_config.dart';
 import 'package:riverpod_core/core/remote_config/remote_config_provider.dart';
 import 'package:riverpod_core/core/remote_config/remote_config_source.dart';
+import 'package:riverpod_core/core/storage/cache/cache_store.dart';
 import 'package:riverpod_core/core/storage/cache/cached_repository_helper.dart';
-import 'package:riverpod_core/core/storage/database/app_database.dart';
 
 import '../../helpers/helpers.dart';
 
@@ -55,28 +55,27 @@ AppConfig _config({String? appVersion = '1.0.0'}) => AppConfig(
   appVersion: appVersion,
 );
 
-ProviderContainer _container({
+Future<ProviderContainer> _container({
   required RemoteConfigSource source,
   String? appVersion = '1.0.0',
   String installedVersion = '1.0.0',
-}) {
-  final database = AppDatabase.inMemory();
+}) async {
+  final cache = await fakeCacheStore();
   final container = createContainer(
     overrides: [
       appConfigProvider.overrideWithValue(_config(appVersion: appVersion)),
-      appDatabaseProvider.overrideWithValue(database),
+      cacheStoreProvider.overrideWithValue(cache),
       remoteConfigSourceProvider.overrideWithValue(source),
       appInfoSourceProvider.overrideWithValue(_InstalledInfo(installedVersion)),
     ],
   );
   container.listen(remoteConfigProvider, (_, _) {}, onError: (_, _) {});
-  addTearDown(database.close);
   return container;
 }
 
 void main() {
   test('a flag is false unless the server turns it on', () async {
-    final container = _container(
+    final container = await _container(
       source: _Source(
         value: const RemoteConfig(
           minVersion: '0.0.0',
@@ -93,7 +92,7 @@ void main() {
 
   test('without a config the defaults apply: no gate, no flags', () async {
     final source = _Source(error: const NetworkException());
-    final container = _container(source: source);
+    final container = await _container(source: source);
     await container
         .read(remoteConfigProvider.future)
         .then<void>((_) {}, onError: (_) {});
@@ -109,7 +108,7 @@ void main() {
   });
 
   test('without an override the installed version is compared', () async {
-    final container = _container(
+    final container = await _container(
       appVersion: null,
       installedVersion: '1.2.0',
       source: _Source(
@@ -130,11 +129,11 @@ void main() {
     final source = _Source(
       value: const RemoteConfig(minVersion: '1.0.0', latestVersion: '1.5.0'),
     );
-    final behind = _container(source: source, appVersion: '1.2.0');
+    final behind = await _container(source: source, appVersion: '1.2.0');
     await behind.read(remoteConfigProvider.future);
     expect(behind.read(appGateStatusProvider), AppGateStatus.updateAvailable);
 
-    final current = _container(source: source, appVersion: '1.5.0');
+    final current = await _container(source: source, appVersion: '1.5.0');
     await current.read(remoteConfigProvider.future);
     expect(current.read(appGateStatusProvider), AppGateStatus.ok);
   });

@@ -20,12 +20,11 @@ import 'package:riverpod_core/core/remote_config/remote_config_provider.dart';
 import 'package:riverpod_core/core/remote_config/remote_config_source.dart';
 import 'package:riverpod_core/core/router/app_router.dart';
 import 'package:riverpod_core/core/startup/startup_controller.dart';
-import 'package:riverpod_core/core/storage/database/app_database.dart';
+import 'package:riverpod_core/core/storage/cache/cache_store.dart';
 import 'package:riverpod_core/core/storage/prefs_storage.dart';
 import 'package:riverpod_core/core/storage/secure_storage.dart';
 import 'package:riverpod_core/generated/codegen_loader.g.dart';
 import 'package:riverpod_core/shared/models/auth_user.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../helpers/fake_analytics.dart';
 import '../../helpers/helpers.dart';
@@ -48,11 +47,16 @@ Future<ProviderContainer> _container(
   required bool onboardingSeen,
   List<Override> overrides = const [],
 }) async {
-  SharedPreferences.setMockInitialValues({});
   await EasyLocalization.ensureInitialized();
-  final prefs = await tester.runAsync(
-    () => fakePrefsStorage({if (onboardingSeen) PrefKeys.onboardingSeen: true}),
-  );
+  final storage = await tester.runAsync(() async {
+    final opened = await openTestStorage();
+    await opened.settings.putAll({
+      if (onboardingSeen) PrefKeys.onboardingSeen: true,
+    });
+    return opened;
+  });
+  final opened = storage!;
+  final prefs = PrefsStorage(opened.settings);
   final container = createContainer(
     overrides: [
       // The home page reads the flavor for the dev-only gallery entry.
@@ -67,7 +71,7 @@ Future<ProviderContainer> _container(
       prefsStorageProvider.overrideWith((ref) => Future.value(prefs)),
       secureStorageProvider.overrideWithValue(FakeSecureStorage()),
       splashMinimumDisplayProvider.overrideWithValue(Duration.zero),
-      appDatabaseProvider.overrideWithValue(AppDatabase.inMemory()),
+      cacheStoreProvider.overrideWithValue(CacheStore(opened.cache)),
       appInfoSourceProvider.overrideWithValue(const _FixedAppInfo()),
       remoteConfigSourceProvider.overrideWithValue(
         const MockRemoteConfigSource(),

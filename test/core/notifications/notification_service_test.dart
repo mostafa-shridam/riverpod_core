@@ -20,7 +20,7 @@ import 'package:riverpod_core/core/notifications/settings/notification_settings_
 import 'package:riverpod_core/core/permissions/app_permission.dart';
 import 'package:riverpod_core/core/permissions/permission_service.dart';
 import 'package:riverpod_core/core/router/routes.dart';
-import 'package:riverpod_core/core/storage/database/app_database.dart';
+import 'package:riverpod_core/core/storage/cache/cache_store.dart';
 import 'package:riverpod_core/core/storage/prefs_storage.dart';
 import 'package:riverpod_core/core/storage/secure_storage.dart';
 import 'package:riverpod_core/shared/models/auth_user.dart';
@@ -30,12 +30,12 @@ import '../../helpers/helpers.dart';
 
 /// A container wired with fakes for every notification backend.
 class _Harness {
-  _Harness._(this.prefs) {
+  _Harness._(this.prefs, this.cache) {
     container = createContainer(
       overrides: [
         prefsStorageProvider.overrideWith((ref) => Future.value(prefs)),
         secureStorageProvider.overrideWithValue(FakeSecureStorage()),
-        appDatabaseProvider.overrideWithValue(AppDatabase.inMemory()),
+        cacheStoreProvider.overrideWithValue(cache),
         analyticsServiceProvider.overrideWithValue(
           const NoopAnalyticsService(),
         ),
@@ -56,9 +56,17 @@ class _Harness {
 
   static Future<_Harness> create([
     Map<String, Object> initialPrefs = const {},
-  ]) async => _Harness._(await fakePrefsStorage(initialPrefs));
+  ]) async {
+    final storage = await openTestStorage();
+    await storage.settings.putAll(initialPrefs);
+    return _Harness._(
+      PrefsStorage(storage.settings),
+      CacheStore(storage.cache),
+    );
+  }
 
   final PrefsStorage prefs;
+  final CacheStore cache;
   late final ProviderContainer container;
   final local = FakeLocalNotificationBackend();
   final push = FakePushBackend();

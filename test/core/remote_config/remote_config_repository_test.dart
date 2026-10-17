@@ -3,8 +3,10 @@ import 'package:riverpod_core/core/errors/app_exception.dart';
 import 'package:riverpod_core/core/remote_config/remote_config.dart';
 import 'package:riverpod_core/core/remote_config/remote_config_repository.dart';
 import 'package:riverpod_core/core/remote_config/remote_config_source.dart';
+import 'package:riverpod_core/core/storage/cache/cache_store.dart';
 import 'package:riverpod_core/core/storage/cache/cached_repository_helper.dart';
-import 'package:riverpod_core/core/storage/database/app_database.dart';
+
+import '../../helpers/helpers.dart';
 
 /// Serves [value], or throws [error] when set; counts the calls.
 class _Source implements RemoteConfigSource {
@@ -26,17 +28,15 @@ const _old = RemoteConfig(minVersion: '1.0.0', latestVersion: '1.0.0');
 const _new = RemoteConfig(minVersion: '1.0.0', latestVersion: '1.5.0');
 
 void main() {
-  late AppDatabase database;
+  late CacheStore store;
   late DateTime now;
   late CachedRepositoryHelper helper;
 
-  setUp(() {
-    database = AppDatabase.inMemory();
+  setUp(() async {
+    store = await fakeCacheStore();
     now = DateTime.utc(2026, 1, 1, 12);
-    helper = CachedRepositoryHelper(database, clock: () => now);
+    helper = CachedRepositoryHelper(store, clock: () => now);
   });
-
-  tearDown(() => database.close());
 
   test('no cache: the fetched config is emitted once', () async {
     final source = _Source(value: _new);

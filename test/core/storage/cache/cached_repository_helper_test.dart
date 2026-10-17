@@ -4,8 +4,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod_core/core/errors/app_exception.dart';
 import 'package:riverpod_core/core/storage/cache/cache_policy.dart';
 import 'package:riverpod_core/core/storage/cache/cache_result.dart';
+import 'package:riverpod_core/core/storage/cache/cache_store.dart';
 import 'package:riverpod_core/core/storage/cache/cached_repository_helper.dart';
-import 'package:riverpod_core/core/storage/database/app_database.dart';
+
+import '../../../helpers/helpers.dart';
 
 const _ttl = Duration(minutes: 5);
 
@@ -21,18 +23,14 @@ Matcher _result(int data, {bool isStale = false, Matcher? error}) =>
         .having((r) => r.error, 'error', error ?? isNull);
 
 void main() {
-  late AppDatabase database;
+  late CacheStore store;
   late DateTime now;
   late CachedRepositoryHelper helper;
 
-  setUp(() {
-    database = AppDatabase.inMemory();
+  setUp(() async {
+    store = await fakeCacheStore();
     now = DateTime.utc(2026, 10, 16, 12);
-    helper = CachedRepositoryHelper(database, clock: () => now);
-  });
-
-  tearDown(() async {
-    await database.close();
+    helper = CachedRepositoryHelper(store, clock: () => now);
   });
 
   Stream<CacheResult<int>> watchInt({
@@ -53,7 +51,7 @@ void main() {
     required DateTime savedAt,
     String key = 'k',
     String? userId,
-  }) => database.writeCache(
+  }) => store.write(
     key: cacheKey(key, userId: userId),
     payload: '$value',
     savedAt: savedAt,
@@ -133,21 +131,18 @@ void main() {
           emitsInOrder([_result(7), emitsDone]),
         );
 
-        final entry = await database.readCache(cacheKey('k'));
+        final entry = store.read(cacheKey('k'));
         expect(entry, isNotNull);
         expect(entry!.payload, '7');
         expect(entry.etag, 'W/"x"');
-        expect(
-          DateTime.fromMillisecondsSinceEpoch(entry.savedAt, isUtc: true),
-          now,
-        );
+        expect(entry.savedAt, now);
       },
     );
 
     test(
       'a cache entry that cannot be decoded is dropped and treated as a miss',
       () async {
-        await database.writeCache(
+        await store.write(
           key: cacheKey('k'),
           payload: 'not a number',
           savedAt: now,
@@ -157,7 +152,7 @@ void main() {
           watchInt(fetch: () async => _ok(3)),
           emitsInOrder([_result(3), emitsDone]),
         );
-        expect((await database.readCache(cacheKey('k')))!.payload, '3');
+        expect((store.read(cacheKey('k')))!.payload, '3');
       },
     );
 
@@ -190,7 +185,7 @@ void main() {
         gate.complete(_ok(9));
         await pending;
 
-        expect(await database.readCache(cacheKey('k')), isNull);
+        expect(store.read(cacheKey('k')), isNull);
       },
     );
   });
@@ -230,8 +225,8 @@ void main() {
 
       await helper.invalidate('k');
 
-      expect(await database.readCache(cacheKey('k')), isNull);
-      expect(await database.readCache(cacheKey('other')), isNotNull);
+      expect(store.read(cacheKey('k')), isNull);
+      expect(store.read(cacheKey('other')), isNotNull);
     });
 
     test('clearAll removes every entry', () async {
@@ -240,8 +235,8 @@ void main() {
 
       await helper.clearAll();
 
-      expect(await database.readCache(cacheKey('k')), isNull);
-      expect(await database.readCache(cacheKey('other')), isNull);
+      expect(store.read(cacheKey('k')), isNull);
+      expect(store.read(cacheKey('other')), isNull);
     });
   });
 
@@ -255,11 +250,23 @@ void main() {
 
       await helper.invalidate('k', userId: 'a');
 
-      expect(await database.readCache(cacheKey('k', userId: 'a')), isNull);
-      expect(
-        (await database.readCache(cacheKey('k', userId: 'b')))!.payload,
-        '2',
-      );
+      expect(store.read(cacheKey('k', userId: 'a')), isNull);
+      expect((store.read(cacheKey('k', userId: 'b')))!.payload, '2');
     });
+  });
+
+  test('a cache hit records the access time', () async {
+    await store.write(
+      key: cacheKey('k'),
+      payload: '1',
+      savedAt: now.subtract(const Duration(hours: 1)),
+    );
+
+    final results = await watchInt(
+      fetch: () async => throw const NetworkException(),
+    ).toList();
+    expect(results.last.isStale, isTrue);
+
+    expect(store.read(cacheKey('k'))!.lastAccessedAt, now);
   });
 }
