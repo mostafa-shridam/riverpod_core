@@ -31,20 +31,25 @@ void main() {
       expect(manifest, contains('android:autoVerify="true"'));
     });
 
-    test('iOS plist and entitlements match the same host and scheme', () {
-      final plist = _read('ios/Runner/Info.plist');
-      expect(plist, contains('<string>$deepLinkScheme</string>'));
-      expect(
-        RegExp(
-          r'<key>FlutterDeepLinkingEnabled</key>\s*<true/>',
-        ).hasMatch(plist),
-        isTrue,
-      );
-      expect(
-        _read('ios/Runner/Runner.entitlements'),
-        contains('applinks:$deepLinkHost'),
-      );
-    });
+    test(
+      'iOS plist (and entitlements, when enabled) match the same host and scheme',
+      () {
+        final plist = _read('ios/Runner/Info.plist');
+        expect(plist, contains('<string>$deepLinkScheme</string>'));
+        expect(
+          RegExp(
+            r'<key>FlutterDeepLinkingEnabled</key>\s*<true/>',
+          ).hasMatch(plist),
+          isTrue,
+        );
+        // Not shipped: a free Apple team cannot sign it (DEEP_LINKS.md). If an
+        // app adds it, it must use the same host.
+        final entitlements = _read('ios/Runner/Runner.entitlements');
+        if (entitlements.contains('applinks:')) {
+          expect(entitlements, contains('applinks:$deepLinkHost'));
+        }
+      },
+    );
 
     test('the scheme is a valid URI scheme and the host is a placeholder', () {
       expect(() => Uri.parse('$deepLinkScheme://videos/abc'), returnsNormally);

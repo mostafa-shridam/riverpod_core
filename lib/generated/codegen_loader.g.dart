@@ -489,24 +489,21 @@ class CodegenLoader extends AssetLoader {
         },
       },
     },
-    "security": {
-      "lock": {
-        "title": "App locked",
-        "message": "Unlock to continue.",
-        "unlock": "Unlock",
-        "reason": "Unlock the app",
-        "enableReason": "Confirm to turn on app lock",
+    "app_gate": {
+      "forceUpdate": {
+        "title": "Update required",
+        "body":
+            "This version of the app is no longer supported. Update to keep going.",
+        "store": "Update now",
       },
-      "settings": {
-        "title": "Security",
-        "appLock": "App lock",
-        "appLockSubtitle":
-            "Ask for biometrics or the device passcode when you return to the app.",
-        "unavailable":
-            "Set up biometrics or a device passcode in the system settings to use app lock.",
-        "cancelled": "Authentication was cancelled. App lock stays as it was.",
-        "failed": "Authentication failed. Try again.",
-        "lockedOut": "Too many attempts. Try again later.",
+      "maintenance": {
+        "title": "We'll be right back",
+        "body": "The app is under maintenance. Please try again shortly.",
+      },
+      "update": {
+        "banner": "A new version of the app is available.",
+        "action": "Update",
+        "later": "Later",
       },
     },
     "more": {
@@ -525,6 +522,26 @@ class CodegenLoader extends AssetLoader {
         "rate": "Rate the app",
         "actionFailed": "Could not complete that. Please try again.",
         "loadFailed": "Could not load the app details.",
+      },
+    },
+    "security": {
+      "lock": {
+        "title": "App locked",
+        "message": "Unlock to continue.",
+        "unlock": "Unlock",
+        "reason": "Unlock the app",
+        "enableReason": "Confirm to turn on app lock",
+      },
+      "settings": {
+        "title": "Security",
+        "appLock": "App lock",
+        "appLockSubtitle":
+            "Ask for biometrics or the device passcode when you return to the app.",
+        "unavailable":
+            "Set up biometrics or a device passcode in the system settings to use app lock.",
+        "cancelled": "Authentication was cancelled. App lock stays as it was.",
+        "failed": "Authentication failed. Try again.",
+        "lockedOut": "Too many attempts. Try again later.",
       },
     },
   };
@@ -996,23 +1013,21 @@ class CodegenLoader extends AssetLoader {
         "secure": {"title": "حسابك آمن", "body": "سجّل الدخول لحماية بياناتك."},
       },
     },
-    "security": {
-      "lock": {
-        "title": "التطبيق مقفل",
-        "message": "افتح القفل للمتابعة.",
-        "unlock": "فتح القفل",
-        "reason": "افتح قفل التطبيق",
-        "enableReason": "أكّد لتفعيل قفل التطبيق",
+    "app_gate": {
+      "forceUpdate": {
+        "title": "مطلوب تحديث",
+        "body":
+            "هذا الإصدار من التطبيق لم يعد مدعومًا. حدّث التطبيق لمتابعة الاستخدام.",
+        "store": "تحديث الآن",
       },
-      "settings": {
-        "title": "الأمان",
-        "appLock": "قفل التطبيق",
-        "appLockSubtitle": "اطلب البصمة أو رمز الجهاز عند العودة إلى التطبيق.",
-        "unavailable":
-            "فعّل البصمة أو رمز الجهاز من إعدادات النظام لاستخدام قفل التطبيق.",
-        "cancelled": "تم إلغاء المصادقة. لم يتغير قفل التطبيق.",
-        "failed": "فشلت المصادقة. حاول مرة أخرى.",
-        "lockedOut": "محاولات كثيرة. حاول لاحقًا.",
+      "maintenance": {
+        "title": "نعود إليك قريبًا",
+        "body": "التطبيق قيد الصيانة حاليًا. يرجى المحاولة بعد قليل.",
+      },
+      "update": {
+        "banner": "يتوفر إصدار جديد من التطبيق.",
+        "action": "تحديث",
+        "later": "لاحقًا",
       },
     },
     "more": {
@@ -1031,6 +1046,25 @@ class CodegenLoader extends AssetLoader {
         "rate": "قيّم التطبيق",
         "actionFailed": "تعذر إتمام ذلك. حاول مرة أخرى.",
         "loadFailed": "تعذر تحميل تفاصيل التطبيق.",
+      },
+    },
+    "security": {
+      "lock": {
+        "title": "التطبيق مقفل",
+        "message": "افتح القفل للمتابعة.",
+        "unlock": "فتح القفل",
+        "reason": "افتح قفل التطبيق",
+        "enableReason": "أكّد لتفعيل قفل التطبيق",
+      },
+      "settings": {
+        "title": "الأمان",
+        "appLock": "قفل التطبيق",
+        "appLockSubtitle": "اطلب البصمة أو رمز الجهاز عند العودة إلى التطبيق.",
+        "unavailable":
+            "فعّل البصمة أو رمز الجهاز من إعدادات النظام لاستخدام قفل التطبيق.",
+        "cancelled": "تم إلغاء المصادقة. لم يتغير قفل التطبيق.",
+        "failed": "فشلت المصادقة. حاول مرة أخرى.",
+        "lockedOut": "محاولات كثيرة. حاول لاحقًا.",
       },
     },
   };

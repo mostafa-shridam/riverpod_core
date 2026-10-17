@@ -17,14 +17,14 @@ The placeholders are `example.com` and `riverpod-core`. They are written in four
 | `lib/core/router/deep_link.dart` | `deepLinkHost`, `deepLinkScheme` (the one Dart place) |
 | `android/app/src/main/AndroidManifest.xml` | two `intent-filter`s on `MainActivity` + `flutter_deeplinking_enabled` |
 | `ios/Runner/Info.plist` | `CFBundleURLTypes` scheme + `FlutterDeepLinkingEnabled` |
-| `ios/Runner/Runner.entitlements` | `applinks:<host>` |
+| `ios/Runner/Runner.entitlements` | `applinks:<host>` only after you enable Universal Links (not in the template, see below) |
 
-`dart run tool/rename_app.dart --name "My App" --id com.company.myapp [--host links.company.com]` updates all four: the scheme becomes the package name with `_` as `-` (a URI scheme cannot hold an underscore: `Uri.parse('my_app://x')` throws, so Flutter could not even read such a link). Without `--host` the host stays `example.com`. `routeForAppLink` also accepts the underscore spelling of the scheme (`riverpod_core://...`) so a hand-written link still resolves.
+`dart run tool/rename_app.dart --name "My App" --id com.company.myapp [--host links.company.com]` updates all of them (the entitlements line only when it exists): the scheme becomes the package name with `_` as `-` (a URI scheme cannot hold an underscore: `Uri.parse('my_app://x')` throws, so Flutter could not even read such a link). Without `--host` the host stays `example.com`. `routeForAppLink` also accepts the underscore spelling of the scheme (`riverpod_core://...`) so a hand-written link still resolves.
 
 ## How the app handles a link
 No plugin: Flutter hands the link to go_router (`flutter_deeplinking_enabled`). An https link's path already is a route path (`/videos/abc`). go_router matches only the path of a custom-scheme link, so `deepLinkRedirect` (first step of the router redirect) rewrites `riverpod-core://videos/abc` to `/videos/abc`; an unmapped custom link goes home. The session/onboarding redirect then runs as for any location.
 
-Known limit: a link that arrives while the user is signed out or in onboarding lands on login/onboarding and is NOT replayed after sign-in (notification taps are: NOTIFICATIONS.md). Suggested follow-up task.
+A link that arrives while the user cannot see it yet (splash, onboarding, signed out) is remembered in the notification router's pending queue (newest 5, NOTIFICATIONS.md) and opened after sign-in, in order with notification taps. Test: `test/core/router/app_router_test.dart`.
 
 ## Android App Links (https)
 1. Replace the host in the four places (or run the rename tool with `--host`).
@@ -38,7 +38,10 @@ Fingerprints: the upload key and, with Play App Signing, the app signing key fro
 3. `android:autoVerify="true"` is already on the https filter. Check: `adb shell pm get-app-links com.company.myapp`; test: `adb shell am start -a android.intent.action.VIEW -d "https://<host>/videos/abc"`.
 
 ## iOS Universal Links (https)
-1. The entitlement `applinks:<host>` is in `Runner.entitlements`. It needs the Associated Domains capability on the App ID and a provisioning profile that has it. A free personal team cannot sign it: remove that entry from the entitlements file for device runs with such an account (the custom scheme keeps working), or use a paid team.
+1. The template does NOT ship the Associated Domains entitlement: a free personal Apple team cannot sign it, so `flutter run` on a real iPhone would fail. The custom scheme works without it. To enable Universal Links you need a paid Apple Developer team:
+   - In Xcode: Runner target > Signing & Capabilities > + Capability > Associated Domains, add `applinks:<host>` (or add to `ios/Runner/Runner.entitlements`: key `com.apple.developer.associated-domains`, an array with the string `applinks:<host>`; the file already exists for `aps-environment`).
+   - Enable Associated Domains on the App ID in the developer portal and regenerate the provisioning profile.
+   - Use the same `<host>` as `deepLinkHost` and the manifest.
 2. Host `https://<host>/.well-known/apple-app-site-association` (no extension, `application/json`, no redirect):
 ```json
 { "applinks": { "details": [ { "appIDs": ["<TEAM_ID>.com.company.myapp"],
@@ -53,4 +56,4 @@ Fingerprints: the upload key and, with Play App Signing, the app signing key fro
 A custom scheme is not exclusive (another app can claim it), so never carry secrets or sign-in tokens in it.
 
 ## Not verified here
-Link opening on a real device, domain verification and the entitlement on a signed build need a real domain and Apple/Google accounts. The template tests cover the mapping, the router and the file agreement only.
+Link opening on a real device, domain verification and the entitlement on a signed build need a real domain and Apple/Google accounts. The template tests cover the mapping, the router, the replay after sign-in and the file agreement only.

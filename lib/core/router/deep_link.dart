@@ -19,14 +19,13 @@ final _linkPattern = RegExp(
 String _normalizeScheme(String scheme) =>
     scheme.toLowerCase().replaceAll('_', '-');
 
-/// Maps an app link to a typed route; null when it is not ours or not mapped.
+/// The `type` and `id` of an app link, or null when it is not ours.
 ///
-/// `https://<deepLinkHost>/<type>/<id>` and `<deepLinkScheme>://<type>/<id>`
-/// resolve through `routeForDeepLink`. The link is read as text on purpose:
-/// `Uri.parse` rejects a scheme with an underscore (`riverpod_core://...`),
-/// which an app may have written by hand. The underscore form is accepted as
-/// the same scheme.
-GoRouteData? routeForAppLink(String link) {
+/// `https://<deepLinkHost>/<type>/<id>` and `<deepLinkScheme>://<type>/<id>`.
+/// The link is read as text on purpose: `Uri.parse` rejects a scheme with an
+/// underscore (`riverpod_core://...`), which an app may have written by hand.
+/// The underscore form is accepted as the same scheme.
+({String type, String id})? parseAppLink(String link) {
   final match = _linkPattern.firstMatch(link.trim());
   if (match == null) {
     return null;
@@ -54,7 +53,7 @@ GoRouteData? routeForAppLink(String link) {
     return null;
   }
   try {
-    return routeForDeepLink(
+    return (
       type: Uri.decodeComponent(parts[0]),
       id: Uri.decodeComponent(parts[1]),
     );
@@ -63,6 +62,14 @@ GoRouteData? routeForAppLink(String link) {
   } on ArgumentError {
     return null;
   }
+}
+
+/// Maps an app link to a typed route; null when it is not ours or not mapped.
+GoRouteData? routeForAppLink(String link) {
+  final parsed = parseAppLink(link);
+  return parsed == null
+      ? null
+      : routeForDeepLink(type: parsed.type, id: parsed.id);
 }
 
 /// Router redirect for the custom scheme. go_router matches the path only, so

@@ -22,7 +22,7 @@ at implementation time and record them in its report.
 - Why: works for every folder, including `.fttemplates`-generated features; zero custom config.
 - Rejected: keeping per-folder redirects (needs a build.yaml edit for each new feature).
 
-## D-004 — Local database: Drift
+## D-004 — Local database: Drift (superseded by D-034)
 - Context: checklist requires one local DB; current code uses Hive (`hive_flutter 1.1.0`, effectively unmaintained).
 - Decision: Drift (SQLite) for structured data and the HTTP/SWR cache; `shared_preferences` for settings; `flutter_secure_storage` for secrets. Hive is removed in C-06.
 - Why: actively maintained, typed queries, migrations, streams that fit Riverpod, works on all platforms.
@@ -34,7 +34,7 @@ at implementation time and record them in its report.
 - Why: routes must not diverge by device; deep links and notification taps need one source of truth.
 - Rejected: separate routers per device class.
 
-## D-006 — Flavors via `--dart-define-from-file`
+## D-006 — Flavors via `--dart-define-from-file` (superseded by D-024)
 - Decision: `env/dev.json`, `env/staging.json`, `env/prod.json` (git-ignored) with committed `env/*.example.json`; `AppConfig.fromEnvironment()` validates required keys at startup and shows/throws a clear error. Native flavor wiring (Android flavors / iOS schemes) is added by its own task.
 - Why: no extra package, works with `flutter run/build --dart-define-from-file=env/dev.json`.
 - Rejected: `flutter_flavorizr` (heavy, rewrites native files), `.env` asset (ships secrets in the bundle).
@@ -97,11 +97,11 @@ at implementation time and record them in its report.
 - Decision: not used. Our Riverpod rules are enforced by review + the checks in review-task. Revisit when versions align.
 - Rejected: pinning old versions of uuid/freezed just for the linter.
 
-## D-018 — Flavor entrypoints (adjusts D-006)
+## D-018 — Flavor entrypoints (adjusts D-006; superseded by D-024)
 - Decision: `lib/main_dev.dart`, `main_staging.dart`, `main_prod.dart` each call `bootstrap(Flavor.x)`. `AppConfig` is still loaded from `--dart-define-from-file=env/<flavor>.json`; the flavor passed by the entrypoint must match the file's `FLAVOR` value, otherwise startup fails with a clear error.
 - Why: IDE run configs and native flavors can target an entrypoint; mismatch protection avoids running prod config in a dev build.
 
-## D-019 — design_system/ replaces core/widgets and core/themes
+## D-019 — design_system/ replaces core/widgets and core/themes (location superseded by D-026)
 - Decision: tokens, theme, responsive helpers and all shared widgets move to `lib/design_system/` (C-05, C-09, C-10). `core/` has no UI.
 - Why: one obvious home for every UI primitive (hard rule 8).
 
@@ -121,7 +121,7 @@ at implementation time and record them in its report.
 - Why: every checklist item (FCM, permissions, biometrics, deep links, store releases) is mobile; fewer native folders to maintain.
 - Rejected: all six platforms.
 
-## D-023 — Strings in design_system widgets (avoids shared generated files)
+## D-023 — Strings in design_system widgets (avoids shared generated files) (superseded by D-037)
 - Context: C-09, C-32, C-33, C-34 all need a few localized labels (close, cancel, confirm, show password…) and would all edit `assets/translations/*.json` and the generated `lib/generated/*.g.dart`.
 - Decision: every widget family keeps its key constants in its own `*_strings.dart` (e.g. `overlays_strings.dart`: `const closeKey = 'ds_overlays.close';`) and resolves them with `.tr()`; widgets also accept an optional override parameter for each label. Each task adds its keys to BOTH `ar.json` and `en.json` under ONE distinct top-level object (`ds_buttons`, `ds_inputs`, `ds_selection`, `ds_overlays`, `ds_feedback`, `ds_display`, `ds_layout`) appended at the end of the file. These tasks do NOT regenerate or commit `lib/generated/*.g.dart`; the Lead regenerates them once after merging (conflicts in the JSON tails are trivially resolved by the Lead).
 - Why: no two in-progress tasks edit the same generated file; a merge conflict can only occur in the JSON tail.

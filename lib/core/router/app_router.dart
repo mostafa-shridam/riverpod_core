@@ -2,7 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:riverpod_core/core/auth/session_controller.dart';
+import 'package:riverpod_core/core/notifications/models/notification_payload.dart';
+import 'package:riverpod_core/core/notifications/models/notification_tap.dart';
+import 'package:riverpod_core/core/notifications/models/notification_tap_source.dart';
 import 'package:riverpod_core/core/notifications/routing/notification_router_provider.dart';
+import 'package:riverpod_core/core/remote_config/remote_config_provider.dart';
 import 'package:riverpod_core/core/router/app_error_page.dart';
 import 'package:riverpod_core/core/router/deep_link.dart';
 import 'package:riverpod_core/core/router/guards/app_redirect.dart';
@@ -28,19 +32,30 @@ GoRouter appRouter(Ref ref) {
     ..onDispose(refresh.dispose)
     ..listen(sessionControllerProvider, (previous, next) => refresh.value++)
     ..listen(onboardingSeenProvider, (previous, next) => refresh.value++)
-    ..listen(startupReadyProvider, (previous, next) => refresh.value++);
+    ..listen(startupReadyProvider, (previous, next) => refresh.value++)
+    ..listen(appGateStatusProvider, (previous, next) => refresh.value++);
 
   final router = GoRouter(
     initialLocation: SplashPage.routeName,
     refreshListenable: refresh,
-    redirect: (context, state) =>
-        deepLinkRedirect(state.uri) ??
-        appRedirect(
-          location: state.uri.path,
-          session: ref.read(sessionControllerProvider),
-          onboardingSeen: ref.read(onboardingSeenProvider),
-          startupReady: ref.read(startupReadyProvider),
-        ),
+    redirect: (context, state) {
+      final uri = state.uri;
+      // A custom-scheme link is first rewritten to its route location.
+      final target = deepLinkRedirect(uri) ?? uri.path;
+      final result = appRedirect(
+        location: target,
+        session: ref.read(sessionControllerProvider),
+        onboardingSeen: ref.read(onboardingSeenProvider),
+        startupReady: ref.read(startupReadyProvider),
+        gate: ref.read(appGateStatusProvider),
+      );
+      if (result != null) {
+        // The user cannot see the link yet (splash, onboarding, sign-in):
+        // remember it, the notification router replays it after sign-in.
+        _rememberDeepLink(ref, uri);
+      }
+      return result ?? (target == uri.path ? null : target);
+    },
     errorBuilder: (context, state) => const AppErrorPage(),
     routes: $appRoutes,
   );
@@ -54,4 +69,21 @@ GoRouter appRouter(Ref ref) {
     router.dispose();
   });
   return router;
+}
+
+/// Queues an external app link (https or custom scheme) in the same pending
+/// route queue notification taps use, so it opens after sign-in.
+void _rememberDeepLink(Ref ref, Uri uri) {
+  final link = parseAppLink(uri.toString());
+  if (link == null || routeForDeepLink(type: link.type, id: link.id) == null) {
+    return;
+  }
+  ref
+      .read(notificationRouterProvider)
+      .handle(
+        NotificationTap(
+          payload: NotificationPayload(type: link.type, id: link.id),
+          source: NotificationTapSource.localLaunch,
+        ),
+      );
 }
