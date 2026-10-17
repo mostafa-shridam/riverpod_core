@@ -3,17 +3,6 @@
 // ignore_for_file: constant_identifier_names
 
 abstract class LocaleKeys {
-  static const hello = 'hello';
-  static const arabic = 'arabic';
-  static const english = 'english';
-  static const light = 'light';
-  static const dark = 'dark';
-  static const system = 'system';
-  static const confirmButton = 'confirmButton';
-  static const cancelButton = 'cancelButton';
-  static const selectLanguage = 'selectLanguage';
-  static const goodEvening = 'goodEvening';
-  static const goodMorning = 'goodMorning';
   static const ds_display_imageError = 'ds_display.imageError';
   static const ds_display_expand = 'ds_display.expand';
   static const ds_display_collapse = 'ds_display.collapse';
@@ -176,7 +165,6 @@ abstract class LocaleKeys {
   static const notifications_actionReplySend = 'notifications.actionReplySend';
   static const notifications_actionReplyHint = 'notifications.actionReplyHint';
   static const notifications_actionMarkRead = 'notifications.actionMarkRead';
-  static const notifications_groupSummary = 'notifications.groupSummary';
   static const notifications = 'notifications';
   static const showcase_title = 'showcase.title';
   static const showcase_entry = 'showcase.entry';
@@ -404,7 +392,6 @@ abstract class LocaleKeys {
   static const videos_favorite_removed = 'videos.favorite.removed';
   static const videos_favorite = 'videos.favorite';
   static const videos_detail_title = 'videos.detail.title';
-  static const videos_detail_description = 'videos.detail.description';
   static const videos_detail_related = 'videos.detail.related';
   static const videos_detail_relatedError = 'videos.detail.relatedError';
   static const videos_detail_customTitle = 'videos.detail.customTitle';
@@ -459,7 +446,6 @@ abstract class LocaleKeys {
   static const more_about_shareMessage = 'more.about.shareMessage';
   static const more_about_rate = 'more.about.rate';
   static const more_about_actionFailed = 'more.about.actionFailed';
-  static const more_about_loadFailed = 'more.about.loadFailed';
   static const more_about = 'more.about';
   static const more = 'more';
   static const security_lock_title = 'security.lock.title';

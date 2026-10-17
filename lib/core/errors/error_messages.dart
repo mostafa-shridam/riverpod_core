@@ -1,9 +1,6 @@
 import 'package:riverpod_core/core/errors/app_exception.dart';
 import 'package:riverpod_core/generated/locale_keys.g.dart';
 
-/// Key of the generic "try again" action label.
-const String errorRetryKey = LocaleKeys.errors_retry;
-
 /// `errors.*` localization key describing [exception] to the user. The
 /// switch is exhaustive: a new exception type will not compile until mapped.
 String errorMessageKey(AppException exception) => switch (exception) {
