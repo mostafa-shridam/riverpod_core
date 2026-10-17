@@ -12,6 +12,7 @@ abstract final class PrefKeys {
   static const onboardingSeen = 'settings.onboardingSeen';
   static const appLock = 'settings.appLock';
   static const collectionConsent = 'settings.collectionConsent';
+  static const lastCachePrune = 'settings.lastCachePrune';
 
   /// Same slot the app gate's `DismissedUpdates` already reads and writes.
   static const dismissedUpdateVersions = 'app.remoteConfig.dismissedUpdates';
@@ -58,6 +59,18 @@ class PrefsStorage {
 
   Future<bool> setCollectionConsent({required bool value}) =>
       _put(PrefKeys.collectionConsent, value);
+
+  /// When the cache was last pruned (UTC), so a resume does not prune again
+  /// within the day (D-038). Device-level.
+  DateTime? get lastCachePrune {
+    final millis = _box.get(PrefKeys.lastCachePrune) as int?;
+    return millis == null
+        ? null
+        : DateTime.fromMillisecondsSinceEpoch(millis, isUtc: true);
+  }
+
+  Future<bool> setLastCachePrune(DateTime value) =>
+      _put(PrefKeys.lastCachePrune, value.toUtc().millisecondsSinceEpoch);
 
   /// Versions whose soft update notice the user dismissed.
   List<String> get dismissedUpdateVersions =>

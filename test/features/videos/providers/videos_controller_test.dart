@@ -24,7 +24,11 @@ Future<ProviderContainer> _container(
   final container = ProviderContainer(
     // D-032: no silent retries, so failures settle at once.
     retry: (_, _) => null,
-    overrides: videosOverrides(source: source, prefs: prefs, flavor: flavor),
+    overrides: await videosOverrides(
+      source: source,
+      prefs: prefs,
+      flavor: flavor,
+    ),
   );
   addTearDown(container.dispose);
   // Keeps the auto-dispose controller alive between reads.

@@ -17,7 +17,7 @@ class _Source implements RemoteConfigSource {
   int calls = 0;
 
   @override
-  Future<CacheFetch<RemoteConfig>> fetch() async {
+  Future<CacheFetch<RemoteConfig>> fetch({String? etag}) async {
     calls++;
     if (error != null) throw error!;
     return (value: value!, etag: null);
@@ -68,7 +68,9 @@ void main() {
     final source = _Source(value: _old);
     await RemoteConfigRepository(helper, source).watch().toList();
 
-    now = now.add(RemoteConfigRepository.ttl + const Duration(minutes: 1));
+    now = now.add(
+      RemoteConfigRepository.policy.ttl + const Duration(minutes: 1),
+    );
     source.error = const NetworkException();
     final events = await RemoteConfigRepository(
       helper,

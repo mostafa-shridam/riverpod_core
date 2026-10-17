@@ -13,6 +13,36 @@ bool isExpired({
 String cacheKey(String key, {String? userId}) =>
     userId == null ? 'shared/$key' : 'user/$userId/$key';
 
-/// Eviction age used when a caller does not choose one (D-038). Presets per
-/// data type come with the cache policy task (C-44).
-const defaultMaxAge = Duration(days: 30);
+/// A retention preset (D-038): [ttl] is how long a copy counts as fresh, and
+/// [maxAge] is how long an entry may go unvalidated before pruning removes it.
+/// Features pick a preset; nobody hand-rolls expiry.
+class CachePolicy {
+  const CachePolicy({required this.ttl, required this.maxAge});
+
+  /// Minutes of freshness: feeds and anything that changes often.
+  static const short = CachePolicy(
+    ttl: Duration(minutes: 5),
+    maxAge: Duration(days: 1),
+  );
+
+  /// Hours of freshness: the default for lists and details.
+  static const medium = CachePolicy(
+    ttl: Duration(hours: 1),
+    maxAge: Duration(days: 7),
+  );
+
+  /// Days of freshness: reference data that changes slowly.
+  static const long = CachePolicy(
+    ttl: Duration(days: 1),
+    maxAge: Duration(days: 30),
+  );
+
+  /// Weeks of freshness: data that almost never changes.
+  static const static = CachePolicy(
+    ttl: Duration(days: 7),
+    maxAge: Duration(days: 90),
+  );
+
+  final Duration ttl;
+  final Duration maxAge;
+}

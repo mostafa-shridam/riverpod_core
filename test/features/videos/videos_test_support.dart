@@ -5,6 +5,8 @@ import 'package:riverpod_core/core/config/app_config.dart';
 import 'package:riverpod_core/core/config/flavor.dart';
 import 'package:riverpod_core/core/config/log_level.dart';
 import 'package:riverpod_core/core/errors/app_exception.dart';
+import 'package:riverpod_core/core/storage/cache/cache_store.dart';
+import 'package:riverpod_core/core/storage/cache/cached_repository_helper.dart';
 import 'package:riverpod_core/core/storage/prefs_storage.dart';
 import 'package:riverpod_core/features/videos/data/models/video.dart';
 import 'package:riverpod_core/features/videos/data/models/video_feed.dart';
@@ -13,6 +15,7 @@ import 'package:riverpod_core/features/videos/data/sources/videos_mock_source.da
 import 'package:riverpod_core/features/videos/data/videos_repository.dart';
 
 import '../../helpers/fake_connectivity.dart';
+import '../../helpers/fake_prefs_storage.dart';
 
 /// A valid config for [flavor]; the feature only reads the flavor.
 AppConfig testConfig([Flavor flavor = Flavor.dev]) => AppConfig(
@@ -70,15 +73,22 @@ class ListFailsSource extends VideosMockSource {
   }
 }
 
-/// Provider overrides every videos test needs.
-List<Override> videosOverrides({
+/// Provider overrides every videos test needs. The cache shares the test
+/// storage the prefs are on, so one test sees one store.
+Future<List<Override>> videosOverrides({
   required VideosMockSource source,
   required PrefsStorage prefs,
   FakeConnectivity? connectivity,
   Flavor flavor = Flavor.dev,
-}) => [
-  appConfigProvider.overrideWithValue(testConfig(flavor)),
-  videosSourceProvider.overrideWithValue(source),
-  prefsStorageProvider.overrideWith((ref) => Future.value(prefs)),
-  (connectivity ?? FakeConnectivity()).providerOverride,
-];
+}) async {
+  final storage = await openTestStorage();
+  return [
+    appConfigProvider.overrideWithValue(testConfig(flavor)),
+    videosSourceProvider.overrideWithValue(source),
+    prefsStorageProvider.overrideWith((ref) => Future.value(prefs)),
+    cachedRepositoryHelperProvider.overrideWithValue(
+      CachedRepositoryHelper(CacheStore(storage.cache)),
+    ),
+    (connectivity ?? FakeConnectivity()).providerOverride,
+  ];
+}

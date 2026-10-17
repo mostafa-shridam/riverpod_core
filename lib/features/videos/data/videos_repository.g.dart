@@ -107,4 +107,4 @@ final class VideosRepositoryProvider
   }
 }
 
-String _$videosRepositoryHash() => r'fa0f4ef4492c04beeb49aa823f640078cfdbb887';
+String _$videosRepositoryHash() => r'd502b10e9121e0db4ee5f5916ba7d62ba063d7ac';

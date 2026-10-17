@@ -47,7 +47,7 @@ Future<_Detail> _pump(
     tester,
     ProviderScope(
       retry: (_, _) => null, // D-032
-      overrides: videosOverrides(
+      overrides: await videosOverrides(
         source: source,
         prefs: prefs,
         connectivity: FakeConnectivity(),
@@ -191,7 +191,7 @@ void main() {
         tester,
         ProviderScope(
           retry: (_, _) => null,
-          overrides: videosOverrides(source: source, prefs: prefs),
+          overrides: await videosOverrides(source: source, prefs: prefs),
           child: VideoDetailPage(
             id: 'bee',
             backendFactory: FakeVideoFactory().call,

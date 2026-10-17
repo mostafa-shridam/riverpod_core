@@ -36,7 +36,7 @@ class _Source implements RemoteConfigSource {
   int fetches = 0;
 
   @override
-  Future<CacheFetch<RemoteConfig>> fetch() async {
+  Future<CacheFetch<RemoteConfig>> fetch({String? etag}) async {
     fetches++;
     if (error != null) throw error!;
     return (value: value!, etag: null);

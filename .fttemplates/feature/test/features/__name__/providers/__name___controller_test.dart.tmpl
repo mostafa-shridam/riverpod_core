@@ -5,11 +5,11 @@ import 'package:{{package}}/features/{{name}}/providers/{{name}}_controller.dart
 
 import '../{{name}}_test_support.dart';
 
-ProviderContainer _container(Fake{{Name}}Source source) {
+Future<ProviderContainer> _container(Fake{{Name}}Source source) async {
   final container = ProviderContainer(
     // D-032: no silent retries, so failures settle at once.
     retry: (_, _) => null,
-    overrides: {{nameCamel}}Overrides(source: source),
+    overrides: await {{nameCamel}}Overrides(source: source),
   );
   addTearDown(container.dispose);
   // Keeps the auto-dispose controller alive between reads.
@@ -20,7 +20,7 @@ ProviderContainer _container(Fake{{Name}}Source source) {
 void main() {
   group('{{Name}}Controller', () {
     test('starts loading, then holds the items', () async {
-      final container = _container(Fake{{Name}}Source.data({{nameCamel}}Sample));
+      final container = await _container(Fake{{Name}}Source.data({{nameCamel}}Sample));
       expect(container.read({{nameCamel}}ControllerProvider).isLoading, isTrue);
 
       final items = await container.read({{nameCamel}}ControllerProvider.future);
@@ -29,7 +29,7 @@ void main() {
     });
 
     test('failures end in AsyncError holding an AppException', () async {
-      final container = _container(
+      final container = await _container(
         Fake{{Name}}Source.failing(const NetworkException()),
       );
       await expectLater(
@@ -47,7 +47,7 @@ void main() {
         () async => {{nameCamel}}Sample,
         () async => [{{nameCamel}}Sample.first],
       ]);
-      final container = _container(source);
+      final container = await _container(source);
       await container.read({{nameCamel}}ControllerProvider.future);
 
       await container.read({{nameCamel}}ControllerProvider.notifier).refresh();
@@ -63,7 +63,7 @@ void main() {
         () async => {{nameCamel}}Sample,
         () => Future.error(const ServerException(statusCode: 500)),
       ]);
-      final container = _container(source);
+      final container = await _container(source);
       await container.read({{nameCamel}}ControllerProvider.future);
 
       await container.read({{nameCamel}}ControllerProvider.notifier).refresh();

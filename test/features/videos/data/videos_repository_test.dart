@@ -1,8 +1,15 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod_core/core/errors/app_exception.dart';
+import 'package:riverpod_core/core/storage/cache/cache_policy.dart';
+import 'package:riverpod_core/core/storage/cache/cache_store.dart';
+import 'package:riverpod_core/core/storage/cache/cached_repository_helper.dart';
 import 'package:riverpod_core/core/storage/prefs_storage.dart';
 import 'package:riverpod_core/features/videos/data/models/video.dart';
+import 'package:riverpod_core/features/videos/data/models/video_feed.dart';
 import 'package:riverpod_core/features/videos/data/sources/mock_scenario.dart';
 import 'package:riverpod_core/features/videos/data/sources/sample_videos.dart';
 import 'package:riverpod_core/features/videos/data/sources/videos_mock_source.dart';
@@ -20,11 +27,19 @@ const _videoJson = {
   'durationSeconds': 12,
 };
 
+/// A cache helper over the same test storage as the prefs in one test.
+Future<CachedRepositoryHelper> _cacheHelper() async =>
+    CachedRepositoryHelper(await fakeCacheStore());
+
 Future<VideosRepository> _mockRepository([
   MockScenario scenario = MockScenario.success,
 ]) async {
   final prefs = await fakePrefsStorage();
-  return VideosRepository(fastSource(scenario), Future.value(prefs));
+  return VideosRepository(
+    fastSource(scenario),
+    Future.value(prefs),
+    await _cacheHelper(),
+  );
 }
 
 /// Repository on the real remote source with a fake transport.
@@ -36,7 +51,11 @@ Future<({VideosRepository repository, FakeHttpAdapter adapter})> _remote({
     ..httpClientAdapter = adapter;
   final prefs = await fakePrefsStorage(prefsValues);
   return (
-    repository: VideosRepository(VideosRemoteSource(dio), Future.value(prefs)),
+    repository: VideosRepository(
+      VideosRemoteSource(dio),
+      Future.value(prefs),
+      await _cacheHelper(),
+    ),
     adapter: adapter,
   );
 }
@@ -262,7 +281,11 @@ void main() {
 
     test('toggle adds, removes and persists in prefs', () async {
       final prefs = await fakePrefsStorage();
-      final repository = VideosRepository(fastSource(), Future.value(prefs));
+      final repository = VideosRepository(
+        fastSource(),
+        Future.value(prefs),
+        await _cacheHelper(),
+      );
 
       expect(await repository.toggleFavorite('bee'), {'bee'});
       expect(await repository.toggleFavorite('sintel'), {'bee', 'sintel'});
@@ -276,7 +299,11 @@ void main() {
       final prefs = await fakePrefsStorage({
         videoFavoritesKey: ['bee'],
       });
-      final repository = VideosRepository(fastSource(), Future.value(prefs));
+      final repository = VideosRepository(
+        fastSource(),
+        Future.value(prefs),
+        await _cacheHelper(),
+      );
       expect(await repository.favoriteIds(), {'bee'});
 
       await prefs.clearUserScoped();
@@ -309,4 +336,132 @@ void main() {
       );
     });
   });
+
+  group('fetchFeed cache-first (D-038)', () {
+    late CacheStore store;
+    late DateTime now;
+    late _FeedSource source;
+    late VideosRepository repository;
+
+    setUp(() async {
+      final storage = await openTestStorage();
+      store = CacheStore(storage.cache);
+      now = DateTime.now();
+      source = _FeedSource(_feedOf('a'));
+      final prefs = await fakePrefsStorage();
+      repository = VideosRepository(
+        source,
+        Future.value(prefs),
+        CachedRepositoryHelper(store, clock: () => now),
+      );
+    });
+
+    String payloadOf(String id) => jsonEncode(_feedOf(id).toJson());
+
+    Future<void> seed(String id) => store.write(
+      key: cacheKey(videosFeedKey),
+      payload: payloadOf(id),
+      savedAt: now,
+    );
+
+    /// Waits until the background revalidation has stored [id].
+    Future<void> settle(String id) async {
+      for (
+        var i = 0;
+        i < 500 &&
+            store.read(cacheKey(videosFeedKey))!.payload != payloadOf(id);
+        i++
+      ) {
+        await Future<void>.delayed(const Duration(milliseconds: 1));
+      }
+    }
+
+    test(
+      'a cached feed comes back at once, the network answer after it',
+      () async {
+        await seed('a');
+        final gate = Completer<void>();
+        source
+          ..feed = _feedOf('b')
+          ..gate = gate;
+
+        final first = await repository.fetchFeed();
+        expect(
+          first.videos.single.id,
+          'a',
+          reason: 'no waiting for the network',
+        );
+
+        gate.complete();
+        await settle('b');
+        expect((await repository.fetchFeed()).videos.single.id, 'b');
+      },
+    );
+
+    test('an unchanged answer leaves the cached copy as it is', () async {
+      await seed('a');
+      final before = store.read(cacheKey(videosFeedKey))!.payload;
+
+      expect((await repository.fetchFeed()).videos.single.id, 'a');
+      for (var i = 0; i < 500 && source.calls == 0; i++) {
+        await Future<void>.delayed(const Duration(milliseconds: 1));
+      }
+
+      expect(source.calls, 1, reason: 'revalidated in the background');
+      expect(store.read(cacheKey(videosFeedKey))!.payload, before);
+    });
+
+    test(
+      'fresh waits for the network, returns that answer and stores it',
+      () async {
+        await seed('a');
+        final gate = Completer<void>();
+        source
+          ..feed = _feedOf('b')
+          ..gate = gate;
+
+        final pending = repository.fetchFeed(fresh: true);
+        gate.complete();
+
+        expect((await pending).videos.single.id, 'b');
+        expect(store.read(cacheKey(videosFeedKey))!.payload, payloadOf('b'));
+      },
+    );
+
+    test('fresh raises the error even when a cached feed exists', () async {
+      await seed('a');
+      source.error = const NetworkException();
+
+      await expectLater(
+        repository.fetchFeed(fresh: true),
+        throwsA(isA<NetworkException>()),
+      );
+      expect(store.read(cacheKey(videosFeedKey))!.payload, payloadOf('a'));
+    });
+  });
 }
+
+/// Mock source whose feed and failure a test sets; its answer waits on [gate].
+class _FeedSource extends VideosMockSource {
+  _FeedSource(this.feed) : super(latency: Duration.zero);
+
+  VideoFeed feed;
+  Completer<void>? gate;
+  Object? error;
+  int calls = 0;
+
+  @override
+  Future<VideoFeed> fetchVideos() async {
+    calls++;
+    await gate?.future;
+    final failure = error;
+    if (failure != null) throw failure;
+    return feed;
+  }
+}
+
+VideoFeed _feedOf(String id) => VideoFeed(
+  videos: [
+    Video.fromJson({..._videoJson, 'id': id, 'title': id}),
+  ],
+);

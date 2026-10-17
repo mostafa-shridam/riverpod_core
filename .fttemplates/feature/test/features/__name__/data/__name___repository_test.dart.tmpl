@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:{{package}}/core/errors/app_exception.dart';
+import 'package:{{package}}/core/storage/cache/cached_repository_helper.dart';
 import 'package:{{package}}/features/{{name}}/data/{{name}}_repository.dart';
 import 'package:{{package}}/features/{{name}}/data/sources/{{name}}_remote_source.dart';
 
@@ -9,12 +10,15 @@ import '../../../helpers/helpers.dart';
 const _itemJson = {'id': 'a', 'title': 'A', 'description': 'About A'};
 
 /// Repository on the real remote source with a fake transport.
-({{{Name}}Repository repository, FakeHttpAdapter adapter}) _build() {
+Future<({{{Name}}Repository repository, FakeHttpAdapter adapter})> _build() async {
   final adapter = FakeHttpAdapter();
   final dio = Dio(BaseOptions(baseUrl: 'https://api.example.test'))
     ..httpClientAdapter = adapter;
   return (
-    repository: {{Name}}Repository({{Name}}RemoteSource(dio)),
+    repository: {{Name}}Repository(
+      {{Name}}RemoteSource(dio),
+      CachedRepositoryHelper(await fakeCacheStore()),
+    ),
     adapter: adapter,
   );
 }
@@ -22,7 +26,7 @@ const _itemJson = {'id': 'a', 'title': 'A', 'description': 'About A'};
 void main() {
   group('{{Name}}Repository', () {
     test('maps the JSON list to models', () async {
-      final r = _build();
+      final r = await _build();
       r.adapter.enqueueJson(200, [
         _itemJson,
         {'id': 'b', 'title': 'B'},
@@ -37,7 +41,7 @@ void main() {
     });
 
     test('an empty list is data, not an error', () async {
-      final r = _build();
+      final r = await _build();
       r.adapter.enqueueJson(200, <Object>[]);
       expect(await r.repository.fetchItems(), isEmpty);
     });
@@ -76,7 +80,7 @@ void main() {
         };
     for (final entry in cases.entries) {
       test('${entry.key} becomes ${entry.value.expected}', () async {
-        final r = _build();
+        final r = await _build();
         entry.value.queue(r.adapter);
         await expectLater(
           r.repository.fetchItems(),
@@ -86,7 +90,7 @@ void main() {
     }
 
     test('an unexpected error becomes UnknownException', () async {
-      final r = _build();
+      final r = await _build();
       r.adapter.enqueueError(StateError('boom'));
       await expectLater(
         r.repository.fetchItems(),

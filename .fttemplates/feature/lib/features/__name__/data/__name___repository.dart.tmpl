@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:{{package}}/core/errors/app_exception.dart';
 import 'package:{{package}}/core/errors/error_mapper.dart';
 import 'package:{{package}}/core/network/dio_client.dart';
+import 'package:{{package}}/core/storage/cache/cache_policy.dart';
+import 'package:{{package}}/core/storage/cache/cached_repository_helper.dart';
 import 'package:{{package}}/features/{{name}}/data/models/{{name}}_item.dart';
 import 'package:{{package}}/features/{{name}}/data/sources/{{name}}_remote_source.dart';
 
@@ -11,15 +15,30 @@ part '{{name}}_repository.g.dart';
 /// {{Title}} data for the page. Returns models or throws an [AppException];
 /// JSON and `DioException` never leave this class.
 class {{Name}}Repository {
-  {{Name}}Repository(this._source);
+  {{Name}}Repository(this._source, this._cache);
 
   final {{Name}}RemoteSource _source;
+  final CachedRepositoryHelper _cache;
 
-  /// The ONE read of the list: every caller goes through this method. D-038
-  /// wants it cache-first (cached list first, then a background revalidate
-  /// that does not re-emit unchanged data): C-44 plugs the shared cache helper
-  /// in here without touching any caller.
-  Future<List<{{Name}}Item>> fetchItems() => _guard(_source.fetchItems);
+  /// The ONE read of the list: every caller goes through this method.
+  /// Cache-first (D-038): the cached list comes back at once when there is one,
+  /// and the revalidation runs in the background. [fresh] is for refresh: it
+  /// waits for the network and raises a failure even when a cached list exists.
+  Future<List<{{Name}}Item>> fetchItems({bool fresh = false}) =>
+      _cache.load<List<{{Name}}Item>>(
+        key: '{{name}}.items',
+        fetch: (_) => _guard(
+          () async => (value: await _source.fetchItems(), etag: null),
+        ),
+        decode: (payload) => [
+          for (final item in jsonDecode(payload) as List<dynamic>)
+            {{Name}}Item.fromJson(item as Map<String, dynamic>),
+        ],
+        encode: (items) =>
+            jsonEncode([for (final item in items) item.toJson()]),
+        policy: CachePolicy.medium,
+        fresh: fresh,
+      );
 
   Future<T> _guard<T>(Future<T> Function() call) async {
     try {
@@ -44,5 +63,8 @@ class {{Name}}Repository {
 
 @Riverpod(keepAlive: true)
 {{Name}}Repository {{nameCamel}}Repository(Ref ref) {
-  return {{Name}}Repository(ref.watch({{nameCamel}}RemoteSourceProvider));
+  return {{Name}}Repository(
+    ref.watch({{nameCamel}}RemoteSourceProvider),
+    ref.watch(cachedRepositoryHelperProvider),
+  );
 }

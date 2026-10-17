@@ -17,6 +17,7 @@ import 'package:riverpod_core/core/crash/crash_reporter.dart';
 import 'package:riverpod_core/core/firebase/observability_init.dart';
 import 'package:riverpod_core/core/logger/app_logger.dart';
 import 'package:riverpod_core/core/notifications/notification_service_provider.dart';
+import 'package:riverpod_core/core/storage/cache/cache_prune_scheduler.dart';
 import 'package:riverpod_core/core/storage/hive_boxes.dart';
 import 'package:riverpod_core/core/storage/prefs_storage.dart';
 import 'package:riverpod_core/core/utils/formatting/formatting_setup.dart';
@@ -85,6 +86,8 @@ Future<void> bootstrap(
         await initObservability(container);
         crashReporter = container.read(crashReporterProvider);
         installErrorHandlers(logger: logger, crashReporter: crashReporter);
+        // Cache pruning runs off the critical path (D-038).
+        container.read(cachePruneSchedulerProvider).start();
 
         try {
           await container.read(prefsStorageProvider.future);

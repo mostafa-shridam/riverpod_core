@@ -10,11 +10,20 @@ class VideosController extends _$VideosController {
   // Lives on the notifier, so a reload keeps the search text.
   String _query = '';
 
-  @override
-  Future<VideosState> build() => _load();
+  /// Set by [refresh] so the next build reads the network, not the cache.
+  bool _freshNext = false;
 
-  Future<VideosState> _load() async {
-    final feed = await ref.watch(videosRepositoryProvider).fetchFeed();
+  @override
+  Future<VideosState> build() {
+    final fresh = _freshNext;
+    _freshNext = false;
+    return _load(fresh: fresh);
+  }
+
+  Future<VideosState> _load({bool fresh = false}) async {
+    final feed = await ref
+        .watch(videosRepositoryProvider)
+        .fetchFeed(fresh: fresh);
     return VideosState(
       videos: feed.videos,
       loadedAt: DateTime.now(),
@@ -34,6 +43,7 @@ class VideosController extends _$VideosController {
   /// leaves the old data with the error, which the view shows as stale).
   Future<void> refresh() async {
     _fromScratch = false;
+    _freshNext = true;
     ref.invalidateSelf();
     await _settle();
   }
@@ -50,7 +60,7 @@ class VideosController extends _$VideosController {
     _fromScratch = true;
     // Not invalidateSelf: a rebuild would bring the old data back.
     state = const AsyncLoading<VideosState>();
-    state = await AsyncValue.guard(_load);
+    state = await AsyncValue.guard(() => _load(fresh: true));
     if (!state.hasError) _fromScratch = false;
   }
 

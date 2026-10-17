@@ -442,7 +442,7 @@ C-26 Integration tests (auth flow + one feature flow) · C-29 README + HOW_TO_ST
 ## C-44 — Cache-first policy, retention and pruning (D-038)
 | status | owner | blocked by |
 |---|---|---|
-| READY | — | C-41 |
+| REVIEW | Worker B | — |
 - Goal: D-038. Make cache-first the default for every read feature and keep the cache bounded.
 - Files: `lib/core/storage/cache/**` (`cache_policy.dart` presets, `cached_repository_helper.dart` revalidate-with-etag / payload-hash no-op, `cache_pruner.dart`), `lib/core/storage/cache_store.dart` (lastAccessedAt, maxAge, size cap), `lib/core/bootstrap/bootstrap.dart` (schedule prune after first frame; tiny edit), app lifecycle hook for prune on resume >24h, `lib/features/videos/data/videos_repository.dart` (switch to the helper if C-39 is merged), `ai-docs/STATE_AND_DATA.md`, `.fttemplates/**` is C-25's, `test/core/storage/cache/**`
 - Done when: cached value is emitted first; unchanged payload does not re-emit; changed payload emits once; failure with cache = stale value + error, without cache = error; ttl vs maxAge behave as D-038; pruning removes expired, then least-recently-used over the cap; user-scoped keys; logout clears; no feature hand-rolls expiry (grep).

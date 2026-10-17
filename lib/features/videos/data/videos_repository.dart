@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:riverpod_core/core/errors/app_exception.dart';
 import 'package:riverpod_core/core/errors/error_mapper.dart';
 import 'package:riverpod_core/core/network/dio_client.dart';
+import 'package:riverpod_core/core/storage/cache/cache_policy.dart';
+import 'package:riverpod_core/core/storage/cache/cached_repository_helper.dart';
 import 'package:riverpod_core/core/storage/prefs_storage.dart';
 import 'package:riverpod_core/features/videos/data/models/video.dart';
 import 'package:riverpod_core/features/videos/data/models/video_feed.dart';
@@ -21,16 +25,20 @@ const videosUseMockSource = true;
 /// Prefs key of the favorite video ids. Under `user.` so logout clears it.
 const videoFavoritesKey = 'user.videos.favorites';
 
+/// Cache key of the video list. Shared by every user: it is public data.
+const videosFeedKey = 'videos.feed';
+
 /// Id of the synthetic video built from a link the user typed.
 const customVideoId = 'custom';
 
 /// Videos for the list and detail pages. Returns models or throws an
 /// [AppException]; JSON and `DioException` never leave this class.
 class VideosRepository {
-  VideosRepository(this._source, this._prefs);
+  VideosRepository(this._source, this._prefs, this._cache);
 
   final VideosRemoteSource _source;
   final Future<PrefsStorage> _prefs;
+  final CachedRepositoryHelper _cache;
 
   /// True when the source is the mock, so [simulate] has an effect.
   bool get supportsSimulation => _source is VideosMockSource;
@@ -48,10 +56,23 @@ class VideosRepository {
   }
 
   /// The ONE read of the list (the controller and related videos use only
-  /// this). D-038 wants it cache-first (cached list first, then a background
-  /// revalidate that does not re-emit unchanged data): C-44 switches this
-  /// method to the shared cache helper without touching any caller.
-  Future<VideoFeed> fetchFeed() => _guard(_source.fetchVideos);
+  /// this). Cache-first (D-038): the cached feed comes back at once when there
+  /// is one, and the revalidation finishes in the background so the next read
+  /// is fresh. With no cache this waits for the network.
+  ///
+  /// [fresh] is for refresh and reload: it waits for the network and returns
+  /// that answer, and a failure is raised even when a cached copy exists, so
+  /// the page shows the error next to the old data.
+  Future<VideoFeed> fetchFeed({bool fresh = false}) => _cache.load<VideoFeed>(
+    key: videosFeedKey,
+    fetch: (_) =>
+        _guard(() async => (value: await _source.fetchVideos(), etag: null)),
+    decode: (payload) =>
+        VideoFeed.fromJson(jsonDecode(payload) as Map<String, dynamic>),
+    encode: (feed) => jsonEncode(feed.toJson()),
+    policy: CachePolicy.short,
+    fresh: fresh,
+  );
 
   Future<Video> fetchVideo(String id) => _guard(() => _source.fetchVideo(id));
 
@@ -128,5 +149,6 @@ VideosRepository videosRepository(Ref ref) {
   return VideosRepository(
     ref.watch(videosSourceProvider),
     ref.watch(prefsStorageProvider.future),
+    ref.watch(cachedRepositoryHelperProvider),
   );
 }

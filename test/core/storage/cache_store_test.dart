@@ -93,8 +93,10 @@ void main() {
         key: 'k',
         payload: '1',
         savedAt: saved,
-        ttl: const Duration(minutes: 5),
-        maxAge: const Duration(days: 7),
+        policy: const CachePolicy(
+          ttl: Duration(minutes: 5),
+          maxAge: Duration(days: 7),
+        ),
       );
       final entry = store.read('k')!;
       expect(entry.ttl, const Duration(minutes: 5));
@@ -188,7 +190,7 @@ void main() {
 
       expect(entry.payload, 'old');
       expect(entry.lastAccessedAt, saved);
-      expect(entry.maxAge, defaultMaxAge);
+      expect(entry.maxAge, CachePolicy.medium.maxAge);
     },
   );
 }
