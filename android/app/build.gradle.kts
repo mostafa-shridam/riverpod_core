@@ -8,6 +8,13 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Firebase Google Services + Crashlytics (D-042): applied ONLY when the app has its own
+// google-services.json (git-ignored), so a clean clone builds without any Firebase file.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+    apply(plugin = "com.google.firebase.crashlytics")
+}
+
 // Release signing values live in the untracked android/key.properties (see tool/release/README.md).
 val keystoreProperties = Properties()
 val keystorePropertiesFile = rootProject.file("key.properties")

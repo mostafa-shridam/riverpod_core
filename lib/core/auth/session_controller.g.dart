@@ -112,7 +112,7 @@ final class SessionControllerProvider
   }
 }
 
-String _$sessionControllerHash() => r'5c25e56f2afc3414cbff1b55973af7e7adfb9255';
+String _$sessionControllerHash() => r'72404a133311b6838dfc468512af9c5067ae2997';
 
 /// Single owner of the session. Guards read the [SessionStatus]. The
 /// controller is also the app's [AccessTokenRefresher], so the Dio refresh

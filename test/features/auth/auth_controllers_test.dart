@@ -1,6 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod_core/core/auth/session_controller.dart';
+import 'package:riverpod_core/core/config/app_config.dart';
+import 'package:riverpod_core/core/config/flavor.dart';
+import 'package:riverpod_core/core/config/log_level.dart';
 import 'package:riverpod_core/core/errors/app_exception.dart';
 import 'package:riverpod_core/core/storage/secure_storage.dart';
 import 'package:riverpod_core/features/auth/data/models/auth_requests.dart';
@@ -38,9 +41,22 @@ class _FakeSource implements AuthRemoteSource {
   Future<void> logout() => _answer(() {});
 }
 
+const _config = AppConfig(
+  flavor: Flavor.dev,
+  appName: 'Test',
+  apiBaseUrl: 'https://api.example.test',
+  connectTimeout: Duration(seconds: 15),
+  receiveTimeout: Duration(seconds: 30),
+  logLevel: LogLevel.off,
+  enableCrashReporting: false,
+  enableAnalytics: false,
+);
+
 ProviderContainer _container(AuthRemoteSource source) {
   return createContainer(
     overrides: [
+      // Sign-in now tags analytics/crash, which read the config.
+      appConfigProvider.overrideWithValue(_config),
       authRemoteSourceProvider.overrideWithValue(source),
       secureStorageProvider.overrideWithValue(FakeSecureStorage()),
     ],
