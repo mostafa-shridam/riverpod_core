@@ -1,0 +1,3 @@
+const deepLinkHost = 'example.com';
+
+const deepLinkScheme = 'riverpod-core';

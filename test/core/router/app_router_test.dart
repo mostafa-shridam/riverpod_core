@@ -178,5 +178,20 @@ void main() {
       expect(_page('item-detail-page'), findsOneWidget);
       expect(find.text('42'), findsOneWidget);
     });
+
+    testWidgets('a custom-scheme link opens the typed route (C-31)', (
+      tester,
+    ) async {
+      final container = await _container(tester, onboardingSeen: true);
+      addTearDown(container.dispose);
+      await _signIn(container);
+      await _pumpRouter(tester, container);
+
+      container.read(appRouterProvider).go('riverpod-core://items/42');
+      await tester.pumpAndSettle();
+
+      expect(_page('item-detail-page'), findsOneWidget);
+      expect(find.text('42'), findsOneWidget);
+    });
   });
 }

@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:riverpod_core/core/auth/session_controller.dart';
 import 'package:riverpod_core/core/notifications/routing/notification_router_provider.dart';
 import 'package:riverpod_core/core/router/app_error_page.dart';
+import 'package:riverpod_core/core/router/deep_link.dart';
 import 'package:riverpod_core/core/router/guards/app_redirect.dart';
 import 'package:riverpod_core/core/router/routes.dart';
 import 'package:riverpod_core/core/startup/splash_page.dart';
@@ -32,12 +33,14 @@ GoRouter appRouter(Ref ref) {
   final router = GoRouter(
     initialLocation: SplashPage.routeName,
     refreshListenable: refresh,
-    redirect: (context, state) => appRedirect(
-      location: state.uri.path,
-      session: ref.read(sessionControllerProvider),
-      onboardingSeen: ref.read(onboardingSeenProvider),
-      startupReady: ref.read(startupReadyProvider),
-    ),
+    redirect: (context, state) =>
+        deepLinkRedirect(state.uri) ??
+        appRedirect(
+          location: state.uri.path,
+          session: ref.read(sessionControllerProvider),
+          onboardingSeen: ref.read(onboardingSeenProvider),
+          startupReady: ref.read(startupReadyProvider),
+        ),
     errorBuilder: (context, state) => const AppErrorPage(),
     routes: $appRoutes,
   );
