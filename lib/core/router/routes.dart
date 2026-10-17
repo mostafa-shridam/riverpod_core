@@ -153,6 +153,8 @@ class ItemDetailRoute extends GoRouteData with $ItemDetailRoute {
 GoRouteData? routeForDeepLink({required String type, required String id}) {
   return switch (type) {
     'myEvents' => ItemDetailRoute(id: id),
+    'items' => ItemDetailRoute(id: id),
+    'videos' => VideoDetailRoute(id: id),
     _ => null,
   };
 }

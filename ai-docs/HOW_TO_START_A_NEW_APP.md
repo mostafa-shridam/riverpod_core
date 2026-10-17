@@ -16,12 +16,12 @@ From the project root:
 ```
 dart run tool/rename_app.dart --name "My App" --id com.company.myapp
 ```
-- Add `--package my_app` to override the Dart package name (default: derived from `--name`); `--dry-run` only prints the changes; invalid input writes nothing.
+- Add `--package my_app` to override the Dart package name (default: derived from `--name`), `--host links.company.com` for the deep-link domain (default: keep `example.com`); `--dry-run` only prints the changes; invalid input writes nothing.
 - It updates: `pubspec.yaml` (name, description), every `package:riverpod_core/` import in `lib/`, `test/`, `integration_test/`, Android `namespace` + `applicationId` + `MainActivity` package/folder + manifest label,
   iOS `CFBundleDisplayName`/`CFBundleName` + `PRODUCT_BUNDLE_IDENTIFIER` (and `<id>.RunnerTests`), the first `# ` title of `README.md`, and `APP_NAME` in `env/*.env` and `env/*.env.example`.
 - Then run what the script prints: `flutter pub get`, `dart run build_runner build --delete-conflicting-outputs` (or `./build.sh`), `dart format .`, `flutter analyze`.
 - Write your own `README.md` afterwards (only its first title line is renamed).
-- Placeholders the script does not know about yet: **(pending C-31)** deep-link host and custom scheme.
+- Deep links: the custom scheme becomes the package name with `_` as `-`; `--host` rewrites the https host (manifest, `deep_link.dart`, and `applinks:` if you enabled it). See `ai-docs/DEEP_LINKS.md`.
 
 ## 3. Environments
 ```
@@ -42,12 +42,14 @@ Skip it and the app still runs: push is off with one log line, everything else w
   Until C-30 is merged, crash reporting and analytics are the no-op/console implementations behind `CrashReporter` / `AnalyticsService`.
 - **Native flavors (optional, D-043):** the template ships none, so `flutter run` needs no `--flavor`. If your app needs different bundle ids per environment, add Android `productFlavors` in
   `android/app/build.gradle.kts` and iOS schemes/configurations in Xcode yourself, then run with `--flavor <name> -t lib/main_staging.dart` (staging) and keep `Flavor.current` for the rest.
-  Keep one `google-services.json` per flavor directory if you use Firebase. Record the change as a DECISION in your app.
+  Keep one `google-services.json` per flavor directory if you use Firebase. Record the change as a DECISION in your app. Give each flavor its own deep-link scheme (manifest placeholders on Android, per-configuration `CFBundleURLSchemes` on iOS) and keep `deepLinkScheme` in step.
 
 ## 5. Branding
 - Edit ONLY `lib/core/design_system/tokens/brand_config.dart` (`brandSeedColor`, `brandFontFamily`). Light and dark schemes derive from the seed; nothing else holds a hex value.
 - Replace the Android notification icon `android/app/src/main/res/drawable/ic_notification.xml`.
-- **(pending C-31)** launcher icon (`dart run flutter_launcher_icons`) and native splash: the generic assets, config blocks and commands arrive with C-31. Until then `flutter_launcher_icons` is a dev dependency with its config commented out in `pubspec.yaml`.
+- **Icon**: replace `assets/images/app_icon.png` (1024 px, full icon) and `assets/images/app_icon_foreground.png` (1024 px, transparent, artwork inside the central 66%) with your own art (the placeholders come from `dart run tool/generate_placeholder_icon.dart`, which uses the seed color). Set `adaptive_icon_background` in the `flutter_launcher_icons` block of `pubspec.yaml`, then run `dart run flutter_launcher_icons` and commit the generated files. If it rewrites `ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS` in `ios/Runner.xcodeproj/project.pbxproj` to `AppIcon`, revert that line to `YES`.
+- **Native splash**: set colors and image in the `flutter_native_splash` block of `pubspec.yaml` (same color as the seed), run `dart run flutter_native_splash:create`, commit. If it re-indents `ios/Runner/Info.plist`, keep only the real changes.
+- **Deep links**: `ai-docs/DEEP_LINKS.md` (host, scheme, `assetlinks.json`, `apple-app-site-association`, enabling Universal Links with a paid Apple team).
 
 ## 6. Translations
 Edit `assets/translations/{ar,en}.json` (both files, same commit), then `./build.sh` and `dart format lib/generated`, and commit the regenerated `lib/generated/*`.

@@ -200,5 +200,40 @@ void main() {
       expect(_page('item-detail-page'), findsOneWidget);
       expect(find.text('42'), findsOneWidget);
     });
+
+    testWidgets('a custom-scheme link opens the typed route (C-31)', (
+      tester,
+    ) async {
+      final container = await _container(tester, onboardingSeen: true);
+      addTearDown(container.dispose);
+      await _signIn(container);
+      await _pumpRouter(tester, container);
+
+      container.read(appRouterProvider).go('riverpod-core://items/42');
+      await tester.pumpAndSettle();
+
+      expect(_page('item-detail-page'), findsOneWidget);
+      expect(find.text('42'), findsOneWidget);
+    });
+
+    testWidgets('a link opened while signed out is replayed after sign-in', (
+      tester,
+    ) async {
+      final container = await _container(tester, onboardingSeen: true);
+      addTearDown(container.dispose);
+      await _pumpRouter(tester, container);
+      expect(_page('login-page'), findsOneWidget);
+
+      container.read(appRouterProvider).go('https://example.com/items/42');
+      await tester.pumpAndSettle();
+      expect(_page('login-page'), findsOneWidget);
+      expect(_page('item-detail-page'), findsNothing);
+
+      await _signIn(container);
+      await tester.pumpAndSettle();
+
+      expect(_page('item-detail-page'), findsOneWidget);
+      expect(find.text('42'), findsOneWidget);
+    });
   });
 }
