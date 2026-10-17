@@ -18,15 +18,15 @@
 ## Rules
 - A bug fix starts with a failing test.
 - Tests are deterministic: no real network, no real clock (inject `Clock`/use `fakeAsync`), no sleeping.
-- Never delete/weaken a test without recording in the report which behaviour stopped being true (hard rule 6).
-- Golden files live in `test/goldens/` next to the test; update only via `flutter test --update-goldens <file>` for tests your task owns, and say so in the report. Goldens use a fixed test font and `pixelRatio` set in the helper.
+- Never delete/weaken a test without recording (commit message or PR text) which behaviour stopped being true (hard rule 6).
+- Golden files live in `test/goldens/` next to the test; update only via `flutter test --update-goldens <file>` for tests your change owns, and say so in the commit message. Goldens use a fixed test font and `pixelRatio` set in the helper.
 
 ## Helpers (`test/helpers/`)
 - `pumpApp(tester, widget, {overrides, locale, themeMode, textScale, size})` — wraps in `ProviderScope`, localization, theme.
 - `createContainer({overrides})` — `ProviderContainer` that is disposed via `addTearDown`.
 - `FakeHttpAdapter` — queue of canned responses/errors for Dio.
 - `FakeSecureStorage`, `FakePrefsStorage`, `FakeConnectivity`, `FakeCrashReporter`, `FakeAnalytics` (in-memory fakes, subclassing/overriding the concrete core classes or interfaces where one exists).
-- Each fake above is added by the task that creates its interface (C-04 creates only `pumpApp`, `createContainer`, `FakeHttpAdapter`).
+- Each fake is added together with the interface it fakes.
 - Mocks with `mocktail`: register fallback values in `setUpAll`; verify interactions, not implementation details.
 
 ## Commands
@@ -37,7 +37,7 @@ flutter test --coverage            # CI
 flutter test integration_test      # needs a device/emulator; not part of the default gate
 ```
 
-## Integration tests (C-26)
+## Integration tests
 - Location: `integration_test/`. `app_flow_test.dart` drives the real app through `bootstrap` on a device: onboarding, sign-in (wrong and right credentials), videos, favorite, About, logout.
 - Seams, not mocks of the app: `helpers/flow_setup.dart` gives the mock remote config, a fake video player (`videoBackendFactoryProvider`), in-memory secure storage, fresh settings and cache on each run, and an env with no real values and no network.
 - No real timers are needed in the test code. The app's own mock auth delay (400 ms) and splash minimum (800 ms) are the only waits; `pumpUntilFound` polls for the screen, it never uses `pumpAndSettle` (spinners never settle).

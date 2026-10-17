@@ -102,7 +102,7 @@ void main() {
         await h.service.initialize();
 
         expect(h.local.timezoneName, 'Africa/Cairo');
-        // C-47: channels are created later by NotificationLabelSync, once
+        // Channels are created later by NotificationLabelSync, once
         // translations are loaded (initialize used to create them early).
         expect(h.local.createChannelsCalls, 0);
         expect(h.push.initializeCalls, 1);

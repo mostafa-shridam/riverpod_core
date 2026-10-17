@@ -47,7 +47,7 @@ Future<List<Override>> openFreshStorage() async {
 Future<void> startApp(WidgetTester tester) async {
   Widget? app;
   // Needed before EasyLocalization builds: production bootstrap does not call it
-  // (listed as a defect in C-26), so the test does.
+  // (a known gap), so the test does.
   await EasyLocalization.ensureInitialized();
   // bootstrap installs its own error handlers. Restore the test framework's
   // afterwards, so a failure fails the test with its real error.

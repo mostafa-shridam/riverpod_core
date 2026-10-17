@@ -1,4 +1,4 @@
-# FIREBASE (C-30, D-042)
+# FIREBASE (D-042)
 
 Crash reporting (Crashlytics) and analytics (Firebase Analytics) are real but strictly optional. The template contains NO Firebase file, key or project id. A clean clone builds and runs with Noop crash/analytics.
 
@@ -48,4 +48,4 @@ Implement `CrashReporter` and/or `AnalyticsService` for the new vendor and retur
 
 ## Known limits
 - Not verified against a real Firebase project in the template (no project data by design).
-- Collection consent uses `shared_preferences` directly (key `settings.collectionConsent`) because `PrefKeys` belongs to the storage task; move it into `PrefsStorage` when that is free.
+- Collection consent is stored in `PrefsStorage` (key `settings.collectionConsent`) and survives logout.

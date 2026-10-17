@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:integration_test/integration_test_driver.dart';
 
-/// Run by `flutter drive` for the owner's screenshots (C-26). Each
+/// Run by `flutter drive` for the owner's screenshots. Each
 /// `takeScreenshot` name is written to `$SCREENS_DIR/<name>.png`.
 Future<void> main() => integrationDriver(
   responseDataCallback: (data) async {

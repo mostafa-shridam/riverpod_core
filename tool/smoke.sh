@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Clean-clone smoke run (C-26). Copies the committed tree into a temp dir,
+# Clean-clone smoke run. Copies the committed tree into a temp dir,
 # uses only the committed *.env.example files (no real values, no Firebase
 # files), then runs codegen, analyze, the unit tests, the debug builds and the
 # integration test on an iOS simulator. Exits non-zero on the first failure.

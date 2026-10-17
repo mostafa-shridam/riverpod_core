@@ -200,7 +200,7 @@ class AppConfig {
   }
 }
 
-/// Per-flavor defaults for optional keys (see the C-02 decision in the report).
+/// Per-flavor defaults for optional keys (D-024).
 class _FlavorDefaults {
   const _FlavorDefaults({
     required this.logLevel,
@@ -226,7 +226,7 @@ class _FlavorDefaults {
   final bool enableCrashReporting;
 }
 
-/// The validated [AppConfig]. Overridden in `bootstrap` (C-08) before any read;
+/// The validated [AppConfig]. Overridden in `bootstrap` before any read;
 /// reading it earlier is a programming error.
 @Riverpod(keepAlive: true)
 AppConfig appConfig(Ref ref) {

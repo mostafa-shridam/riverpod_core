@@ -69,7 +69,7 @@ void main() {
     await pumpUntilFound(tester, find.byKey(const ValueKey('home-page')));
 
     // More is reached by route, not by its tab: a tap on the tab is the known
-    // defect in ai-docs/reports/C-26.md.
+    // open item (README, Known open items).
     final home = tester.element(find.byKey(const ValueKey('home-page')));
     const MoreRoute().go(home);
     await pumpUntilFound(tester, find.byKey(const ValueKey('more-page')));

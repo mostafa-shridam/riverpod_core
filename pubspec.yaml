@@ -74,7 +74,7 @@ flutter:
     # env files still builds and tests; EnvLoader reports a missing file (D-024).
     - env/
 
-# Launcher icons: `dart run flutter_launcher_icons` (ai-docs/HOW_TO_START_A_NEW_APP.md).
+# Launcher icons: `dart run flutter_launcher_icons` (README, "Start a new app from this template").
 # The placeholder PNGs come from `dart run tool/generate_placeholder_icon.dart`;
 # an app replaces them with its own artwork. Keep the colors in sync with
 # `brandSeedColor` in lib/core/design_system/tokens/brand_config.dart.

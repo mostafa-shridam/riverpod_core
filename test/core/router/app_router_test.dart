@@ -242,9 +242,7 @@ void main() {
       expect(find.text('42'), findsOneWidget);
     });
 
-    testWidgets('a custom-scheme link opens the typed route (C-31)', (
-      tester,
-    ) async {
+    testWidgets('a custom-scheme link opens the typed route', (tester) async {
       final container = await _container(tester, onboardingSeen: true);
       addTearDown(container.dispose);
       await _signIn(container);

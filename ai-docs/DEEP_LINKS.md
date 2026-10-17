@@ -1,4 +1,4 @@
-# DEEP LINKS (C-31)
+# DEEP LINKS
 
 Two kinds of link open the app on a typed route:
 

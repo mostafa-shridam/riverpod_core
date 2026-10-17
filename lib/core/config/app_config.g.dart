@@ -8,19 +8,19 @@ part of 'app_config.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// The validated [AppConfig]. Overridden in `bootstrap` (C-08) before any read;
+/// The validated [AppConfig]. Overridden in `bootstrap` before any read;
 /// reading it earlier is a programming error.
 
 @ProviderFor(appConfig)
 final appConfigProvider = AppConfigProvider._();
 
-/// The validated [AppConfig]. Overridden in `bootstrap` (C-08) before any read;
+/// The validated [AppConfig]. Overridden in `bootstrap` before any read;
 /// reading it earlier is a programming error.
 
 final class AppConfigProvider
     extends $FunctionalProvider<AppConfig, AppConfig, AppConfig>
     with $Provider<AppConfig> {
-  /// The validated [AppConfig]. Overridden in `bootstrap` (C-08) before any read;
+  /// The validated [AppConfig]. Overridden in `bootstrap` before any read;
   /// reading it earlier is a programming error.
   AppConfigProvider._()
     : super(

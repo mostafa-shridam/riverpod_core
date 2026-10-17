@@ -10,7 +10,7 @@ part of 'session_epoch.dart';
 // ignore_for_file: type=lint, type=warning
 /// Counts sign-outs. Logout bumps it; providers that hold user data watch it
 /// (`ref.watch(sessionEpochProvider)`) and rebuild, so no user data survives
-/// a sign-out. This is the invalidation mechanism of C-17, chosen over a
+/// a sign-out. This is the session invalidation mechanism, chosen over a
 /// root container reset because it needs no change to `ProviderScope`.
 
 @ProviderFor(SessionEpoch)
@@ -18,12 +18,12 @@ final sessionEpochProvider = SessionEpochProvider._();
 
 /// Counts sign-outs. Logout bumps it; providers that hold user data watch it
 /// (`ref.watch(sessionEpochProvider)`) and rebuild, so no user data survives
-/// a sign-out. This is the invalidation mechanism of C-17, chosen over a
+/// a sign-out. This is the session invalidation mechanism, chosen over a
 /// root container reset because it needs no change to `ProviderScope`.
 final class SessionEpochProvider extends $NotifierProvider<SessionEpoch, int> {
   /// Counts sign-outs. Logout bumps it; providers that hold user data watch it
   /// (`ref.watch(sessionEpochProvider)`) and rebuild, so no user data survives
-  /// a sign-out. This is the invalidation mechanism of C-17, chosen over a
+  /// a sign-out. This is the session invalidation mechanism, chosen over a
   /// root container reset because it needs no change to `ProviderScope`.
   SessionEpochProvider._()
     : super(
@@ -56,7 +56,7 @@ String _$sessionEpochHash() => r'0c3db6ed6998d232ba29c8489eb32d468e8fb136';
 
 /// Counts sign-outs. Logout bumps it; providers that hold user data watch it
 /// (`ref.watch(sessionEpochProvider)`) and rebuild, so no user data survives
-/// a sign-out. This is the invalidation mechanism of C-17, chosen over a
+/// a sign-out. This is the session invalidation mechanism, chosen over a
 /// root container reset because it needs no change to `ProviderScope`.
 
 abstract class _$SessionEpoch extends $Notifier<int> {

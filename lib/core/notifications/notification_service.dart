@@ -105,7 +105,7 @@ class NotificationService {
       final zone = await _timezone.localTimezone() ?? 'UTC';
       await _localBackend.initialize(timezoneName: zone, onTap: router.handle);
       // Channels are NOT created here: translations are not loaded yet at
-      // bootstrap, so the names would be raw keys (C-47). The
+      // bootstrap, so the names would be raw keys. The
       // `NotificationLabelSync` widget creates them after the first frame.
       final launch = await _localBackend.launchTap();
       if (launch != null) router.handle(launch);

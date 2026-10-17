@@ -29,7 +29,7 @@ void main() {
   );
 
   testWidgets(
-    'KNOWN DEFECT C-26, skipped: More, About, then logout returns to login',
+    'KNOWN OPEN ITEM, skipped: More, About, then logout returns to login',
     (tester) async {
       await _startSignedIn(tester);
       await _favoriteFirstVideoAndLeave(tester);
@@ -50,7 +50,7 @@ void main() {
   );
 
   testWidgets(
-    'KNOWN DEFECT C-26, skipped: More opens after an items detail is popped',
+    'KNOWN OPEN ITEM, skipped: More opens after an items detail is popped',
     (tester) async {
       await _startSignedIn(tester);
       final home = tester.element(find.byKey(const ValueKey('home-page')));

@@ -30,7 +30,7 @@
 - No `print`. Use the logger (`core/logger`).
 
 ## Comments
-- English only. Explain WHY, not what. No commented-out code, no TODO without a task ID (`// TODO(C-12): ...`).
+- English only. Explain WHY, not what. No commented-out code, no TODO without an owner or decision reference (`// TODO(D-0xx): ...`).
 - Public API of `core/` gets a one-line doc comment (`///`).
 
 ## Strings and localization
@@ -49,7 +49,7 @@
 
 ## UI composition
 - One shared primitive per UI element (button, field, card, dialog, sheet, snackbar, avatar, badge, chip, skeleton, image).
-  Primitives live only in `lib/core/design_system/widgets/`. Features compose them; never re-implement or restyle locally. Missing variant → ask the Lead for a task to extend the primitive.
+  Primitives live only in `lib/core/design_system/widgets/`. Features compose them; never re-implement or restyle locally. Missing variant → extend the shared primitive (ask the owner if unsure).
 - No hard-coded colors, font sizes, spacing, radii, durations in features: use tokens (DESIGN_SYSTEM.md) via `Theme.of(context)` / `context.tokens`. Never use raw `ElevatedButton`/`TextField` etc. in features.
 - Never set `textScaler` to a fixed value. Layouts must survive 2.0× text scale.
 - Touch targets ≥ 48×48 dp. Add `Semantics` labels to icon-only buttons.

@@ -14,6 +14,6 @@ Run on a clean checkout of the release commit. Report each line PASS/FAIL; any F
 5. Signing: Android release uses `key.properties` (untracked), never the debug key; iOS uses the team's distribution profile.
 6. Version: `pubspec.yaml` `version:` bumped (name+build); version screen shows it; changelog updated.
 7. Native: app id/bundle id is the app's own (not `com.example.*`), launcher icon and splash are the app's, permissions in manifests match what the code actually uses, iOS usage descriptions present.
-8. Checklist: `ai-docs/CHECKLIST.md` has no MISSING item the app depends on; deep links/notification routing verified by hand on a real device.
+8. Real devices: deep links, notification routing, biometric app lock and https link verification checked by hand on a real device (see README "Known open items").
 9. Build artifacts: `tool/release/build_android.sh` and `tool/release/build_ios.sh` (or `flutter build appbundle --release` / `flutter build ipa`) succeed with `android/key.properties` and `ios/ExportOptions.plist` in place; size reasonable; obfuscation flags (`--obfuscate --split-debug-info=…`) used and symbols archived.
 10. Smoke on the release build: cold start, login, logout, offline banner, language switch ar↔en, dark mode, text scale 1.5×.

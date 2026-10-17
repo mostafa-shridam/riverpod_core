@@ -3,7 +3,7 @@
 Style: feature-first, pragmatic layering, Riverpod (codegen) for DI + state.
 **No domain layer**: no entities, no use cases, no abstract repository interfaces (D-015).
 Flow: `page → provider → repository → data source`. A feature never imports another feature's internals.
-Shared things live in `core/`, `core/design_system/` or `shared/`. Current code differs in places; CHECKLIST.md/TASKS.md name the task that closes each gap.
+Shared things live in `core/`, `core/design_system/` or `shared/`.
 
 ## Folder tree
 ```

@@ -1,6 +1,6 @@
 ---
 name: new-feature
-description: Scaffold a new feature (data/providers/presentation) from .fttemplates, register its typed route, and add tests. Use when a task says "add feature X".
+description: Scaffold a new feature (data/providers/presentation) from .fttemplates, register its typed route, and add tests. Use when adding feature X.
 ---
 
 # new-feature
@@ -16,7 +16,7 @@ Read ARCHITECTURE.md and CONVENTIONS.md first. The skeleton comes from `.fttempl
 2. Replace the model fields, the endpoint (`<nameCamel>Endpoint`) and the texts. Translate `<nameCamel>.title` in `ar.json` (it holds the English title). New endpoint -> `new-api-call` skill. New page -> `new-page` skill. Strings -> `add-translation-keys` skill.
 3. Paste the printed typed route into `lib/core/router/routes.dart` (+ guard if protected). Edit no other feature.
 4. Extend the generated tests to your behaviour: repository (success + each mapped exception), controller (initial/success/failure/refresh), pages (8 states, goldens).
-5. Generation under the lock (`mkdir /tmp/riverpod_core.lock` ... `rmdir /tmp/riverpod_core.lock`): the two `easy_localization:generate` commands and `dart run build_runner build --delete-conflicting-outputs` from `build.sh`, then `dart format lib test`. Commit `lib/generated/*` with the task (D-037).
-6. Run the gate; write the report; set REVIEW.
+5. Generation under the lock (`mkdir /tmp/riverpod_core.lock` ... `rmdir /tmp/riverpod_core.lock`): the two `easy_localization:generate` commands and `dart run build_runner build --delete-conflicting-outputs` from `build.sh`, then `dart format lib test`. Commit `lib/generated/*` with the change (D-037).
+6. Run the gate (CLAUDE.md, Definition of done).
 
 Never: import another feature's internals; put shared widgets in a feature; use raw Material buttons/fields; add a domain layer.
