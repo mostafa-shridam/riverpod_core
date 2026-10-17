@@ -11,7 +11,8 @@ The knowledge base every AI session must follow. `CLAUDE.md` (repo root) is the 
 | DESIGN_SYSTEM.md | Any UI work: tokens, shared widgets, the 8 data states. |
 | NETWORKING.md | Anything touching Dio, repositories, API calls, uploads, pagination. |
 | STATE_AND_DATA.md | Providers, AsyncValue, caching, storage. |
-| TESTING.md | Writing or changing any test or helper. |
+| NOTIFICATIONS.md | Push and local notifications, Firebase setup for push, payload contract. |
+| TESTING.md | Writing or changing any test or helper; integration test and `tool/smoke.sh`. |
 | CHECKLIST.md | The Lead: what the template still lacks (status per item). |
 | DECISIONS.md | Why things are the way they are. Append-only. Check before proposing alternatives. |
 | DEEP_LINKS.md | App links and custom scheme: host/scheme places, assetlinks.json, apple-app-site-association, enabling Universal Links. |
@@ -22,5 +23,5 @@ The knowledge base every AI session must follow. `CLAUDE.md` (repo root) is the 
 Skills (step-by-step recipes) live in `.claude/skills/`: new-feature, new-page, new-api-call,
 add-translation-keys, review-task, release-check.
 
-Status of docs: ARCHITECTURE, NETWORKING, STATE_AND_DATA, DESIGN_SYSTEM describe the TARGET state.
-Where the current code differs, CHECKLIST.md and TASKS.md say which task closes the gap.
+Status of docs: all planned template tasks are merged, so ARCHITECTURE, NETWORKING, STATE_AND_DATA, DESIGN_SYSTEM and NOTIFICATIONS describe the code as it is.
+If you find a difference, it is a bug in the code or in the doc: CHECKLIST.md lists the known open items; fix it through a task or a DECISION.

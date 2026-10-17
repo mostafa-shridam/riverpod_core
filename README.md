@@ -7,9 +7,7 @@ production app needs is already built, tested and wired behind a small interface
 configuration (env files, one brand file, optional Firebase files, signing keys) and starts building features.
 A fresh clone builds and runs with `flutter run` after copying `env/*.env.example` (D-042).
 
-> **Status notes.** Blocks marked `Status:` describe work that is specified in `ai-docs/TASKS.md` but not merged at the
-> time of writing (2026-10-17). They are removed by the Lead when the task is DONE. Anything not marked is verified
-> against the code in this repository.
+> Everything below is merged and was checked against the code in this repository. Open items are listed in [Known open items](#known-open-items).
 
 - [Who this is for and how to read the docs](#who-this-is-for-and-how-to-read-the-docs)
 - [What is in the box](#what-is-in-the-box)
@@ -17,6 +15,7 @@ A fresh clone builds and runs with `flutter run` after copying `env/*.env.exampl
 - [Packages](#packages)
 - [Environment setup](#environment-setup)
 - [Run and install](#run-and-install)
+- [Remote config, app lock and deep links](#remote-config-app-lock-and-deep-links)
 - [Firebase, Crashlytics and push stay optional](#firebase-crashlytics-and-push-stay-optional)
 - [Start a new app](#start-a-new-app)
 - [Daily workflow](#daily-workflow)
@@ -24,9 +23,11 @@ A fresh clone builds and runs with `flutter run` after copying `env/*.env.exampl
 - [Design system tour](#design-system-tour)
 - [Data layer: cache-first](#data-layer-cache-first)
 - [Testing](#testing)
+- [Integration test and smoke script](#integration-test-and-smoke-script)
 - [CI](#ci)
 - [Release](#release)
 - [Troubleshooting](#troubleshooting)
+- [Known open items](#known-open-items)
 - [Documentation index](#documentation-index)
 - [Decisions at a glance](#decisions-at-a-glance)
 
@@ -65,15 +66,10 @@ Grouped like `ai-docs/CHECKLIST.md` (which carries the DONE/PARTIAL/MISSING stat
 
 ### State and data
 - `AsyncValueView` renders the 8 data states: loading, empty, error, offline, stale, partial, refreshing, success.
-- Settings in prefs (`PrefsStorage`), secrets in `flutter_secure_storage` (`SecureStorage`), structured/offline data in the local database.
-- Stale-while-revalidate cache helper (`CachedRepositoryHelper`).
+- Settings in prefs (`PrefsStorage`), secrets in `flutter_secure_storage` (`SecureStorage`), structured/offline data in `hive_ce` boxes (D-034). Settings and cache boxes are opened in `bootstrap`; a storage failure is fatal and reported.
+- Cache-first data layer (`CachedRepositoryHelper.load`/`watch`, `CachePolicy` presets, ETag revalidation, payload no-op, pruning; D-038). See [Data layer](#data-layer-cache-first).
 - Logout is ONE function (`SessionController.logout`): notifications hook, best-effort remote logout, wipe of secure storage, cache and user-scoped prefs, analytics reset, session epoch bump that invalidates user-scoped providers.
 - Provider auto-retry is disabled on purpose (D-032): errors surface, retry is explicit.
-
-> **Status:** C-41 (move all local storage to `hive_ce`, remove `shared_preferences` and Drift, D-034) and C-44 (cache-first policy,
-> retention and pruning, D-038) are not merged. Today prefs use `shared_preferences` and the cache helper sits on Drift
-> with a per-call `ttl`. The `CachePolicy` presets, ETag revalidation, payload-hash no-op and pruning described in
-> [Data layer](#data-layer-cache-first) do not exist yet.
 
 ### Auth and security
 - Session (`SessionController`, keepAlive): restore at startup, sign in/out, refresh through the single-flight refresher, expiry handling.
@@ -85,13 +81,11 @@ Grouped like `ai-docs/CHECKLIST.md` (which carries the DONE/PARTIAL/MISSING stat
 
 ### Navigation
 - ONE `GoRouter` (`appRouterProvider`), typed routes (`go_router_builder`) in `core/router/routes.dart`, a stateful shell with separate stacks (Home, More).
+- Forced-update and maintenance gate pages (`/force-update`, `/maintenance`) driven by remote config; a soft-update banner in the shell.
+- Deep links: an https app link and the custom scheme `riverpod-core` resolve to the same typed routes (`ai-docs/DEEP_LINKS.md`).
 - Every page declares `static const routeName`; there is no central paths class (D-036).
 - `routeForDeepLink(type, id)` is the single mapping used by notification taps and deep links.
 - Dev-only routes (`/showcase`, `/videos`) redirect home in prod.
-
-> **Status:** C-31 (native deep-link setup, launcher icons, native splash) is not merged: there is no `https`/custom-scheme intent filter or
-> associated-domains entry yet, no generated icons and no native splash. `routeForDeepLink` and notification routing exist and are tested.
-> C-21 (remote config: force update, maintenance mode, feature flags, D-040) is not merged: there is no `core/remote_config/` and no gate pages.
 
 ### UI
 - Material 3 design tokens as `ThemeExtension`s (`context.tokens`): color (from one seed + success/warning/info), type, spacing, radius, elevation, motion, component sizes. Light, dark and system modes.
@@ -112,20 +106,17 @@ Grouped like `ai-docs/CHECKLIST.md` (which carries the DONE/PARTIAL/MISSING stat
 
 ### Production services
 - Leveled logger that is silent in prod and masks secrets (`core/logger`).
-- `CrashReporter` and `AnalyticsService` interfaces with no-op and console implementations (`core/crash`, `core/analytics`).
+- `CrashReporter` and `AnalyticsService` interfaces (`core/crash`, `core/analytics`) with no-op, console and Firebase (Crashlytics, Analytics) implementations. The Firebase ones are used only when the config flag is on AND Firebase is configured; otherwise no-op (D-042, `ai-docs/FIREBASE.md`). A persisted consent switch applies to both; only an opaque user id is sent.
+- Remote config from your own endpoint (D-040): force update, maintenance mode, feature flags (`flagProvider(name)`), cached through the cache-first helper and never blocking startup.
+- Launcher icon and native splash (generic placeholders on the brand seed, regenerated with `flutter_launcher_icons` / `flutter_native_splash`).
 - Share (`ShareService`), external links with a scheme allow-list (`ExternalLinks`), in-app review throttled to once per 90 days (`ReviewService`), app info + About page with licenses.
 - Image picking, cropping and compression, file picking (`MediaService`); permissions with rationale and open-settings (`PermissionService`).
 
-> **Status:** C-30 (Firebase Crashlytics + Firebase Analytics, strictly optional, D-042) is not merged. Today `crashReporterProvider` and
-> `analyticsServiceProvider` return the no-op/console implementations; there is no `firebase_crashlytics` or `firebase_analytics` dependency.
-> C-46 (wire `permissionRationalePresenterProvider` in the bootstrap `ProviderScope`) is not merged; until then the permission flows run without the shared rationale dialog unless the app overrides the provider.
-
 ### Quality
-- About 100 test files mirroring `lib/`, fakes for every native seam (`test/helpers/`), 190+ golden baselines (light/dark, ar/en, tablet, 2.0x text), translation parity and no-literal-keys guard tests, tool tests.
-- GitHub Actions CI: gate + coverage artifact + debug Android and iOS builds (no secrets).
+- About 110 test files (1386 tests in the Lead's last full run) mirroring `lib/`, fakes for every native seam (`test/helpers/`), 200+ golden baselines (light/dark, ar/en, tablet, 2.0x text), translation parity and no-literal-keys guard tests, tool tests.
+- GitHub Actions CI: gate + coverage artifact + debug Android and iOS builds (no secrets), plus an optional nightly/on-demand iOS integration job.
+- Integration test of the real app flow and a clean-clone smoke script (`tool/smoke.sh`).
 - Release scripts with untracked signing; a release build without `android/key.properties` is refused.
-
-> **Status:** C-26 (integration tests: auth flow + one feature flow) is not written yet: there is no `integration_test/` folder.
 
 ## Architecture
 
@@ -143,11 +134,13 @@ lib/
 │   ├── config/                     # AppConfig, Flavor, EnvLoader (the ONLY dotenv user), validation
 │   ├── network/                    # dio_client.dart, interceptors/, pagination/, transfer/
 │   ├── errors/                     # AppException, error_mapper.dart, error_messages.dart
-│   ├── storage/                    # secure_storage, prefs_storage, clear_user_data, cache/, database/
+│   ├── storage/                    # secure_storage, prefs_storage, hive_boxes, clear_user_data, cache/ (store, policy, helper, pruner)
 │   ├── auth/                       # SessionController, tokens, auth_endpoints.dart, session epoch
 │   ├── connectivity/               # online/offline stream
 │   ├── notifications/              # push + local notifications, routing, settings
-│   ├── analytics/  crash/          # interfaces + no-op/console implementations
+│   ├── analytics/  crash/  firebase/   # interfaces + no-op/console/Firebase impls; optional Firebase init + consent
+│   ├── remote_config/              # model, app gate (version compare), source, repository, flags
+│   ├── localization/               # supported locales, translations path
 │   ├── logger/  permissions/  device/  media/  security/
 │   ├── sharing/  links/  review/  app_info/
 │   ├── design_system/              # the ONLY place UI primitives are implemented
@@ -155,12 +148,13 @@ lib/
 │   │   └── widgets/                # buttons inputs selection bottom_sheets dialogs feedback display layout async lists media permissions security
 │   └── utils/                      # validators, formatting/ (numbers, dates, plurals, relative time)
 ├── shared/models/                  # cross-feature models (AuthUser)
-├── features/<feature>/             # auth, home, items, more, onboarding, showcase, videos
+├── features/<feature>/             # app_gate, auth, home, items, more, onboarding, showcase, videos
 │   ├── data/                       # models/ (freezed + json), sources/ (remote, mock), <feature>_repository.dart
 │   ├── providers/                  # notifiers, no widgets
 │   └── presentation/               # pages/ (one page per file) and widgets/
 └── generated/                      # LocaleKeys + codegen loader (committed)
-assets/translations/{ar,en}.json    env/*.env.example    tool/    test/    .fttemplates/feature
+assets/translations/{ar,en}.json    env/*.env.example    tool/ (rename_app, new_feature, smoke.sh, release/)
+test/    integration_test/    .fttemplates/feature
 ```
 
 ### Layering rules and why
@@ -183,7 +177,7 @@ Error model, Riverpod patterns and startup order: `ai-docs/ARCHITECTURE.md`. Nam
 
 ## Packages
 
-Versions are the exact entries in `pubspec.lock`. Licences are read from each package's `LICENSE` file in the pub cache
+Versions are the exact entries in `pubspec.lock` (refreshed 2026-10-17 after C-41, C-30 and C-31). Licences are read from each package's `LICENSE` file in the pub cache
 (or recorded in DECISIONS/reports where noted). "Chosen/rejected" cites a decision when one exists; an empty cell means the
 choice has no recorded alternative (it is the standard package for that job).
 
@@ -202,8 +196,7 @@ choice has no recorded alternative (it is the standard package for that job).
 | easy_localization | 3.0.8 | ar/en, runtime switch, plurals, `LocaleKeys` generation | rejected `gen_l10n` (D-007); no own locale controller (D-035) | MIT |
 | intl | 0.20.3 | date/number formatting behind `AppFormatters` | | BSD-3 |
 | flutter_secure_storage | 11.2.0 | tokens only (`SecureStorage`) | never prefs/DB/logs for secrets | BSD-3 |
-| shared_preferences | 2.5.6 | settings (`PrefsStorage`) | **replaced by `hive_ce` in C-41 (D-034)** | BSD-3 |
-| drift, drift_flutter | 2.35.2, 0.3.1 | local DB for the cache table (`AppDatabase`) | chosen in D-004; **removed by C-41 (D-034)** | MIT, MIT |
+| hive_ce, hive_ce_flutter | 2.22.0, 2.5.0 | the only local store: settings box and cache box (`PrefsStorage`, `CacheStore`) | owner choice (D-034): one simple store; replaced `shared_preferences` and Drift; no SQL or migrations | BSD-3 + Apache-2.0 (both texts in its LICENSE) |
 | path_provider | 2.1.6 | transfer and image-processing directories | | BSD-3 |
 | connectivity_plus | 7.3.2 | online/offline events (`ConnectivityService`) | plugin events, never a DNS lookup | BSD-3 |
 | cached_network_image | 4.0.4 | behind `AppImage` only | disk+memory cache; rejected `Image.network`, own cache (D-021) | MIT |
@@ -215,7 +208,9 @@ choice has no recorded alternative (it is the standard package for that job).
 | file_picker | 13.1.0 | file picking via `MediaService` | own picking rejected (D-033) | MIT |
 | flutter_image_compress | 2.5.1 | JPEG re-encode in the media pipeline | | MIT |
 | permission_handler | 13.0.2 | behind `PermissionService` | | MIT |
-| firebase_core | 5.0.0 | `Firebase.initializeApp()` in the push backend only; failure = push off | optional Firebase (D-042) | BSD-3 |
+| firebase_core | 5.0.0 | `Firebase.initializeApp()` once through `FirebaseBootstrap`; failure = push, Crashlytics and Analytics off | optional Firebase (D-042) | BSD-3 |
+| firebase_crashlytics | 6.0.0 | `CrashlyticsBackend` behind `CrashReporter` | owner choice (D-042); Sentry stays an alternative behind the same interface | BSD-3 |
+| firebase_analytics | 13.0.0 | `AnalyticsBackend` behind `AnalyticsService` | D-042 | BSD-3 |
 | firebase_messaging | 17.0.0 | FCM in `firebase_push_backend.dart` only | deprecated token calls kept on purpose (D-039) | BSD-3 |
 | flutter_local_notifications | 22.3.2 | local notifications backend | | BSD-3 |
 | timezone, flutter_native_timezone_latest | 0.11.2, 1.0.0 | scheduled notifications in the device time zone (UTC fallback) | | BSD-2, MIT |
@@ -227,10 +222,6 @@ choice has no recorded alternative (it is the standard package for that job).
 | url_launcher | 6.3.3 | `ExternalLinks` (scheme allow-list) | | BSD-3 |
 | cloud_firestore, firebase_auth, google_sign_in | 7.0.0, 7.0.0, 7.2.0 | kept on purpose for the app's login and data; **not imported by any template code** | owner rule (D-012); the template never writes to Firestore | BSD-3 |
 
-> **Status:** C-41 swaps `shared_preferences`, `drift`, `drift_flutter` (and dev `drift_dev`) for `hive_ce` + `hive_ce_flutter` (D-034). C-30 adds
-> `firebase_crashlytics` and `firebase_analytics` (D-042). C-31 may add `flutter_native_splash` (to be decided as D-044 in its report).
-> This table must be refreshed from `pubspec.lock` after those merge.
-
 ### Dev dependencies
 
 | Package | Locked | Used for | Licence |
@@ -240,13 +231,15 @@ choice has no recorded alternative (it is the standard package for that job).
 | freezed | 4.0.2 | immutable classes and unions | MIT |
 | json_serializable | 6.14.1 | `fromJson`/`toJson` | BSD |
 | go_router_builder | 4.5.0 | typed routes (`routes.g.dart`, D-016) | BSD |
-| drift_dev | 2.35.1 | Drift generator (**removed by C-41**) | MIT |
 | mocktail | 1.0.5 | mocks in tests | MIT |
 | flutter_test | SDK | unit/widget/golden tests | BSD-3 |
 | flutter_lints | 6.0.0 | base lint set | BSD |
-| flutter_launcher_icons | 0.14.4 | launcher icon generation (config block not yet active, see C-31) | MIT |
+| flutter_launcher_icons | 0.14.4 | launcher icons from `assets/images/app_icon*.png` (config block in `pubspec.yaml`) | MIT |
+| flutter_native_splash | 2.4.8 | native splash (light/dark, Android 12) from the `pubspec.yaml` block | MIT |
+| integration_test | SDK | `integration_test/` flow test | BSD-3 |
 | rename_app | 1.6.6 | listed in pubspec; the supported rename path is our own `tool/rename_app.dart` | MIT |
 
+Removed on the way: `shared_preferences`, `drift`, `drift_flutter`, `drift_dev` (D-034). (`shared_preferences` remains in the lock file only as a transitive dependency of `easy_localization`.)
 `riverpod_lint`/`custom_lint` are NOT used: they cannot resolve with the current riverpod 3 / freezed 4 / uuid 4 stack (D-017).
 Any new package is a DECISION with reason, alternatives, latest stable version and licence (hard rule 11).
 
@@ -266,7 +259,10 @@ for f in env/*.env.example; do cp "$f" "${f%.example}"; done   # same loop CI us
 | `CONNECT_TIMEOUT_MS`, `RECEIVE_TIMEOUT_MS` | positive milliseconds (required) |
 | `LOG_LEVEL` | `debug`, `info`, `warning`, `error`, `off` (optional; per-flavor default) |
 | `ENABLE_CRASH_REPORTING`, `ENABLE_ANALYTICS` | `true`/`false` (optional) |
-| `CRASH_DSN` | optional crash-vendor DSN |
+| `CRASH_DSN` | optional crash-vendor DSN (unused by the Firebase implementation) |
+| `APP_VERSION` | optional override of the installed version, to test the update gate; blank = real version; `x.y.z` when set |
+| `REMOTE_CONFIG_PATH` | remote-config endpoint path, default `/app/config`, must start with `/` |
+| `REMOTE_CONFIG_MOCK` | `true` serves a mock remote config (default `false`) |
 
 - Flavor selection is automatic and lives in ONE place (`Flavor.current`): debug and profile builds use `dev`, release builds use `prod`.
   Staging is explicit: `flutter run -t lib/main_staging.dart`.
@@ -305,24 +301,36 @@ simulator needs no signing. The default `dev` backend URL (`http://10.0.2.2:8080
 in `env/dev.env`. With `authUseMockSource = true` (default in `lib/core/auth/auth_endpoints.dart`) the login flow works with no backend,
 and the demo `videos` feature uses a mock source (dev/staging only).
 
+## Remote config, app lock and deep links
+
+- **Remote config (D-040):** one JSON endpoint (`REMOTE_CONFIG_PATH`, default `/app/config`) read through Dio and the cache-first helper (`short` preset), so the app starts offline with the cached copy or defaults.
+  Fields: `minVersion`, `latestVersion`, `storeUrl`, `maintenance {enabled, message}`, `flags`. `gateStatusFor` gives `ok`, `updateAvailable`, `updateRequired` or `maintenance` (maintenance wins; an unreadable version never blocks).
+  The router sends maintenance and forced update to `/maintenance` and `/force-update` ahead of sign-in; a dismissible soft-update banner sits above the tab bar. Startup waits at most 3 s for it and never fails because of it.
+  Feature flags: `ref.watch(flagProvider('name'))` (false by default). Set `REMOTE_CONFIG_MOCK=true` or `APP_VERSION` to try the gate locally.
+- **App lock (D-041):** biometric lock (`local_auth`) that locks at cold start and when the app returns after a timeout (`appLockTimeoutProvider`, default 30 s), covers the app in the app switcher,
+  and holds screenshot blocking while enabled. The user switches it on in More -> Security (`/security-settings`). Own `MethodChannel` for Android `FLAG_SECURE` and the iOS cover view.
+- **Deep links (`ai-docs/DEEP_LINKS.md`):** the custom scheme `riverpod-core://videos/abc` works with no server; the https app link `https://example.com/videos/abc` needs a domain you own
+  (`assetlinks.json`, `apple-app-site-association`). Both are rewritten into the same typed routes (`routeForAppLink`, `routeForDeepLink`; mapped types: `items`, `myEvents`, `videos`) and a link that arrives before sign-in is replayed after it.
+  iOS Universal Links are opt-in: the template does not ship the Associated Domains entitlement because a free Apple team cannot sign it (steps in DEEP_LINKS.md).
+  Host and scheme are placeholders (`example.com`, `riverpod-core`) kept in agreement across Dart, manifest, Info.plist and entitlements; `tool/rename_app.dart --host links.company.com` rewrites them.
+
 ## Firebase, Crashlytics and push stay optional
 
 The rule (D-042): the template must run with zero project data. Nothing may require `google-services.json` or `GoogleService-Info.plist`.
 
-- **Today (merged):** `Firebase.initializeApp()` runs inside the push backend. If the Firebase files are missing it fails, push is turned off
-  with one log line ("Push is disabled"), `pushAvailableProvider` is false, topic/token calls are no-ops, and local notifications and everything
-  else keep working. The template never writes to Firestore or any Firebase database; device and token go to YOUR backend through `PushTokenRegistrar`
-  (default `NoopPushTokenRegistrar`).
+- **Init:** `FirebaseBootstrap.ensureInitialized()` runs `Firebase.initializeApp()` once for push, Crashlytics and Analytics. It never throws; without the native files it logs one line
+  ("Firebase not configured: crash/analytics disabled"), and push logs "Push is disabled". `pushAvailableProvider` is false, topic/token calls are no-ops, and everything else keeps working.
+- **Crashlytics and Analytics (D-042):** `crashReporterProvider` / `analyticsServiceProvider` return the Firebase implementation only when the config flag is on
+  (`ENABLE_CRASH_REPORTING` / `ENABLE_ANALYTICS`; defaults: on for prod and staging, off for dev) AND Firebase started; otherwise the no-op. Global error handlers send fatal and non-fatal errors through `CrashReporter`.
+  A persisted consent switch (`collectionConsentProvider`, default ON; flip `defaultCollectionConsent` for opt-in regions) applies to both. Only an opaque user id is sent; it is cleared on logout.
+- **Native builds without Firebase files:** the Google Services and Crashlytics Gradle plugins apply only when `android/app/google-services.json` exists, and the iOS Crashlytics symbol-upload phase skips without `GoogleService-Info.plist`.
+  Both files are ignored by version control. How to add Firebase, verify a test crash and switch vendor: `ai-docs/FIREBASE.md`.
+- The template never writes to Firestore or any Firebase database; device and token go to YOUR backend through `PushTokenRegistrar` (default `NoopPushTokenRegistrar`).
 - To enable push in an app: create the Firebase project, put `google-services.json` in `android/app/` and `GoogleService-Info.plist` in `ios/Runner/` (both git-ignored,
-  never commit them), apply the Google Services Gradle plugin (`com.google.gms.google-services`) in `android/app/build.gradle.kts`, upload an APNs auth key
+  never commit them), (the Gradle plugins switch on by themselves once the json exists), upload an APNs auth key
   and enable the Push Notifications and Background Modes capabilities. Full checklist, payload contract, console testing and troubleshooting: `ai-docs/NOTIFICATIONS.md`.
   Test pushes on a real iPhone, not the simulator.
 - Server-side payload keys (`type` + `id`, `url`, `channel`) and how taps map to typed routes: `ai-docs/NOTIFICATIONS.md`; add your own types in `routeForDeepLink`.
-
-> **Status:** C-30 is not merged. When it lands, Crashlytics and Firebase Analytics sit behind the existing `CrashReporter` / `AnalyticsService` interfaces,
-> init is optional (failure falls back to the no-op implementations), collection is off in debug/dev and on in release with a runtime consent switch,
-> and the Google Services / Crashlytics Gradle plugins and the iOS run-script apply only when the Firebase files exist (D-042). Until then there is no
-> Crashlytics code and the Gradle build does not reference the Google Services plugin at all.
 
 ## Start a new app
 
@@ -331,7 +339,7 @@ Full steps live in `ai-docs/HOW_TO_START_A_NEW_APP.md`. In short:
 1. Copy the repo, delete `.git`, `git init`.
 2. Rename: `dart run tool/rename_app.dart --name "My App" --id com.company.myapp` (add `--package my_app`; `--dry-run` previews). It updates
    `pubspec.yaml`, every `package:` import, Android `namespace`/`applicationId`/`MainActivity` package and manifest label, iOS display name and bundle ids,
-   the first `# ` title of `README.md` and `APP_NAME` in `env/*.env*`. Then `flutter pub get`, `./build.sh`, `dart format .`, `flutter analyze`.
+   the first `# ` title of `README.md`, `APP_NAME` in `env/*.env*`, and the deep-link scheme (add `--host links.company.com` for the https host). Then `flutter pub get`, `./build.sh`, `dart format .`, `flutter analyze`.
 3. Fill `env/*.env`; edit ONLY `lib/core/design_system/tokens/brand_config.dart` to rebrand; add Firebase files if you use push.
 4. Scaffold your first feature: `dart run tool/new_feature.dart --name product_orders` (`--dry-run` previews).
 5. Delete the demo features if you do not want them (`features/videos`, `features/showcase`; nothing imports them except the dev-only home tiles and routes, D-028).
@@ -392,13 +400,14 @@ emit the cached value at once (flagged stale when older than its ttl), revalidat
 write and emit only when it changed, keep serving the cache (stale/offline states) when the network fails, error only when there is no cache.
 User-scoped keys include the user id, logout clears everything, features pick a `CachePolicy` preset and never hand-roll expiry.
 
-**Merged today (C-16):** `CachedRepositoryHelper.watch<T>(key, userId, fetch, decode, encode, ttl)` returns `Stream<CacheResult<T>>` over the Drift cache table:
-cached value first (stale when expired), then the fetched value; on failure the cached value with `isStale` and the mapped error, or an error when there is no cache;
-concurrent watchers of one key share one fetch; `invalidate`/`clearAll`. Keys are `shared/<key>` or `user/<id>/<key>`.
-
-> **Status:** not merged yet: C-41 (Hive storage, D-034) and C-44 (`CachePolicy` presets `short/medium/long/static`, ETag / `If-None-Match`, payload-hash no-op,
-> `lastAccessedAt`/`maxAge`, pruning at startup / on resume after 24 h / over the size cap, `videos` switched to the helper). Until then the helper takes an explicit `ttl`,
-> stores no ETag and never prunes. The `videos` feature does not use the helper yet.
+**How it works (`CachedRepositoryHelper`, `CachePolicy`, `CacheStore`, `CachePruner`):**
+- Repositories make one call: `load<T>(key, fetch, decode, encode, policy, fresh)`. The cached value returns at once (flagged stale when older than `policy.ttl`) and the revalidation finishes in the background.
+  `watch<T>` is the stream form. `fresh: true` (pull-to-refresh, reload) waits for the network and raises its error even when a cached copy exists.
+- Revalidation sends the stored ETag as `If-None-Match`; a 304 or an identical payload only moves the retention fields. A changed payload is written and emitted once. On failure the cache keeps serving, flagged stale with the mapped error; with no cache the call errors.
+- Presets: `short` 5 min fresh / 1 day kept, `medium` 1 h / 7 days (default), `long` 1 day / 30 days, `static` 7 days / 90 days. Features pick a preset and never hand-roll expiry.
+- Retention: entries record `savedAt`, `lastAccessedAt`, `etag`, `ttl`, `maxAge`. `CachePruner` removes entries past their `maxAge`, then least-recently-accessed entries above 500; `CachePruneScheduler` runs it after the first frame and on resume when the last prune is over 24 h old.
+- Keys are `shared/<key>` or `user/<id>/<key>`; logout clears the whole cache.
+- Used today by the `videos` feed, remote config, and the feature scaffold (`tool/new_feature.dart` generates `fetchItems({fresh})` on this helper).
 
 ## Testing
 
@@ -420,7 +429,15 @@ flutter test --update-goldens <file>      # only for goldens your change owns, a
 - **Guard tests:** `test/translations/no_literal_keys_test.dart` (no `.tr()`/`.plural()` on a string literal under `lib/`); `test/tool/*` cover the rename and feature scripts.
 - **Never delete or weaken a test** without writing in the report which behaviour stopped being true (hard rule 6).
 
-> **Status:** `integration_test/` (auth flow + one feature flow, C-26) does not exist yet; `flutter test integration_test` has nothing to run.
+## Integration test and smoke script
+
+- `integration_test/app_flow_test.dart` drives the real app through `bootstrap` on a device or simulator: onboarding, wrong then right credentials, videos, first video, favorite, back to home.
+  It uses seams, not mocks of the app (mock remote config, fake video player backend, in-memory secure storage, fresh settings and cache, an env with no real values). The More -> About -> logout test is skipped (see Known open items).
+  Run: `flutter test integration_test/app_flow_test.dart -d <simulator-udid>`.
+- `integration_test/screens_test.dart` + `screens_driver.dart` walk the screens for screenshots; they write PNGs only under `flutter drive` with `--dart-define=CAPTURE_SCREENS=true` and `SCREENS_DIR` set.
+  No screenshots are committed (the folder `ai-docs/reports/C-26-screens` does not exist).
+- `tool/smoke.sh [simulator-udid]` is the clean-clone proof: it copies `HEAD` into a temp dir, refuses Firebase and keystore files, uses only `env/*.env.example`, then runs pub get, codegen, format, analyze, `flutter test`, the Android and iOS debug builds and the flow test, exiting non-zero on the first failure
+  (`SKIP_ANDROID=1` skips the Android build). It never touches your working tree and tests committed code only, so commit first. Last recorded run passed (C-26 report: 1365 tests, both builds, flow on an iPhone 17 Pro simulator).
 
 ## CI
 
@@ -429,6 +446,7 @@ flutter test --update-goldens <file>      # only for goldens your change owns, a
    `flutter analyze`, `flutter test --coverage`, upload `coverage/lcov.info`.
 2. `build-android`: `flutter build apk --debug` (JDK 17).
 3. `build-ios`: `flutter build ios --no-codesign --debug` (macOS runner).
+4. `integration-ios` (optional, nightly and on demand, not a required PR check): boots an iPhone simulator and runs the flow test.
 
 Flutter is pinned to 3.47.0 (`FLUTTER_VERSION` in the workflow); bump it deliberately. Details and verified action versions: `.github/workflows/README.md`.
 
@@ -471,7 +489,13 @@ Details: `tool/release/README.md`, `.claude/skills/release-check/SKILL.md`.
 | CI says generated code is stale | run `./build.sh` and `dart format lib/generated`, commit the result |
 | `build_runner` conflicts | `dart run build_runner build --delete-conflicting-outputs` |
 | Push is disabled on a device | Firebase files missing or Google Services plugin not applied (one log line says so) |
-| Channel names show keys | channels were created before translations loaded; `syncChannelLabels()` (done at sign-in) |
+| Channel names show keys | channels are created by `NotificationLabelSync` after translations load and on every language change; check that widget is mounted (it sits in `App`'s `MaterialApp.builder`) |
+
+## Known open items
+
+1. After popping a detail page, a tap on the bottom navigation is absorbed for about 2-3 s on the simulator (a route transition window, not permanent; not the toast, no infinite animation; C-26 report). The two More-tab integration steps stay skipped until it is measured on a real device.
+2. QR scanning and root/jailbreak detection are declined on purpose (D-043, D-041); an app that needs them adds a package or attestation service through a DECISION.
+3. Real-device verification is still pending for biometrics (app lock), `FLAG_SECURE` and the iOS cover view, FCM/APNs delivery, Crashlytics delivery, and https link verification (domain and signing). Tests cover the logic behind seams only.
 
 ## Documentation index
 
@@ -486,6 +510,8 @@ Details: `tool/release/README.md`, `.claude/skills/release-check/SKILL.md`.
 | [`ai-docs/NETWORKING.md`](ai-docs/NETWORKING.md) | Dio client, interceptors, errors, repositories, pagination, transfers |
 | [`ai-docs/STATE_AND_DATA.md`](ai-docs/STATE_AND_DATA.md) | Riverpod, AsyncValue, cache-first, storage, session lifecycle |
 | [`ai-docs/NOTIFICATIONS.md`](ai-docs/NOTIFICATIONS.md) | push and local notifications, Firebase setup, payload contract, troubleshooting |
+| [`ai-docs/DEEP_LINKS.md`](ai-docs/DEEP_LINKS.md) | app links and custom scheme, `assetlinks.json`, `apple-app-site-association`, Universal Links opt-in |
+| [`ai-docs/FIREBASE.md`](ai-docs/FIREBASE.md) | optional Crashlytics and Analytics, adding Firebase files, consent, vendor switch, test crash |
 | [`ai-docs/TESTING.md`](ai-docs/TESTING.md) | what to test, helpers, commands |
 | [`ai-docs/TASKS.md`](ai-docs/TASKS.md) | the only task list and statuses |
 | [`ai-docs/CHECKLIST.md`](ai-docs/CHECKLIST.md) | template completeness, status per item |
