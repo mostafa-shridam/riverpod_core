@@ -10,6 +10,8 @@ List<RouteBase> get $appRoutes => [
   $splashRoute,
   $onboardingRoute,
   $loginRoute,
+  $forceUpdateRoute,
+  $maintenanceRoute,
   $registerRoute,
   $forgotPasswordRoute,
   $appShellRoute,
@@ -85,6 +87,60 @@ mixin $LoginRoute on GoRouteData {
 
   @override
   String get location => GoRouteData.$location('/login');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $forceUpdateRoute => GoRouteData.$route(
+  path: '/force-update',
+  hasOverriddenOnExit: false,
+  factory: $ForceUpdateRoute._fromState,
+);
+
+mixin $ForceUpdateRoute on GoRouteData {
+  static ForceUpdateRoute _fromState(GoRouterState state) =>
+      const ForceUpdateRoute();
+
+  @override
+  String get location => GoRouteData.$location('/force-update');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $maintenanceRoute => GoRouteData.$route(
+  path: '/maintenance',
+  hasOverriddenOnExit: false,
+  factory: $MaintenanceRoute._fromState,
+);
+
+mixin $MaintenanceRoute on GoRouteData {
+  static MaintenanceRoute _fromState(GoRouterState state) =>
+      const MaintenanceRoute();
+
+  @override
+  String get location => GoRouteData.$location('/maintenance');
 
   @override
   void go(BuildContext context) => context.go(location);
