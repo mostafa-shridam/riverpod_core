@@ -9,6 +9,7 @@ import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 import 'helpers/flow_setup.dart';
 import 'helpers/pump_until.dart';
+import 'helpers/screen_capture.dart';
 
 /// The screens the owner looks at. Screenshots are written only when run
 /// under `flutter drive` with `--dart-define=CAPTURE_SCREENS=true`; under
@@ -16,12 +17,14 @@ import 'helpers/pump_until.dart';
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  Future<void> shot(String name) async {
-    if (captureScreens) await binding.takeScreenshot(name);
-  }
-
   testWidgets('screens for the owner', (tester) async {
-    if (captureScreens) await binding.convertFlutterSurfaceToImage();
+    // Captured from the Flutter layer: takeScreenshot returns the native launch
+    // screen on iOS.
+    final capture = ScreenCapture(binding, tester);
+    Future<void> shot(String name) async {
+      if (captureScreens) await capture.shot(name);
+    }
+
     await startApp(tester);
     await tester.pump(const Duration(milliseconds: 200));
     await shot('splash');
