@@ -435,7 +435,7 @@ flutter test --update-goldens <file>      # only for goldens your change owns, a
   It uses seams, not mocks of the app (mock remote config, fake video player backend, in-memory secure storage, fresh settings and cache, an env with no real values). The More -> About -> logout test is skipped (see Known open items).
   Run: `flutter test integration_test/app_flow_test.dart -d <simulator-udid>`.
 - `integration_test/screens_test.dart` + `screens_driver.dart` walk the screens for screenshots; they write PNGs only under `flutter drive` with `--dart-define=CAPTURE_SCREENS=true` and `SCREENS_DIR` set.
-  No screenshots are committed (the folder `ai-docs/reports/C-26-screens` does not exist).
+  Real screenshots from the iPhone 17 Pro simulator (onboarding, login, home, videos, video detail, More, and the component gallery in English/Arabic, light/dark) are committed in [ai-docs/reports/C-26-screens](ai-docs/reports/C-26-screens/README.md).
 - `tool/smoke.sh [simulator-udid]` is the clean-clone proof: it copies `HEAD` into a temp dir, refuses Firebase and keystore files, uses only `env/*.env.example`, then runs pub get, codegen, format, analyze, `flutter test`, the Android and iOS debug builds and the flow test, exiting non-zero on the first failure
   (`SKIP_ANDROID=1` skips the Android build). It never touches your working tree and tests committed code only, so commit first. Last recorded run passed (C-26 report: 1365 tests, both builds, flow on an iPhone 17 Pro simulator).
 
