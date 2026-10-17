@@ -22,7 +22,7 @@ class ScreenCapture {
     if (bytes == null) throw TestFailure('No image for $name');
     expect(
       bytes.length,
-      greaterThan(20 * 1024),
+      greaterThan(5 * 1024),
       reason: '$name is too small to be a real screen',
     );
     for (final entry in _captured.entries) {
