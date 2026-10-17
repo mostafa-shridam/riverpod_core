@@ -5,6 +5,7 @@ import 'package:riverpod_core/core/app/scroll_behavior.dart';
 import 'package:riverpod_core/core/design_system/responsive/text_scale.dart';
 import 'package:riverpod_core/core/design_system/theme/app_theme.dart';
 import 'package:riverpod_core/core/design_system/widgets/feedback/snackbar/app_messenger.dart';
+import 'package:riverpod_core/core/notifications/notification_label_sync.dart';
 import 'package:riverpod_core/core/router/app_router.dart';
 import 'package:riverpod_core/core/security/app_lock_overlay.dart';
 
@@ -31,7 +32,7 @@ class App extends ConsumerWidget {
           data: mediaQuery.copyWith(
             textScaler: clampTextScale(mediaQuery.textScaler),
           ),
-          child: AppLockOverlay(child: child!),
+          child: NotificationLabelSync(child: AppLockOverlay(child: child!)),
         );
       },
     );

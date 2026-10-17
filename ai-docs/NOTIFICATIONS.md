@@ -20,7 +20,7 @@ device/           DeviceInfo, DeviceInfoSource (+ device_info_plus impl), device
 ```
 Rules: every plugin sits behind a small `*Backend` interface exposed as a provider (`localNotificationBackendProvider`, `pushBackendProvider`, `notificationPermissionBackendProvider`, `timezoneBackendProvider`); tests override them with the fakes in `test/helpers/fake_notification_backends.dart`, so no platform channel is ever needed. There is no `X.instance`.
 
-Startup: `bootstrap` calls `notificationServiceProvider.initialize()` (never throws, never prompts). Order: load settings, init local (time zone, channels, cold-start tap), init push (Firebase, background handler, foreground listeners, initial message). A failing part is logged and the rest keeps working.
+Startup: `bootstrap` calls `notificationServiceProvider.initialize()` (never throws, never prompts). Order: load settings, init local (time zone, cold-start tap; channels are NOT created here, translations are not loaded yet), init push (Firebase, background handler, foreground listeners, initial message). A failing part is logged and the rest keeps working.
 
 ## Firebase is optional
 `Firebase.initializeApp()` fails when the app has no `google-services.json` / `GoogleService-Info.plist`. Then push is off: one log line ("Push is disabled"), `pushAvailableProvider` is false, topics/token calls are no-ops, local notifications and everything else work. Hide push-only UI with `ref.watch(pushAvailableProvider)`.
@@ -63,7 +63,7 @@ Example FCM HTTP v1 body:
 
 Scheduling: exact alarm only when the Android 12+ exact-alarm permission is granted (`SCHEDULE_EXACT_ALARM` is declared; `USE_EXACT_ALARM` is NOT, Google Play restricts it to alarm/calendar apps). Otherwise it falls back to an inexact alarm that may be a few minutes late; `schedule` returns `ScheduleResult.exact` or `.inexact` so the UI can offer `requestExactAlarmPermission()`. A time in the past returns `inThePast` and schedules nothing. Repeats use the device time zone (`flutter_native_timezone_latest` + `timezone`, UTC fallback) and survive reboot (boot receiver in the manifest). Scheduled notifications are cancelled on logout and when the master switch goes off; the app re-schedules what it needs after the user turns notifications on.
 
-Channels: ONE table, `channels/notification_channels.dart` (`general`, `high_priority`, `silent`, `reminders`, in two groups). Channel names and descriptions are `LocaleKeys` under `notifications`, resolved when the channel is created; `syncChannelLabels()` re-creates them in the current language (done at startup and sign-in; call it after the user changes the app language). Never rename a shipped channel id: users keep per-channel settings. Small icon: `android/.../drawable/ic_notification.xml` (replace per app); accent color: `brandSeedColor`.
+Channels: ONE table, `channels/notification_channels.dart` (`general`, `high_priority`, `silent`, `reminders`, in two groups). Channel names and descriptions are `LocaleKeys` under `notifications`, resolved when the channel is created; `syncChannelLabels()` re-creates them in the current language (done by `NotificationLabelSync`, mounted in `App`, after translations load on the first frame and on every language change, and again at sign-in). Never rename a shipped channel id: users keep per-channel settings. Small icon: `android/.../drawable/ic_notification.xml` (replace per app); accent color: `brandSeedColor`.
 
 iOS categories/actions: `NotificationCategories.message` (inline reply + mark as read), registered at init and re-registered with localized titles by `syncChannelLabels()`.
 
@@ -121,7 +121,7 @@ Already in the repo: Android manifest (`POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALA
 | Scheduled notification late | exact alarms not allowed: `schedule` returned `inexact`; offer `requestExactAlarmPermission()`; battery optimisation can delay too |
 | Scheduled notification wrong hour | the device time zone: if the platform cannot report it the backend falls back to UTC; check the device's automatic time zone setting |
 | Tap does nothing | unknown `type` in `routeForDeepLink`, missing `id`, or the user is not signed in (the tap is queued and replays after sign-in) |
-| Channel names show keys | channels were created before translations loaded; call `syncChannelLabels()` (done at sign-in) |
+| Channel names show keys | channels were created before translations loaded; `NotificationLabelSync` (in `App`) re-creates them after load and on language change, so check it is mounted |
 | Changed channel importance has no effect | Android never changes an existing channel's importance; use a new channel id or reinstall |
 
 ## Known limits
