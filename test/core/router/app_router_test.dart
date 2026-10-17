@@ -10,6 +10,8 @@ import 'package:riverpod_core/core/auth/session_controller.dart';
 import 'package:riverpod_core/core/config/app_config.dart';
 import 'package:riverpod_core/core/config/flavor.dart';
 import 'package:riverpod_core/core/design_system/theme/app_theme.dart';
+import 'package:riverpod_core/core/design_system/widgets/buttons/app_button.dart';
+import 'package:riverpod_core/core/design_system/widgets/media/app_video_backend.dart';
 import 'package:riverpod_core/core/localization/app_locales.dart';
 import 'package:riverpod_core/core/network/session_events.dart';
 import 'package:riverpod_core/core/notifications/models/notification_payload.dart';
@@ -23,11 +25,14 @@ import 'package:riverpod_core/core/startup/startup_controller.dart';
 import 'package:riverpod_core/core/storage/cache/cache_store.dart';
 import 'package:riverpod_core/core/storage/prefs_storage.dart';
 import 'package:riverpod_core/core/storage/secure_storage.dart';
+import 'package:riverpod_core/features/videos/data/sources/sample_videos.dart';
 import 'package:riverpod_core/generated/codegen_loader.g.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 import 'package:riverpod_core/shared/models/auth_user.dart';
 
 import '../../helpers/fake_analytics.dart';
 import '../../helpers/helpers.dart';
+import '../design_system/widgets/media/fake_video_backend.dart';
 
 /// The installed app facts without the platform channel.
 class _FixedAppInfo implements AppInfoSource {
@@ -270,6 +275,42 @@ void main() {
 
       expect(_page('item-detail-page'), findsOneWidget);
       expect(find.text('42'), findsOneWidget);
+    });
+  });
+
+  group('video pages leave no overlay behind', () {
+    testWidgets('More still opens after a favorite toast and two pops', (
+      tester,
+    ) async {
+      final fakes = FakeVideoFactory();
+      final container = await _container(
+        tester,
+        onboardingSeen: true,
+        overrides: [videoBackendFactoryProvider.overrideWithValue(fakes.call)],
+      );
+      await _pumpRouter(tester, container);
+      await _signIn(container);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const ValueKey('home-videos-tile')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(sampleVideos.first.title));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.widgetWithText(AppButton, LocaleKeys.videos_favorite_add.tr()),
+      );
+      // The favorite toast is still on screen when the user leaves the page
+      // (as on the device): pop while it is shown.
+      await tester.pump(const Duration(milliseconds: 500));
+
+      Navigator.of(tester.element(find.byType(AppBar).last)).pop();
+      await tester.pump(const Duration(seconds: 1));
+      Navigator.of(tester.element(find.byType(AppBar).last)).pop();
+      await tester.pump(const Duration(seconds: 1));
+
+      await tester.tap(find.byIcon(Icons.more_horiz));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('more-page')), findsOneWidget);
     });
   });
 }

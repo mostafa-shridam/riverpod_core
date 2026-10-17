@@ -36,3 +36,12 @@ flutter test test/core/error       # one folder
 flutter test --coverage            # CI
 flutter test integration_test      # needs a device/emulator; not part of the default gate
 ```
+
+## Integration tests (C-26)
+- Location: `integration_test/`. `app_flow_test.dart` drives the real app through `bootstrap` on a device: onboarding, sign-in (wrong and right credentials), videos, favorite, About, logout.
+- Seams, not mocks of the app: `helpers/flow_setup.dart` gives the mock remote config, a fake video player (`videoBackendFactoryProvider`), in-memory secure storage, fresh settings and cache on each run, and an env with no real values and no network.
+- No real timers are needed in the test code. The app's own mock auth delay (400 ms) and splash minimum (800 ms) are the only waits; `pumpUntilFound` polls for the screen, it never uses `pumpAndSettle` (spinners never settle).
+- `screens_test.dart` walks the screens for the owner's screenshots. Screenshots are written only under `flutter drive` with `--dart-define=CAPTURE_SCREENS=true` and `SCREENS_DIR` set (driver: `integration_test/screens_driver.dart`).
+- Run on a simulator: `flutter test integration_test/app_flow_test.dart -d <udid>` (boot one with `xcrun simctl boot <udid>`).
+- Clean-clone smoke: `tool/smoke.sh [udid]` copies `HEAD` into a temp dir, uses only `env/*.env.example`, refuses Firebase or keystore files, and runs pub get, codegen, format, analyze, `flutter test`, the Android and iOS debug builds, and the flow test. It exits non-zero on the first failure and never touches the working tree. It tests committed code only, so commit first.
+- CI: the `integration-ios` job runs on `workflow_dispatch` and nightly. It is not in the required PR checks.

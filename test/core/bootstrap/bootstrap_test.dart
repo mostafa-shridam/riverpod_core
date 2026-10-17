@@ -277,6 +277,26 @@ void main() {
     expect(backend.requests, [AppPermission.camera]);
   });
 
+  testWidgets('the real app builds its localization without a locale error', (
+    tester,
+  ) async {
+    // The app is pumped as bootstrap built it, not through pumpApp (which
+    // initializes EasyLocalization itself).
+    final flutterHandler = FlutterError.onError;
+    final platformHandler = PlatformDispatcher.instance.onError;
+    Widget? app;
+    try {
+      app = await tester.runAsync<Widget?>(() => run(flavor: Flavor.dev));
+    } finally {
+      FlutterError.onError = flutterHandler;
+      PlatformDispatcher.instance.onError = platformHandler;
+    }
+    await tester.pumpWidget(app!);
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('Arabic plurals work inside pumpApp', (tester) async {
     late String text;
     await pumpApp(

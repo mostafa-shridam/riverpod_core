@@ -3,6 +3,10 @@ name: CI
 on:
   push:
   pull_request:
+  # Optional runs: the iOS integration job only (not required for PRs).
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * *'
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -17,6 +21,7 @@ env:
 jobs:
   test:
     name: Gate (format, analyze, test)
+    if: github.event_name != 'workflow_dispatch' && github.event_name != 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -94,3 +99,29 @@ jobs:
         run: |
           for f in env/*.env.example; do cp "$f" "${f%.example}"; done
       - run: flutter build ios --no-codesign --debug
+
+  # Optional: the flow test on an iOS simulator. Runs on demand and nightly;
+  # not in the required PR checks.
+  integration-ios:
+    name: Integration test (iOS simulator, optional)
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - run: flutter pub get
+      - name: Create env files from the committed examples
+        run: |
+          for f in env/*.env.example; do cp "$f" "${f%.example}"; done
+      - name: Boot an iPhone simulator
+        run: |
+          udid=$(xcrun simctl list devices available | grep -E 'iPhone 1[0-9]' | grep -Eo '[0-9A-F-]{36}' | head -1)
+          xcrun simctl boot "$udid"
+          echo "SIM_UDID=$udid" >> "$GITHUB_ENV"
+      - name: Integration test
+        run: flutter test integration_test/app_flow_test.dart -d "$SIM_UDID"

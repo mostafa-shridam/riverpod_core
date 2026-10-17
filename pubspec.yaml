@@ -81,6 +81,8 @@ dev_dependencies:
     sdk: flutter
   freezed: ^4.0.2
   go_router_builder: ^4.5.0
+  integration_test:
+    sdk: flutter
   json_serializable: ^6.14.1
   mocktail: ^1.0.5
   rename_app: ^1.6.6
