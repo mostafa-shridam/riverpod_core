@@ -277,7 +277,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-41 — Storage on hive_ce (remove shared_preferences and Drift)
 | status | owner | blocked by |
 |---|---|---|
-| REVIEW | Worker B | — |
+| DONE | Worker B | — |
 - Goal: D-034. One local store.
 - Files: `lib/core/storage/**` (`prefs_storage.dart` re-implemented on a Hive box with the SAME public API and typed keys minus the locale and digits fields; `database/` replaced by `cache_store.dart` over a Hive box with the same operations the C-16 helper uses: read, write(key, payload, savedAt, etag), delete, deleteSavedBefore, clear), `lib/core/storage/cache/**` (adapt the C-16 helper to `CacheStore`), `lib/core/storage/clear_user_data.dart`, `lib/core/bootstrap/bootstrap.dart` (Hive.initFlutter + open boxes before runApp), `pubspec.yaml`, `pubspec.lock` (add `hive_ce`, `hive_ce_flutter`; remove `shared_preferences`, `drift`, `drift_flutter`, `drift_dev`), `test/core/storage/**`, `test/helpers/fake_prefs_storage.dart`, `test/helpers/pump_app.dart` (drop shared_preferences mock), `test/core/bootstrap/bootstrap_test.dart`
 - Done when: no import of shared_preferences or drift remains (grep); boxes are opened once in bootstrap and exposed through keepAlive providers; tests use a temp-dir Hive (`Hive.init(tempDir)`), no platform channel; cache expiry/etag/user-scoping behave exactly as in C-16 tests; `clearUserData` wipes secure storage, cache box and user-scoped prefs; the old Drift generated files are deleted.
@@ -425,16 +425,24 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 - Files: `test/core/network/transfer/transfer_controller_test.dart`, `ios/Podfile.lock`, `ai-docs/reports/C-48.md`, `ai-docs/TASKS.md`.
 - Report: `ai-docs/reports/C-48.md`.
 
+## C-46 — Storage and wiring leftovers after C-41
+| status | owner | blocked by |
+|---|---|---|
+| READY | — | — |
+- Goal: close the small gaps left by C-41/C-36/C-45.
+- Files: `lib/core/bootstrap/bootstrap.dart` (ProviderScope override `permissionRationalePresenterProvider` with `showPermissionRationale` from design_system; tiny diff, C-44 edits `bootstrap.dart` too for prune scheduling), `lib/core/remote_config/**` + `lib/core/storage/**` (wire the typed `DismissedUpdates` accessor instead of the generic slot, same key; app_gate/soft update must use it), `lib/core/constants.dart` (delete once nothing imports it: bootstrap, `test/helpers/pump_app.dart` and two tests import it today: move what they need to its natural owner), `test/**` touched by those, `test/core/startup/**` (splash minimum-display test: inject a clock into `StartupController` instead of a real 120 ms timer), `ai-docs/reports/C-46.md`
+- Done when: the rationale dialog shows before the system prompt in a widget test using the real app wiring; no generic-slot string-list access remains for appLock/disabledChannels/dismissed updates (grep); `constants.dart` gone; splash test deterministic; gate green.
+- Tests: wiring test, typed accessor round trip, clock-injected splash test.
+
 ---
 
 ## Backlog (full tasks written when dependencies near DONE)
-C-46 Wire `permissionRationalePresenterProvider` (override with `showPermissionRationale`) in the ProviderScope of bootstrap — after C-41 (same file) ·
 C-26 Integration tests (auth flow + one feature flow) · C-29 README + HOW_TO_START_A_NEW_APP.
 
 ## C-44 — Cache-first policy, retention and pruning (D-038)
 | status | owner | blocked by |
 |---|---|---|
-| BLOCKED | — | C-41 |
+| READY | — | C-41 |
 - Goal: D-038. Make cache-first the default for every read feature and keep the cache bounded.
 - Files: `lib/core/storage/cache/**` (`cache_policy.dart` presets, `cached_repository_helper.dart` revalidate-with-etag / payload-hash no-op, `cache_pruner.dart`), `lib/core/storage/cache_store.dart` (lastAccessedAt, maxAge, size cap), `lib/core/bootstrap/bootstrap.dart` (schedule prune after first frame; tiny edit), app lifecycle hook for prune on resume >24h, `lib/features/videos/data/videos_repository.dart` (switch to the helper if C-39 is merged), `ai-docs/STATE_AND_DATA.md`, `.fttemplates/**` is C-25's, `test/core/storage/cache/**`
 - Done when: cached value is emitted first; unchanged payload does not re-emit; changed payload emits once; failure with cache = stale value + error, without cache = error; ttl vs maxAge behave as D-038; pruning removes expired, then least-recently-used over the cap; user-scoped keys; logout clears; no feature hand-rolls expiry (grep).
