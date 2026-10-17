@@ -13,7 +13,6 @@ abstract final class PrefKeys {
   static const appLock = 'settings.appLock';
   static const collectionConsent = 'settings.collectionConsent';
 
-  /// Same slot the app gate's `DismissedUpdates` already reads and writes.
   static const dismissedUpdateVersions = 'app.remoteConfig.dismissedUpdates';
 
   static const userPrefix = 'user.';

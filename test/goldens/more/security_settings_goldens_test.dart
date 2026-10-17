@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod_core/core/design_system/widgets/security/app_lock_screen.dart';
-import 'package:riverpod_core/core/security/app_lock_controller.dart';
+import 'package:riverpod_core/core/storage/prefs_storage.dart';
 import 'package:riverpod_core/features/more/presentation/pages/security_settings_page.dart';
 
 import '../../core/security/security_fakes.dart';
@@ -23,7 +23,7 @@ void main() {
         overrides: await securityOverrides(
           tester,
           prefs: {
-            appLockPrefKey: ['1'],
+            PrefKeys.appLock: ['1'],
           },
         ),
         themeMode: mode,

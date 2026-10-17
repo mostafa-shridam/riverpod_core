@@ -65,7 +65,7 @@ void main() {
       expect(h.biometric.reasons, hasLength(1));
       expect(h.state.enabled, isTrue);
       expect(h.state.locked, isFalse, reason: 'the user just proved identity');
-      expect(h.prefs.getStringList(appLockPrefKey), ['1']);
+      expect(h.prefs.appLockEnabled, isTrue);
     });
 
     test('a refused enable changes nothing and returns the result', () async {
@@ -80,14 +80,14 @@ void main() {
         );
         expect(await h.controller.setEnabled(enabled: true), failure);
         expect(h.state.enabled, isFalse);
-        expect(h.prefs.getStringList(appLockPrefKey), isEmpty);
+        expect(h.prefs.appLockEnabled, isFalse);
       }
     });
 
     test('disabling is stored and needs no prompt', () async {
       final h = await _Harness.create(
         initialPrefs: {
-          appLockPrefKey: ['1'],
+          PrefKeys.appLock: ['1'],
         },
       );
       expect(h.state.enabled, isTrue);
@@ -97,7 +97,7 @@ void main() {
       );
       expect(h.state.enabled, isFalse);
       expect(h.state.locked, isFalse);
-      expect(h.prefs.getStringList(appLockPrefKey), isEmpty);
+      expect(h.prefs.appLockEnabled, isFalse);
       expect(h.biometric.reasons, isEmpty);
     });
 
@@ -114,7 +114,7 @@ void main() {
       final h = await _Harness.create();
       await h.controller.setEnabled(enabled: true);
       await h.prefs.clearUserScoped();
-      expect(h.prefs.getStringList(appLockPrefKey), ['1']);
+      expect(h.prefs.appLockEnabled, isTrue);
     });
   });
 
@@ -199,7 +199,7 @@ void main() {
     Future<_Harness> lockedHarness(BiometricResult result) async {
       final h = await _Harness.create(
         initialPrefs: {
-          appLockPrefKey: ['1'],
+          PrefKeys.appLock: ['1'],
         },
         biometric: FakeBiometricBackend(result: result),
       );
@@ -242,7 +242,7 @@ void main() {
       expect(await h.controller.unlock(), BiometricResult.notAvailable);
       expect(h.state.enabled, isFalse);
       expect(h.state.locked, isFalse);
-      expect(h.prefs.getStringList(appLockPrefKey), isEmpty);
+      expect(h.prefs.appLockEnabled, isFalse);
     });
 
     test('unlock while unlocked does not prompt', () async {

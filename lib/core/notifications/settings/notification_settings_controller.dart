@@ -4,10 +4,6 @@ import 'package:riverpod_core/core/storage/prefs_storage.dart';
 
 part 'notification_settings_controller.g.dart';
 
-/// Settings key of the channel ids the user switched off. Under the user
-/// prefix, so logout clears it.
-const notificationDisabledChannelsKey = 'user.notifications.disabledChannels';
-
 /// Owns [NotificationSettings]: loads them from the settings store and saves
 /// every change. The master flag lives in `PrefsStorage.notificationsEnabled`.
 @Riverpod(keepAlive: true)
@@ -17,9 +13,7 @@ class NotificationSettingsController extends _$NotificationSettingsController {
     final prefs = await ref.watch(prefsStorageProvider.future);
     return NotificationSettings(
       masterEnabled: prefs.notificationsEnabled,
-      disabledChannels: prefs
-          .getStringList(notificationDisabledChannelsKey)
-          .toSet(),
+      disabledChannels: prefs.disabledNotificationChannels.toSet(),
     );
   }
 
@@ -47,10 +41,7 @@ class NotificationSettingsController extends _$NotificationSettingsController {
     } else {
       disabled.add(channelId);
     }
-    await prefs.setStringList(
-      notificationDisabledChannelsKey,
-      disabled.toList()..sort(),
-    );
+    await prefs.setDisabledNotificationChannels(disabled.toList()..sort());
     state = AsyncData(current.copyWith(disabledChannels: disabled));
   }
 }

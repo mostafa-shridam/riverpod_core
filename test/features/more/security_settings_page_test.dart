@@ -8,6 +8,7 @@ import 'package:riverpod_core/core/design_system/widgets/async/error_state.dart'
 import 'package:riverpod_core/core/design_system/widgets/async/skeleton_list.dart';
 import 'package:riverpod_core/core/security/app_lock_controller.dart';
 import 'package:riverpod_core/core/security/biometric_service.dart';
+import 'package:riverpod_core/core/storage/prefs_storage.dart';
 import 'package:riverpod_core/features/more/presentation/pages/security_settings_page.dart';
 
 import '../../core/security/security_fakes.dart';
@@ -99,7 +100,7 @@ void main() {
         tester,
         biometric: biometric,
         prefs: {
-          appLockPrefKey: ['1'],
+          PrefKeys.appLock: ['1'],
         },
       ),
     );

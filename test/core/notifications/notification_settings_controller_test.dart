@@ -54,8 +54,11 @@ void main() {
     await controller.setChannelEnabled('general', value: false);
     await controller.setChannelEnabled('silent', value: true);
 
-    expect(notificationDisabledChannelsKey, startsWith('user.notifications.'));
-    expect(prefs.getStringList(notificationDisabledChannelsKey), ['general']);
+    expect(
+      PrefKeys.disabledNotificationChannels,
+      startsWith('user.notifications.'),
+    );
+    expect(prefs.disabledNotificationChannels, ['general']);
   });
 
   test('settings survive a restart', () async {
@@ -87,7 +90,7 @@ void main() {
 
     await prefs.clearUserScoped();
 
-    expect(prefs.getStringList(notificationDisabledChannelsKey), isEmpty);
+    expect(prefs.disabledNotificationChannels, isEmpty);
   });
 
   test('the master switch silences every channel', () {

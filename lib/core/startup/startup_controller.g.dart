@@ -108,6 +108,58 @@ final class SplashRemoteConfigTimeoutProvider
 String _$splashRemoteConfigTimeoutHash() =>
     r'078db055fa554db62f9a3c6844a8e746b2735acb';
 
+/// The clock the minimum display time is measured on. Tests move it by hand.
+
+@ProviderFor(startupClock)
+final startupClockProvider = StartupClockProvider._();
+
+/// The clock the minimum display time is measured on. Tests move it by hand.
+
+final class StartupClockProvider
+    extends
+        $FunctionalProvider<
+          DateTime Function(),
+          DateTime Function(),
+          DateTime Function()
+        >
+    with $Provider<DateTime Function()> {
+  /// The clock the minimum display time is measured on. Tests move it by hand.
+  StartupClockProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'startupClockProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$startupClockHash();
+
+  @$internal
+  @override
+  $ProviderElement<DateTime Function()> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  DateTime Function() create(Ref ref) {
+    return startupClock(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(DateTime Function() value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<DateTime Function()>(value),
+    );
+  }
+}
+
+String _$startupClockHash() => r'4c3e842b8872fed041a3dae5d11594d7188d6c7c';
+
 /// The startup sequence. Config is already validated in bootstrap. Mandatory
 /// steps: the session restore, then the settings read (it carries the
 /// onboarding-seen flag). A failed step leaves the state in error, so the
@@ -148,7 +200,7 @@ final class StartupControllerProvider
   StartupController create() => StartupController();
 }
 
-String _$startupControllerHash() => r'1d1bf8dc9e9df8f50134925e4fee7d8751f7ddbc';
+String _$startupControllerHash() => r'aeb0f66f61e0b121dc875096cce9a89dbfa82946';
 
 /// The startup sequence. Config is already validated in bootstrap. Mandatory
 /// steps: the session restore, then the settings read (it carries the

@@ -41,20 +41,32 @@ const _appConfig = AppConfig(
   enableAnalytics: false,
 );
 
+/// A clock the test moves by hand.
+class _Clock {
+  _Clock(this.now);
+
+  DateTime now;
+
+  DateTime call() => now;
+}
+
 Future<ProviderContainer> _container({
   SecureStorage? secure,
   Duration minimum = Duration.zero,
   RemoteConfigSource? remote,
   Duration remoteTimeout = const Duration(seconds: 3),
+  _Clock? clock,
 }) async {
   final storage = await openTestStorage();
   final prefs = PrefsStorage(storage.settings);
   final cache = CacheStore(storage.cache);
+  final time = clock ?? _Clock(DateTime(2026));
   final container = createContainer(
     overrides: [
       appConfigProvider.overrideWithValue(_appConfig),
       secureStorageProvider.overrideWithValue(secure ?? FakeSecureStorage()),
       prefsStorageProvider.overrideWith((ref) => Future.value(prefs)),
+      startupClockProvider.overrideWithValue(time.call),
       splashMinimumDisplayProvider.overrideWithValue(minimum),
       cacheStoreProvider.overrideWithValue(cache),
       remoteConfigSourceProvider.overrideWithValue(
@@ -124,20 +136,46 @@ void main() {
       );
     });
 
-    test('holds for the minimum display time', () async {
+    test(
+      'holds until the minimum display time has passed on the clock',
+      () async {
+        final clock = _Clock(DateTime(2026));
+        final container = await _container(
+          minimum: const Duration(milliseconds: 120),
+          clock: clock,
+        );
+        addTearDown(container.dispose);
+
+        var done = false;
+        final sequence = container.read(startupControllerProvider.future);
+        unawaited(sequence.then((_) => done = true));
+        // The clock has not moved, so the splash must keep holding however long
+        // the event loop runs.
+        await Future<void>.delayed(const Duration(milliseconds: 60));
+        expect(done, isFalse, reason: 'the clock has not reached the minimum');
+
+        clock.now = clock.now.add(const Duration(milliseconds: 120));
+        await sequence;
+
+        expect(done, isTrue);
+        expect(container.read(startupReadyProvider), isTrue);
+      },
+    );
+
+    test('a clock already past the minimum does not wait', () async {
+      final clock = _Clock(DateTime(2026));
       final container = await _container(
-        minimum: const Duration(milliseconds: 120),
+        minimum: const Duration(hours: 1),
+        clock: clock,
       );
       addTearDown(container.dispose);
 
-      final watch = Stopwatch()..start();
-      await container.read(startupControllerProvider.future);
-      watch.stop();
+      // The deadline is taken when the sequence starts; the clock then passes it.
+      final sequence = container.read(startupControllerProvider.future);
+      clock.now = clock.now.add(const Duration(hours: 2));
+      await sequence;
 
-      expect(
-        watch.elapsed,
-        greaterThanOrEqualTo(const Duration(milliseconds: 120)),
-      );
+      expect(container.read(startupReadyProvider), isTrue);
     });
 
     test(

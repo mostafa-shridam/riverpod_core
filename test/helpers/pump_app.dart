@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
-import 'package:riverpod_core/core/constants.dart';
 import 'package:riverpod_core/core/design_system/responsive/text_scale.dart';
 import 'package:riverpod_core/core/design_system/theme/app_theme.dart';
+import 'package:riverpod_core/core/localization/app_locales.dart';
 import 'package:riverpod_core/generated/codegen_loader.g.dart';
 
 /// Default phone window used when a test does not pass [size].

@@ -14,21 +14,19 @@ StoreOpener storeOpener(Ref ref) =>
     (uri) => launchUrl(uri, mode: LaunchMode.externalApplication);
 
 /// Newest versions the user dismissed the soft update notice for. Device
-/// setting (not per user), kept in the prefs string-list slot.
+/// setting (not per user), read and written through `PrefsStorage`.
 @Riverpod(keepAlive: true)
 class DismissedUpdates extends _$DismissedUpdates {
-  static const prefKey = 'app.remoteConfig.dismissedUpdates';
-
   @override
   Future<List<String>> build() async {
     final prefs = await ref.watch(prefsStorageProvider.future);
-    return prefs.getStringList(prefKey);
+    return prefs.dismissedUpdateVersions;
   }
 
   Future<void> dismiss(String version) async {
     final prefs = await ref.read(prefsStorageProvider.future);
-    final next = {...prefs.getStringList(prefKey), version}.toList();
-    await prefs.setStringList(prefKey, next);
+    final next = {...prefs.dismissedUpdateVersions, version}.toList();
+    await prefs.setDismissedUpdateVersions(next);
     state = AsyncData(next);
   }
 }
