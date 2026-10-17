@@ -1,6 +1,6 @@
 # Real app screenshots (iPhone 17 Pro simulator)
 
-Captured by `integration_test/screens_test.dart` through `flutter drive` (see ai-docs/TESTING.md), from the Flutter render layer, dev flavor, mock data, no Firebase files. Each file is a different screen (the test fails if two captures are identical).
+Captured by `integration_test/screens_test.dart` through `flutter drive` (see `ai-docs/TESTING.md`), from the Flutter render layer, dev flavor, mock data, no Firebase files. Each file is a different screen (the test fails if two captures are identical).
 
 | File | Screen |
 |---|---|

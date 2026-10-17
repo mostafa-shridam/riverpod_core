@@ -35,16 +35,16 @@ A fresh clone builds and runs with `flutter run` after copying `env/*.env.exampl
 
 The audience is the template owner and engineers who start apps from it (humans and AI sessions).
 
-- `CLAUDE.md` is the law: hard rules, stop conditions, definition of done. It wins over everything.
+- `CLAUDE.md` is the law: hard rules, definition of done. It wins over everything.
 - `ai-docs/` holds the detail (rules, architecture, conventions, design system, networking, state/data, testing,
-  notifications, decisions, tasks). Nothing outside `CLAUDE.md` and `ai-docs/` may be invented (D-001).
+  notifications, decisions). Nothing outside `CLAUDE.md` and `ai-docs/` may be invented (D-001).
 - `ai-docs/DECISIONS.md` is append-only: check it before proposing an alternative to anything below.
 - If code and docs disagree, the docs say what should be true: fix the code in a task, or change the doc through a new
   DECISION. Never silently pick one.
 
 ## What is in the box
 
-Grouped like `ai-docs/CHECKLIST.md` (which carries the DONE/PARTIAL/MISSING status of every item and the task that closed it).
+Grouped by area.
 
 ### Foundation
 - Feature-first structure (`data/ providers/ presentation/`), no domain layer (D-015).
@@ -53,7 +53,7 @@ Grouped like `ai-docs/CHECKLIST.md` (which carries the DONE/PARTIAL/MISSING stat
 - Config from `env/<flavor>.env` via `flutter_dotenv`, validated at startup with a clear error screen (D-024).
   Debug builds are `dev`, release builds are `prod`, `staging` only through `lib/main_staging.dart`.
 - `bootstrap()`: guarded zone, global error handlers (logger + crash reporter), config load, storage warm-up, notifications init, formatting init, `runApp`.
-- Native build health: Gradle 8.14.3, AGP 8.11.1, Kotlin 2.4.0, `compileSdk` 37, `minSdk` 24, iOS 15.0 + CocoaPods (C-43).
+- Native build health: Gradle 8.14.3, AGP 8.11.1, Kotlin 2.4.0, `compileSdk` 37, `minSdk` 24, iOS 15.0 + CocoaPods.
 - Scripts: `tool/rename_app.dart` (rename name/id/package), `tool/new_feature.dart` (scaffold a feature), `tool/release/*` (signed release builds).
 
 ### Networking
@@ -77,7 +77,7 @@ Grouped like `ai-docs/CHECKLIST.md` (which carries the DONE/PARTIAL/MISSING stat
 - Splash -> onboarding -> auth -> home with pure redirect rules (`appRedirect`) and a startup sequence.
 - Biometric app lock (`local_auth`), screenshot blocking and app-switcher cover (own `MethodChannel`: Android `FLAG_SECURE`, iOS cover view), a security settings page (D-041).
 - No root/jailbreak detection on purpose: client-side checks give false confidence (D-041).
-- Social sign-in is an extension point only (see the C-17 report). `google_sign_in`, `firebase_auth` and `cloud_firestore` are kept on purpose for each app's own login and data (owner rule, D-012); template code does not import them.
+- Social sign-in is an extension point only. `google_sign_in`, `firebase_auth` and `cloud_firestore` are kept on purpose for each app's own login and data (owner rule, D-012); template code does not import them.
 
 ### Navigation
 - ONE `GoRouter` (`appRouterProvider`), typed routes (`go_router_builder`) in `core/router/routes.dart`, a stateful shell with separate stacks (Home, More).
@@ -113,7 +113,7 @@ Grouped like `ai-docs/CHECKLIST.md` (which carries the DONE/PARTIAL/MISSING stat
 - Image picking, cropping and compression, file picking (`MediaService`); permissions with rationale and open-settings (`PermissionService`).
 
 ### Quality
-- About 110 test files (1386 tests in the Lead's last full run) mirroring `lib/`, fakes for every native seam (`test/helpers/`), 200+ golden baselines (light/dark, ar/en, tablet, 2.0x text), translation parity and no-literal-keys guard tests, tool tests.
+- About 110 test files mirroring `lib/`, fakes for every native seam (`test/helpers/`), 200+ golden baselines (light/dark, ar/en, tablet, 2.0x text), translation parity and no-literal-keys guard tests, tool tests.
 - GitHub Actions CI: gate + coverage artifact + debug Android and iOS builds (no secrets), plus an optional nightly/on-demand iOS integration job.
 - Integration test of the real app flow and a clean-clone smoke script (`tool/smoke.sh`).
 - Release scripts with untracked signing; a release build without `android/key.properties` is refused.
@@ -177,8 +177,8 @@ Error model, Riverpod patterns and startup order: `ai-docs/ARCHITECTURE.md`. Nam
 
 ## Packages
 
-Versions are the exact entries in `pubspec.lock` (refreshed 2026-10-17 after C-41, C-30 and C-31). Licences are read from each package's `LICENSE` file in the pub cache
-(or recorded in DECISIONS/reports where noted). "Chosen/rejected" cites a decision when one exists; an empty cell means the
+Versions are the exact entries in `pubspec.lock`. Licences are read from each package's `LICENSE` file in the pub cache
+(or recorded in DECISIONS where noted). "Chosen/rejected" cites a decision when one exists; an empty cell means the
 choice has no recorded alternative (it is the standard package for that job).
 
 ### Dependencies
@@ -269,11 +269,11 @@ for f in env/*.env.example; do cp "$f" "${f%.example}"; done   # same loop CI us
 - Startup validates every key and lists every problem on a plain error screen (`ConfigErrorApp`) instead of crashing.
 - The values are **bundled in the app**: never put real secrets in env files. Secrets that must stay private belong on the server.
 - No native Android flavors / iOS schemes ship by default, so plain `flutter run` needs no `--flavor` (D-043). If an app needs different
-  bundle ids per environment it adds native flavors itself; see `ai-docs/HOW_TO_START_A_NEW_APP.md`.
+  bundle ids per environment it adds native flavors itself; see "Start a new app from this template" above.
 
 ## Run and install
 
-Prerequisites (verified in C-43): Flutter 3.47.0 stable (CI pins this version; Dart `^3.10.1` per `pubspec.yaml`), JDK 17+ (21 works),
+Prerequisites (verified): Flutter 3.47.0 stable (CI pins this version; Dart `^3.10.1` per `pubspec.yaml`), JDK 17+ (21 works),
 Android SDK with platform 37, Xcode and CocoaPods for iOS (`pod install` runs on the first iOS build). Platforms: Android and iOS only (D-022).
 
 ```bash
@@ -332,17 +332,46 @@ The rule (D-042): the template must run with zero project data. Nothing may requ
   Test pushes on a real iPhone, not the simulator.
 - Server-side payload keys (`type` + `id`, `url`, `channel`) and how taps map to typed routes: `ai-docs/NOTIFICATIONS.md`; add your own types in `routeForDeepLink`.
 
-## Start a new app
+## Start a new app from this template
 
-Full steps live in `ai-docs/HOW_TO_START_A_NEW_APP.md`. In short:
+The template holds no project data (D-042): you bring your own app name and id, env values, brand, optional Firebase files and signing keys.
 
-1. Copy the repo, delete `.git`, `git init`.
-2. Rename: `dart run tool/rename_app.dart --name "My App" --id com.company.myapp` (add `--package my_app`; `--dry-run` previews). It updates
-   `pubspec.yaml`, every `package:` import, Android `namespace`/`applicationId`/`MainActivity` package and manifest label, iOS display name and bundle ids,
-   the first `# ` title of `README.md`, `APP_NAME` in `env/*.env*`, and the deep-link scheme (add `--host links.company.com` for the https host). Then `flutter pub get`, `./build.sh`, `dart format .`, `flutter analyze`.
-3. Fill `env/*.env`; edit ONLY `lib/core/design_system/tokens/brand_config.dart` to rebrand; add Firebase files if you use push.
-4. Scaffold your first feature: `dart run tool/new_feature.dart --name product_orders` (`--dry-run` previews).
-5. Delete the demo features if you do not want them (`features/videos`, `features/showcase`; nothing imports them except the dev-only home tiles and routes, D-028).
+1. **Prerequisites.** Flutter 3.47.0 stable (CI pins this), JDK 17+ (21 works), Android SDK (platform 37), Xcode + CocoaPods for iOS. Android and iOS only (D-022).
+2. **Copy.** Clone or copy the repo, delete the `.git` folder, run `git init`, first commit "Initial commit from riverpod_core".
+3. **Rename.** `dart run tool/rename_app.dart --name "My App" --id com.company.myapp`
+   - Options: `--package my_app` (Dart package name, default derived from `--name`), `--host links.company.com` (deep-link https host, default `example.com`), `--dry-run` (print only; invalid input writes nothing).
+   - It updates `pubspec.yaml` (name, description), every `package:riverpod_core/` import in `lib/`, `test/`, `integration_test/`, Android `namespace`/`applicationId`/`MainActivity` package and folder/manifest label,
+     iOS `CFBundleDisplayName`/`CFBundleName` and `PRODUCT_BUNDLE_IDENTIFIER` (and `<id>.RunnerTests`), the first `# ` title of `README.md`, `APP_NAME` in `env/*.env*`, and the deep-link scheme (the package name with `-` for `_`).
+   - Then run what it prints: `flutter pub get`, `./build.sh` (or `dart run build_runner build --delete-conflicting-outputs`), `dart format .`, `flutter analyze`. Write your own `README.md` afterwards (only its title is renamed).
+4. **Environments.** `for f in env/*.env.example; do cp "$f" "${f%.example}"; done`, then fill `env/dev.env`, `env/staging.env`, `env/prod.env`
+   (keys: `APP_NAME`, `API_BASE_URL`, `CONNECT_TIMEOUT_MS`, `RECEIVE_TIMEOUT_MS`, optional `LOG_LEVEL`, `ENABLE_CRASH_REPORTING`, `ENABLE_ANALYTICS`, `CRASH_DSN`, `REMOTE_CONFIG_PATH`).
+   - `flutter run` = dev (debug), `flutter run --release` = prod, `flutter run -t lib/main_staging.dart` = staging (D-024). Staging and prod need an `https` base URL.
+   - The app refuses to start, with an on-screen list of problems, if a required key is missing or invalid. The real `env/*.env` files are git-ignored and bundled in the app: never put real secrets in them.
+   - Set `authUseMockSource` to `false` in `lib/core/auth/auth_endpoints.dart` and set your real endpoints there once your backend exists.
+5. **Firebase (optional).** Skip it and the app still runs: push is off with one log line, everything else works.
+   - Push: create the Firebase project, add `google-services.json` to `android/app/` and `GoogleService-Info.plist` to `ios/Runner/` locally (git-ignored, never commit; the Gradle plugins and the iOS symbol-upload phase switch on by themselves once the files exist),
+     upload an APNs auth key, enable Push Notifications + Background Modes (Remote notifications). Implement `PushTokenRegistrar` for your API and override `pushTokenRegistrarProvider`; add your notification `type` values to `routeForDeepLink` in `core/router/routes.dart`. Checklist and testing: `ai-docs/NOTIFICATIONS.md`.
+   - Crashlytics and Analytics (D-042): same two files, then `ENABLE_CRASH_REPORTING=true` / `ENABLE_ANALYTICS=true` in the env files you want. Details, test crash, vendor switch: `ai-docs/FIREBASE.md`.
+   - Native flavors are optional (D-043): the template ships none. If you need different bundle ids per environment, add Android `productFlavors` and iOS schemes yourself, run with `--flavor <name> -t lib/main_staging.dart`, keep `Flavor.current`, one `google-services.json` per flavor directory, and a deep-link scheme per flavor.
+6. **Branding, icons, splash.**
+   - Edit ONLY `lib/core/design_system/tokens/brand_config.dart` (`brandSeedColor`, `brandFontFamily`). Replace the Android notification icon `android/app/src/main/res/drawable/ic_notification.xml`.
+   - Icon: replace `assets/images/app_icon.png` (1024 px) and `assets/images/app_icon_foreground.png` (1024 px, transparent, artwork inside the central 66%) (placeholders come from `dart run tool/generate_placeholder_icon.dart`),
+     set `adaptive_icon_background` in the `flutter_launcher_icons` block of `pubspec.yaml`, run `dart run flutter_launcher_icons`, commit the generated files. If it rewrites `ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS` in `ios/Runner.xcodeproj/project.pbxproj` to `AppIcon`, revert that line to `YES`.
+   - Native splash: set colors and image in the `flutter_native_splash` block of `pubspec.yaml` (same color as the seed), run `dart run flutter_native_splash:create`, commit. If it re-indents `ios/Runner/Info.plist`, keep only the real changes.
+7. **Deep links.** The custom scheme works at once; https links need your domain (`--host`, `assetlinks.json`, `apple-app-site-association`); iOS Universal Links need a paid Apple team and are opt-in. Full guide: `ai-docs/DEEP_LINKS.md`.
+8. **Translations.** Edit `assets/translations/{ar,en}.json` (both files, same commit), then `./build.sh` and `dart format lib/generated`, and commit the regenerated `lib/generated/*`.
+   Use ONLY `LocaleKeys.group_key.tr()` in code (D-037); the parity and no-literal-keys tests must stay green. Recipe: `.claude/skills/add-translation-keys/SKILL.md`.
+9. **First feature.** `dart run tool/new_feature.dart --name product_orders` (`--dry-run` previews). Replace the model fields and endpoint, paste the printed route into `routes.dart`, run the printed generation commands. Read features are cache-first through `CachedRepositoryHelper.load` with a `CachePolicy` preset (D-038); never hand-roll expiry.
+10. **Demo features.** `features/showcase` (`/showcase`) and `features/videos` exist only in dev and staging builds. Delete them when you ship: remove the two feature folders, their routes in `routes.dart` and the two dev-only tiles in `features/home/presentation/pages/home_page.dart`, then regenerate and fix tests (including `integration_test/app_flow_test.dart`). Nothing else imports them (D-028).
+11. **Storage.** `hive_ce` behind `PrefsStorage` (settings) and `CacheStore` (cache); secrets in `flutter_secure_storage` behind `SecureStorage`. Use those three only (D-034). Logout clears secrets, cache and user-scoped settings in `SessionController.logout`; user-scoped keys use the `user.` prefix (settings) or `user/<id>/` (cache).
+12. **Remote config and app lock.** Remote config (D-040): serve one JSON endpoint at `REMOTE_CONFIG_PATH` (default `/app/config`) with `minVersion`, `latestVersion`, `storeUrl`, `maintenance {enabled, message}` and `flags`; it drives the forced-update and maintenance pages, the soft-update banner and `flagProvider(name)`.
+    `REMOTE_CONFIG_MOCK=true` serves a mock; `APP_VERSION` overrides the installed version to test the gate. App lock needs no configuration (More -> Security; override `appLockTimeoutProvider` for another timeout).
+13. **Gate before every commit.** The Definition of Done in `CLAUDE.md` (see "Daily workflow"). CI (`.github/workflows/ci.yml`) runs the same plus a stale-generated-code check and debug builds for Android and iOS.
+14. **Release.** Android: `cp android/key.properties.example android/key.properties`, fill it, keep the keystore outside the repo. iOS: pick your team in Xcode, `cp ios/ExportOptions.plist.example ios/ExportOptions.plist`.
+    Build with `tool/release/build_android.sh` and `tool/release/build_ios.sh` (`[--flavor staging|prod]`; they run the gate, then obfuscated release builds; see `tool/release/README.md`). Before shipping run `.claude/skills/release-check/SKILL.md`. Signing files and `build-symbols/` stay untracked.
+15. **Integration and smoke.** `flutter test integration_test/app_flow_test.dart -d <simulator-udid>` drives the real app (not in the default gate); `tool/smoke.sh [udid]` proves a clean clone works (commit first). See "Integration test and smoke script".
+16. **Not verified in the template; check on real devices in your app:** biometric app lock, Android `FLAG_SECURE` and the iOS cover view, FCM/APNs delivery, Crashlytics delivery, https link verification.
+    Verified toolchain: Gradle 8.14.3, AGP 8.11.1, Kotlin 2.4.0, `compileSdk` 37, `minSdk` 24, iOS 15.0.
 
 ### Scaffold a feature
 
@@ -364,8 +393,7 @@ flutter analyze                                           # 0 issues
 flutter test                                              # all green
 ```
 
-Repo process for AI sessions: one task at a time from `ai-docs/TASKS.md`, own git worktree/branch, commits by explicit path as `C-xx: <what>`,
-never push or amend, report in `ai-docs/reports/C-xx.md`. Skills (step-by-step recipes) are in `.claude/skills/`:
+Repo process for AI sessions: small branch, commits by explicit path, never push or amend, update the doc that owns a rule when behaviour changes (see `CLAUDE.md`). Skills (step-by-step recipes) are in `.claude/skills/`:
 `new-feature`, `new-page`, `new-api-call`, `add-translation-keys`, `review-task`, `release-check`.
 
 ## Localization
@@ -435,9 +463,9 @@ flutter test --update-goldens <file>      # only for goldens your change owns, a
   It uses seams, not mocks of the app (mock remote config, fake video player backend, in-memory secure storage, fresh settings and cache, an env with no real values). The More -> About -> logout test is skipped (see Known open items).
   Run: `flutter test integration_test/app_flow_test.dart -d <simulator-udid>`.
 - `integration_test/screens_test.dart` + `screens_driver.dart` walk the screens for screenshots; they write PNGs only under `flutter drive` with `--dart-define=CAPTURE_SCREENS=true` and `SCREENS_DIR` set.
-  Real screenshots from the iPhone 17 Pro simulator (onboarding, login, home, videos, video detail, More, and the component gallery in English/Arabic, light/dark) are committed in [ai-docs/reports/C-26-screens](ai-docs/reports/C-26-screens/README.md).
+  Real screenshots from the iPhone 17 Pro simulator (onboarding, login, home, videos, video detail, More, and the component gallery in English/Arabic, light/dark) are committed in [docs/screenshots](docs/screenshots/README.md).
 - `tool/smoke.sh [simulator-udid]` is the clean-clone proof: it copies `HEAD` into a temp dir, refuses Firebase and keystore files, uses only `env/*.env.example`, then runs pub get, codegen, format, analyze, `flutter test`, the Android and iOS debug builds and the flow test, exiting non-zero on the first failure
-  (`SKIP_ANDROID=1` skips the Android build). It never touches your working tree and tests committed code only, so commit first. Last recorded run passed (C-26 report: 1365 tests, both builds, flow on an iPhone 17 Pro simulator).
+  (`SKIP_ANDROID=1` skips the Android build). It never touches your working tree and tests committed code only, so commit first.
 
 ## CI
 
@@ -493,7 +521,7 @@ Details: `tool/release/README.md`, `.claude/skills/release-check/SKILL.md`.
 
 ## Known open items
 
-1. After popping a detail page, a tap on the bottom navigation is absorbed for about 2-3 s on the simulator (a route transition window, not permanent; not the toast, no infinite animation; C-26 report). The two More-tab integration steps stay skipped until it is measured on a real device.
+1. After popping a detail page, a tap on the bottom navigation is absorbed for about 2-3 s on the simulator (a route transition window, not permanent; not the toast, no infinite animation). The two More-tab integration steps stay skipped until it is measured on a real device.
 2. QR scanning and root/jailbreak detection are declined on purpose (D-043, D-041); an app that needs them adds a package or attestation service through a DECISION.
 3. Real-device verification is still pending for biometrics (app lock), `FLAG_SECURE` and the iOS cover view, FCM/APNs delivery, Crashlytics delivery, and https link verification (domain and signing). Tests cover the logic behind seams only.
 
@@ -501,9 +529,9 @@ Details: `tool/release/README.md`, `.claude/skills/release-check/SKILL.md`.
 
 | File | Content |
 |---|---|
-| [`CLAUDE.md`](CLAUDE.md) | the law: hard rules, stop conditions, definition of done |
+| [`CLAUDE.md`](CLAUDE.md) | the law: hard rules, definition of done |
 | [`ai-docs/README.md`](ai-docs/README.md) | index of the knowledge base |
-| [`ai-docs/RULES.md`](ai-docs/RULES.md) | process: roles, sessions, tasks, commits, review, done |
+| [`ai-docs/RULES.md`](ai-docs/RULES.md) | process: commits, heavy commands, decisions, done |
 | [`ai-docs/ARCHITECTURE.md`](ai-docs/ARCHITECTURE.md) | target architecture, folder tree, dependency direction, Riverpod patterns, error model, startup |
 | [`ai-docs/CONVENTIONS.md`](ai-docs/CONVENTIONS.md) | naming, pages and routes, imports, formatting, strings, RTL-safe layout |
 | [`ai-docs/DESIGN_SYSTEM.md`](ai-docs/DESIGN_SYSTEM.md) | tokens, breakpoints, widget catalog, the 8 data states |
@@ -513,11 +541,7 @@ Details: `tool/release/README.md`, `.claude/skills/release-check/SKILL.md`.
 | [`ai-docs/DEEP_LINKS.md`](ai-docs/DEEP_LINKS.md) | app links and custom scheme, `assetlinks.json`, `apple-app-site-association`, Universal Links opt-in |
 | [`ai-docs/FIREBASE.md`](ai-docs/FIREBASE.md) | optional Crashlytics and Analytics, adding Firebase files, consent, vendor switch, test crash |
 | [`ai-docs/TESTING.md`](ai-docs/TESTING.md) | what to test, helpers, commands |
-| [`ai-docs/TASKS.md`](ai-docs/TASKS.md) | the only task list and statuses |
-| [`ai-docs/CHECKLIST.md`](ai-docs/CHECKLIST.md) | template completeness, status per item |
 | [`ai-docs/DECISIONS.md`](ai-docs/DECISIONS.md) | append-only decision log |
-| [`ai-docs/HOW_TO_START_A_NEW_APP.md`](ai-docs/HOW_TO_START_A_NEW_APP.md) | steps to create an app from this template |
-| [`ai-docs/reports/`](ai-docs/reports) | one report per task (what, tests, decisions, Lead review) |
 | [`tool/release/README.md`](tool/release/README.md) | release scripts and signing |
 | [`.github/workflows/README.md`](.github/workflows/README.md) | CI jobs and action versions |
 
@@ -537,10 +561,10 @@ Full text and rejected alternatives: `ai-docs/DECISIONS.md`. "Superseded" entrie
 | D-008 | Repositories throw `AppException`; no `ApiResult` wrapper |
 | D-009 | Dependency hygiene: no unused or app-specific packages (partly superseded by D-012) |
 | D-010 | Singletons become providers |
-| D-011 | The Lead decides technical choices; the owner decides taste, accounts and paid services |
+| D-011 | Safe technical choices are decided and recorded; the owner decides taste, accounts and paid services |
 | D-012 | Keep `cloud_firestore`, `firebase_auth`, `google_sign_in` for apps with sign-in |
 | D-013 | Latest stable packages, versions recorded from `pubspec.lock` |
-| D-014 | With no workers open, the Lead implements tasks directly on `main` |
+| D-014 | Work mode without workers (superseded by D-044) |
 | D-015 | No domain layer: page -> provider -> repository -> data source |
 | D-016 | Typed routes with `go_router_builder` |
 | D-017 | No `riverpod_lint` / `custom_lint` (cannot resolve with the current stack) |
@@ -570,3 +594,4 @@ Full text and rejected alternatives: `ai-docs/DECISIONS.md`. "Superseded" entrie
 | D-041 | `share_plus`, `in_app_review`, `package_info_plus`, `local_auth`; own screen-security channel; no root/jailbreak check |
 | D-042 | Crashlytics + Firebase Analytics, strictly optional; the template runs with zero project data |
 | D-043 | No native flavors by default; mobile only; no QR scanner |
+| D-044 | Process docs retired; `ai-docs/` keeps only binding docs, new-app steps live in the README |
