@@ -108,10 +108,20 @@ void main() {
 
     final controller = container.read(transferControllerProvider.notifier);
 
+    // Gate: completes when the controller reports the first chunk (0.5), so
+    // the part file exists before cancel(); no sleeping, no timing guess.
+    final firstChunk = Completer<void>();
+    container.listen(transferControllerProvider, (_, next) {
+      if (next is TransferRunning &&
+          next.progress == 0.5 &&
+          !firstChunk.isCompleted) {
+        firstChunk.complete();
+      }
+    });
+
     final future = controller.download('https://x.test/a.bin', 'a.bin');
-    await Future<void>.delayed(Duration.zero);
     chunks.add(Uint8List.fromList(List.filled(5, 1)));
-    await Future<void>.delayed(const Duration(milliseconds: 20));
+    await firstChunk.future;
     expect(container.read(transferControllerProvider), isA<TransferRunning>());
 
     controller.cancel();

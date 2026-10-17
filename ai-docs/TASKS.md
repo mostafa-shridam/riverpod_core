@@ -417,6 +417,14 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 - Done when: no `Localization key ... not found` warning at startup (verify with a widget test that pumps the app with real translations and a log/`EasyLocalization.logger` check, or a fake translator that fails on empty), channels and groups are created/updated once translations are loaded and re-registered with the new names when the user switches language (same channel ids; Android allows renaming by re-creating), initialization stays non-blocking, tap/permission behaviour unchanged.
 - Tests: channel registration runs after translations (fake translator records order), locale switch re-registers with the translated names, startup without translations loaded does not register with raw keys.
 
+## C-48 — Verify merged main, de-flake timing tests, refresh Podfile.lock
+| status | owner | blocked by |
+|---|---|---|
+| REVIEW | Worker S10 (worker-v2) | — |
+- Goal: full gate + both debug builds on merged main; make `transfer_controller_test` cancel test deterministic; commit the plugin-only `ios/Podfile.lock` refresh.
+- Files: `test/core/network/transfer/transfer_controller_test.dart`, `ios/Podfile.lock`, `ai-docs/reports/C-48.md`, `ai-docs/TASKS.md`.
+- Report: `ai-docs/reports/C-48.md`.
+
 ---
 
 ## Backlog (full tasks written when dependencies near DONE)
