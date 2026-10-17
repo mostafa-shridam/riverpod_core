@@ -456,3 +456,11 @@ C-26 Integration tests (auth flow + one feature flow) · C-29 README + HOW_TO_ST
 - Files: `lib/core/storage/cache/**` (`cache_policy.dart` presets, `cached_repository_helper.dart` revalidate-with-etag / payload-hash no-op, `cache_pruner.dart`), `lib/core/storage/cache_store.dart` (lastAccessedAt, maxAge, size cap), `lib/core/bootstrap/bootstrap.dart` (schedule prune after first frame; tiny edit), app lifecycle hook for prune on resume >24h, `lib/features/videos/data/videos_repository.dart` (switch to the helper if C-39 is merged), `ai-docs/STATE_AND_DATA.md`, `.fttemplates/**` is C-25's, `test/core/storage/cache/**`
 - Done when: cached value is emitted first; unchanged payload does not re-emit; changed payload emits once; failure with cache = stale value + error, without cache = error; ttl vs maxAge behave as D-038; pruning removes expired, then least-recently-used over the cap; user-scoped keys; logout clears; no feature hand-rolls expiry (grep).
 - Tests: all of the above with fake clock and temp-dir Hive.
+
+## C-49 — Remove everything that has no use
+| status | owner | blocked by |
+|---|---|---|
+| REVIEW | Worker S11 (worker-c49) | — |
+- Goal: owner request: find and remove dead files, declarations, dependencies, assets, translation keys and stale config, each with proof; keep template extension points.
+- Files: `pubspec.yaml`, `pubspec.lock`, `build.sh`, `.gitignore`, `assets/translations/*.json`, `lib/generated/*`, `lib/core/errors/error_messages.dart`, `test/core/errors/error_messages_test.dart`, `test/helpers/helpers_test.dart`, tracked build artifacts, `ai-docs/reports/C-49.md`, `ai-docs/TASKS.md`.
+- Report: `ai-docs/reports/C-49.md`.
