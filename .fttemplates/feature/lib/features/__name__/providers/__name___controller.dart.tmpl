@@ -13,11 +13,12 @@ class {{Name}}Controller extends _${{Name}}Controller {
   }
 
   /// Reloads while keeping the previous data on screen (refreshing; a failure
-  /// leaves the old data with the error, which the view shows as stale).
+  /// leaves the old data with the error, which the view shows as stale). The
+  /// refresh waits for the network, not the cached list (D-038).
   Future<void> refresh() async {
     state = const AsyncLoading<List<{{Name}}Item>>();
     state = await AsyncValue.guard(
-      () => ref.read({{nameCamel}}RepositoryProvider).fetchItems(),
+      () => ref.read({{nameCamel}}RepositoryProvider).fetchItems(fresh: true),
     );
   }
 }

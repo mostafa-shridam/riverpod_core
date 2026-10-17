@@ -22,7 +22,7 @@ Future<void> _pump(
 }) async {
   final container = ProviderContainer(
     retry: (_, _) => null, // D-032
-    overrides: {{nameCamel}}Overrides(source: source),
+    overrides: await {{nameCamel}}Overrides(source: source),
   );
   addTearDown(container.dispose);
   await pumpDs(

@@ -81,14 +81,14 @@ Future<ProviderContainer> _container({
 /// Never answers, like a server that hangs.
 class _Hanging implements RemoteConfigSource {
   @override
-  Future<CacheFetch<RemoteConfig>> fetch() =>
+  Future<CacheFetch<RemoteConfig>> fetch({String? etag}) =>
       Completer<CacheFetch<RemoteConfig>>().future;
 }
 
 /// Fails like an unreachable server.
 class _Unreachable implements RemoteConfigSource {
   @override
-  Future<CacheFetch<RemoteConfig>> fetch() async =>
+  Future<CacheFetch<RemoteConfig>> fetch({String? etag}) async =>
       throw const NetworkException();
 }
 

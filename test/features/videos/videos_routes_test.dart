@@ -24,7 +24,7 @@ Future<void> _pumpRouter(
   await pumpDs(
     tester,
     ProviderScope(
-      overrides: videosOverrides(
+      overrides: await videosOverrides(
         source: fastSource(),
         prefs: prefs,
         connectivity: FakeConnectivity(),

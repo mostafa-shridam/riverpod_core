@@ -10,6 +10,7 @@ import 'package:riverpod_core/core/storage/cache/cached_repository_helper.dart';
 import '../../../helpers/helpers.dart';
 
 const _ttl = Duration(minutes: 5);
+const _policy = CachePolicy(ttl: _ttl, maxAge: Duration(days: 1));
 
 String _encode(int value) => '$value';
 int _decode(String payload) => int.parse(payload);
@@ -36,14 +37,14 @@ void main() {
   Stream<CacheResult<int>> watchInt({
     String key = 'k',
     String? userId,
-    required Future<CacheFetch<int>> Function() fetch,
+    required CacheFetcher<int> fetch,
   }) => helper.watch<int>(
     key: key,
     userId: userId,
     fetch: fetch,
     decode: _decode,
     encode: _encode,
-    ttl: _ttl,
+    policy: _policy,
   );
 
   Future<void> seed(
@@ -60,7 +61,7 @@ void main() {
   group('CachedRepositoryHelper.watch', () {
     test('cache miss emits only the fetched value', () async {
       await expectLater(
-        watchInt(fetch: () async => _ok(2)),
+        watchInt(fetch: (_) async => _ok(2)),
         emitsInOrder([_result(2), emitsDone]),
       );
     });
@@ -72,7 +73,7 @@ void main() {
         final gate = Completer<CacheFetch<int>>()..complete(_ok(2));
 
         await expectLater(
-          watchInt(fetch: () => gate.future),
+          watchInt(fetch: (_) => gate.future),
           emitsInOrder([_result(1), _result(2), emitsDone]),
         );
       },
@@ -84,7 +85,7 @@ void main() {
         await seed(1, savedAt: now.subtract(const Duration(minutes: 10)));
 
         await expectLater(
-          watchInt(fetch: () async => _ok(2)),
+          watchInt(fetch: (_) async => _ok(2)),
           emitsInOrder([_result(1, isStale: true), _result(2), emitsDone]),
         );
       },
@@ -96,7 +97,7 @@ void main() {
         await seed(1, savedAt: now);
 
         await expectLater(
-          watchInt(fetch: () async => throw const NetworkException()),
+          watchInt(fetch: (_) async => throw const NetworkException()),
           emitsInOrder([
             _result(1),
             _result(1, isStale: true, error: isA<NetworkException>()),
@@ -110,7 +111,7 @@ void main() {
       'a failed fetch without a cache errors with the mapped exception',
       () async {
         await expectLater(
-          watchInt(fetch: () async => throw const NetworkException()),
+          watchInt(fetch: (_) async => throw const NetworkException()),
           emitsError(isA<NetworkException>()),
         );
       },
@@ -118,7 +119,7 @@ void main() {
 
     test('unknown fetch errors are mapped to UnknownException', () async {
       await expectLater(
-        watchInt(fetch: () async => throw StateError('boom')),
+        watchInt(fetch: (_) async => throw StateError('boom')),
         emitsError(isA<UnknownException>()),
       );
     });
@@ -127,7 +128,7 @@ void main() {
       'a successful fetch is written to the cache with its etag and time',
       () async {
         await expectLater(
-          watchInt(fetch: () async => _ok(7, etag: 'W/"x"')),
+          watchInt(fetch: (_) async => _ok(7, etag: 'W/"x"')),
           emitsInOrder([_result(7), emitsDone]),
         );
 
@@ -149,7 +150,7 @@ void main() {
         );
 
         await expectLater(
-          watchInt(fetch: () async => _ok(3)),
+          watchInt(fetch: (_) async => _ok(3)),
           emitsInOrder([_result(3), emitsDone]),
         );
         expect((store.read(cacheKey('k')))!.payload, '3');
@@ -159,7 +160,7 @@ void main() {
     test('concurrent watchers of one key share one fetch', () async {
       var fetches = 0;
       final gate = Completer<CacheFetch<int>>();
-      Future<CacheFetch<int>> fetch() {
+      Future<CacheFetch<int>> fetch(String? etag) {
         fetches++;
         return gate.future;
       }
@@ -178,7 +179,7 @@ void main() {
       'a fetch that finishes after invalidate does not write its value',
       () async {
         final gate = Completer<CacheFetch<int>>();
-        final pending = watchInt(fetch: () => gate.future).toList();
+        final pending = watchInt(fetch: (_) => gate.future).toList();
         await pumpEventQueue();
 
         await helper.invalidate('k');
@@ -190,10 +191,84 @@ void main() {
     );
   });
 
+  group('ETag and unchanged data (D-038)', () {
+    test('the stored etag is sent back and a 304 keeps the copy', () async {
+      await store.write(
+        key: cacheKey('k'),
+        payload: '1',
+        savedAt: now.subtract(const Duration(minutes: 10)),
+        etag: 'e1',
+      );
+      String? sent;
+
+      await expectLater(
+        watchInt(
+          fetch: (etag) async {
+            sent = etag;
+            return (value: null, etag: 'e1');
+          },
+        ),
+        // Stale first; the 304 confirms it, so the stale flag clears once.
+        emitsInOrder([_result(1, isStale: true), _result(1), emitsDone]),
+      );
+
+      expect(sent, 'e1');
+      final entry = store.read(cacheKey('k'));
+      expect(entry!.payload, '1');
+      expect(entry.savedAt, now);
+    });
+
+    test('a 304 on a fresh copy emits nothing more', () async {
+      await store.write(
+        key: cacheKey('k'),
+        payload: '1',
+        savedAt: now,
+        etag: 'e1',
+      );
+
+      await expectLater(
+        watchInt(fetch: (_) async => (value: null, etag: 'e1')),
+        emitsInOrder([_result(1), emitsDone]),
+      );
+    });
+
+    test('an identical payload is not rewritten or re-emitted', () async {
+      await seed(2, savedAt: now);
+      final before = store.read(cacheKey('k'))!.payload;
+
+      await expectLater(
+        watchInt(fetch: (_) async => _ok(2)),
+        emitsInOrder([_result(2), emitsDone]),
+      );
+
+      expect(store.read(cacheKey('k'))!.payload, before);
+      expect(store.read(cacheKey('k'))!.savedAt, now);
+    });
+
+    test(
+      'an identical payload on a stale copy clears the stale flag once',
+      () async {
+        await seed(2, savedAt: now.subtract(const Duration(minutes: 10)));
+
+        await expectLater(
+          watchInt(fetch: (_) async => _ok(2)),
+          emitsInOrder([_result(2, isStale: true), _result(2), emitsDone]),
+        );
+      },
+    );
+
+    test('a 304 without a cached copy is an error', () async {
+      await expectLater(
+        watchInt(fetch: (_) async => (value: null, etag: 'e1')),
+        emitsError(isA<UnknownException>()),
+      );
+    });
+  });
+
   group('CachedRepositoryHelper.read', () {
     test('returns null on a miss and never fetches', () async {
       expect(
-        await helper.read<int>(key: 'k', decode: _decode, ttl: _ttl),
+        await helper.read<int>(key: 'k', decode: _decode, policy: _policy),
         isNull,
       );
     });
@@ -203,7 +278,7 @@ void main() {
       final fresh = await helper.read<int>(
         key: 'k',
         decode: _decode,
-        ttl: _ttl,
+        policy: _policy,
       );
       expect(fresh!.data, 4);
       expect(fresh.isStale, isFalse);
@@ -212,7 +287,7 @@ void main() {
       final stale = await helper.read<int>(
         key: 'k',
         decode: _decode,
-        ttl: _ttl,
+        policy: _policy,
       );
       expect(stale!.isStale, isTrue);
     });
@@ -263,7 +338,7 @@ void main() {
     );
 
     final results = await watchInt(
-      fetch: () async => throw const NetworkException(),
+      fetch: (_) async => throw const NetworkException(),
     ).toList();
     expect(results.last.isStale, isTrue);
 

@@ -59,10 +59,10 @@ class CacheStore {
           ? savedAt
           : _time(raw['lastAccessedAt'] as int),
       ttl: raw['ttl'] == null
-          ? defaultMaxAge
+          ? CachePolicy.medium.ttl
           : Duration(milliseconds: raw['ttl'] as int),
       maxAge: raw['maxAge'] == null
-          ? defaultMaxAge
+          ? CachePolicy.medium.maxAge
           : Duration(milliseconds: raw['maxAge'] as int),
       etag: raw['etag'] as String?,
     );
@@ -74,16 +74,37 @@ class CacheStore {
     required String payload,
     required DateTime savedAt,
     String? etag,
-    Duration ttl = const Duration(hours: 1),
-    Duration maxAge = defaultMaxAge,
+    CachePolicy policy = CachePolicy.medium,
   }) => _box.put(key, {
     'payload': payload,
     'savedAt': savedAt.toUtc().millisecondsSinceEpoch,
     'lastAccessedAt': savedAt.toUtc().millisecondsSinceEpoch,
-    'ttl': ttl.inMilliseconds,
-    'maxAge': maxAge.inMilliseconds,
+    'ttl': policy.ttl.inMilliseconds,
+    'maxAge': policy.maxAge.inMilliseconds,
     'etag': etag,
   });
+
+  /// Records a validation of [key] at [savedAt] without touching the payload:
+  /// the server confirmed the copy (304 or identical payload), so only its
+  /// retention fields move. Missing keys are ignored.
+  Future<void> revalidate(
+    String key, {
+    required DateTime savedAt,
+    required CachePolicy policy,
+    String? etag,
+  }) async {
+    final raw = _box.get(key);
+    if (raw == null) {
+      return;
+    }
+    await _box.put(key, {
+      ...raw,
+      'savedAt': savedAt.toUtc().millisecondsSinceEpoch,
+      'ttl': policy.ttl.inMilliseconds,
+      'maxAge': policy.maxAge.inMilliseconds,
+      'etag': etag ?? raw['etag'],
+    });
+  }
 
   /// Records a read of [key] at [at]. Missing keys are ignored.
   Future<void> touch(String key, DateTime at) async {
@@ -112,6 +133,25 @@ class CacheStore {
       ),
     );
     return keys;
+  }
+
+  /// Keys of entries older than their own [CacheEntry.maxAge] at [now].
+  List<String> keysExpired(DateTime now) {
+    final expired = <String>[];
+    for (final key in _box.keys) {
+      final entry = read(key as String);
+      if (entry != null && now.difference(entry.savedAt) > entry.maxAge) {
+        expired.add(key);
+      }
+    }
+    return expired;
+  }
+
+  /// Removes entries past their own maxAge. Returns how many were removed.
+  Future<int> deleteExpired(DateTime now) async {
+    final keys = keysExpired(now);
+    await _box.deleteAll(keys);
+    return keys.length;
   }
 
   /// Removes entries saved before [cutoff]. Returns how many were removed.

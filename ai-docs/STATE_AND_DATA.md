@@ -27,13 +27,15 @@ class ProductsController extends _$ProductsController {
 
 ## Caching: cache-first (D-038)
 Every read feature goes through the ONE helper in `core/storage/cache/` (Hive box):
-- `CachedRepositoryHelper.watch<T>(key, fetch, policy, decode, encode)` returns a `Stream<CacheResult<T>>`:
-  1. emits the cached value immediately, flagged `isStale` when older than `policy.ttl`;
-  2. revalidates in the background (`etag` / `If-None-Match` when supported);
-  3. unchanged (304 or same payload hash) → keeps the cache, emits nothing new; changed → writes the cache and emits the fresh value;
-  4. failure → keeps serving the cache flagged `stale` + the error (`stale`/`offline` UI states); error only when there is no cache.
-- Entries: key, JSON payload, `savedAt`, `lastAccessedAt`, `etag`, `ttl`, `maxAge`. Writes update or invalidate the affected keys.
-- Retention: `CachePolicy` presets (`short`/`medium`/`long`/`static`) set ttl and maxAge in days; expired entries are pruned at startup (off the critical path), on resume after 24h, and least-recently-accessed first when the box passes its cap.
+- A repository makes one call: `CachedRepositoryHelper.load<T>(key, fetch, decode, encode, policy, fresh)` returns the data as a `Future`. The stream form, `watch<T>`, is what `load` is built on.
+  1. Cache-first: the cached value comes back at once, flagged `isStale` when older than `policy.ttl`; the revalidation finishes in the background.
+  2. Revalidation sends the stored ETag as `If-None-Match`. A 304 means unchanged.
+  3. Unchanged (304, or the same encoded payload) keeps the cache and writes nothing but the retention fields. A stale copy gets one emission that clears its stale flag. Changed → writes the cache and emits the fresh value.
+  4. Failure → keeps serving the cache flagged `stale` + the error (`stale`/`offline` UI states); error only when there is no cache.
+  5. `fresh: true` (refresh and reload) waits for the network and returns that answer; a failure is raised even when a cached copy exists, so the page shows the error beside the old data.
+- Presets (`CachePolicy`, D-038): `short` 5 min fresh / 1 day kept (feeds, remote config), `medium` 1 h / 7 days (the default for lists and details), `long` 1 day / 30 days, `static` 7 days / 90 days. A feature picks a preset; no feature hand-rolls expiry.
+- Entries: key, JSON payload, `savedAt` (last validated), `lastAccessedAt`, `etag`, `ttl`, `maxAge`. Writes update or invalidate the affected keys.
+- Pruning (`CachePruner`, scheduled by `CachePruneScheduler`): removes entries past their own `maxAge`, then the least recently accessed entries above the cap (500). It runs after the first frame and on resume when the last prune is more than 24 h old.
 - Logout clears the whole cache. Cache keys include the user id for user-scoped data.
 
 ## Storage choices

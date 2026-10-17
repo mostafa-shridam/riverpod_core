@@ -1,11 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/misc.dart' show Override;
+import 'package:{{package}}/core/storage/cache/cache_store.dart';
+import 'package:{{package}}/core/storage/cache/cached_repository_helper.dart';
 import 'package:{{package}}/features/{{name}}/data/models/{{name}}_item.dart';
 import 'package:{{package}}/features/{{name}}/data/{{name}}_repository.dart';
 import 'package:{{package}}/features/{{name}}/data/sources/{{name}}_remote_source.dart';
 
 import '../../helpers/fake_connectivity.dart';
+import '../../helpers/fake_prefs_storage.dart';
 
 const {{nameCamel}}Sample = [
   {{Name}}Item(id: 'a', title: 'First', description: 'About the first'),
@@ -39,11 +42,18 @@ class Fake{{Name}}Source implements {{Name}}RemoteSource {
   }
 }
 
-/// Provider overrides every test of this feature needs.
-List<Override> {{nameCamel}}Overrides({
+/// Provider overrides every test of this feature needs. The cache is opened on
+/// the test storage (in memory), so a test never reads a real box.
+Future<List<Override>> {{nameCamel}}Overrides({
   required Fake{{Name}}Source source,
   FakeConnectivity? connectivity,
-}) => [
-  {{nameCamel}}RemoteSourceProvider.overrideWithValue(source),
-  (connectivity ?? FakeConnectivity()).providerOverride,
-];
+}) async {
+  final storage = await openTestStorage();
+  return [
+    {{nameCamel}}RemoteSourceProvider.overrideWithValue(source),
+    cachedRepositoryHelperProvider.overrideWithValue(
+      CachedRepositoryHelper(CacheStore(storage.cache)),
+    ),
+    (connectivity ?? FakeConnectivity()).providerOverride,
+  ];
+}

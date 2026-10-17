@@ -52,7 +52,7 @@ Future<_Harness> _pump(
   final connectivity = FakeConnectivity(online: online);
   final container = ProviderContainer(
     retry: (_, _) => null, // D-032
-    overrides: videosOverrides(
+    overrides: await videosOverrides(
       source: source,
       prefs: prefs,
       connectivity: connectivity,
