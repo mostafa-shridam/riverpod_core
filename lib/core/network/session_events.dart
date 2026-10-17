@@ -4,8 +4,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'session_events.g.dart';
 
-/// Signals that the session can no longer be renewed. The auth feature (C-17)
-/// listens and sends the user to sign-in; C-07 only raises the signal.
+/// Signals that the session can no longer be renewed. The auth feature
+/// listens and sends the user to sign-in; the network layer only raises the signal.
 class SessionEvents {
   final _expired = StreamController<void>.broadcast();
   bool _isExpired = false;

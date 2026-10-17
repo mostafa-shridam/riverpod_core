@@ -6,7 +6,7 @@ import 'package:riverpod_core/core/utils/formatting/app_formatters.dart';
 /// [formatters] so it follows the digit policy.
 ///
 /// Arabic few/many only work when `EasyLocalization` is built with
-/// `ignorePluralRules: false` (see `ai-docs/reports/C-12.md`).
+/// `ignorePluralRules: false` (see D-035).
 String pluralText(String key, num count, {required AppFormatters formatters}) {
   return plural(key, count, args: [formatters.number(count)]);
 }

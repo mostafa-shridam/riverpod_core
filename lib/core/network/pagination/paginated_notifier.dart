@@ -5,7 +5,7 @@ import 'package:riverpod_core/core/network/pagination/page.dart';
 import 'package:riverpod_core/core/network/pagination/page_request.dart';
 import 'package:riverpod_core/core/network/pagination/paginated_state.dart';
 
-/// Base notifier for paginated lists (NETWORKING.md, C-14).
+/// Base notifier for paginated lists (NETWORKING.md).
 ///
 /// A concrete `@riverpod` notifier implements [build] as `firstPage()` and
 /// [fetchPage]. The base handles loading, [loadMore], [refresh], de-duplication

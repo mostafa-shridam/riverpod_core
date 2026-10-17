@@ -17,7 +17,7 @@ import 'package:riverpod_core/core/storage/secure_storage.dart';
 
 part 'dio_client.g.dart';
 
-/// Where request log lines go. Default: `dart:developer` (C-08 replaces it
+/// Where request log lines go. Default: `dart:developer` (bootstrap replaces it
 /// with the app logger).
 typedef NetworkLogSink = void Function(String line);
 

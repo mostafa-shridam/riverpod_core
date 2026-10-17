@@ -80,7 +80,7 @@ Future<void> bootstrap(
           retry: (retryCount, error) => null,
           overrides: [
             appConfigProvider.overrideWithValue(config),
-            // The rationale is shown before the system prompt (C-46).
+            // The rationale is shown before the system prompt.
             permissionRationalePresenterProvider.overrideWithValue(
               showPermissionRationale,
             ),

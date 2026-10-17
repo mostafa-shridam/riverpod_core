@@ -4,7 +4,7 @@ import 'package:riverpod_core/core/errors/app_exception.dart';
 
 part 'token_refresher.g.dart';
 
-/// Renews the access token and stores the new one. C-17 provides the real
+/// Renews the access token and stores the new one. The auth feature provides the real
 /// implementation (it owns the refresh endpoint); the network layer only calls
 /// it. Throws when the session cannot be renewed.
 abstract interface class AccessTokenRefresher {

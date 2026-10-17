@@ -47,7 +47,7 @@ void main() {
     expect(AppTokens.light.lerp(null, 0.8), AppTokens.light);
   });
 
-  test('component sizes and search debounce match the C-09 spec', () {
+  test('component sizes and search debounce match the D-025 spec', () {
     const tokens = AppTokens.light;
     expect(tokens.sizes.minTouchTarget, 48);
     expect(tokens.sizes.buttonHeightSm, 40);

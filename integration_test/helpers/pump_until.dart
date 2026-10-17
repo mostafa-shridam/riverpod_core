@@ -32,7 +32,7 @@ Future<void> tapWhenFound(WidgetTester tester, Finder finder) async {
 
 /// Pops the top route through its navigator, then waits until no route
 /// transition is absorbing taps. Used instead of `pageBack`: the video detail
-/// page showed no back button for `pageBack` to tap (C-26).
+/// page showed no back button for `pageBack` to tap.
 Future<void> popRoute(WidgetTester tester) async {
   Navigator.of(tester.element(find.byType(AppBar).last)).pop();
   await tester.pump();

@@ -10,7 +10,7 @@ import 'package:riverpod_core/generated/locale_keys.g.dart';
 /// Typing fills the next box (auto-advance). Pasting keeps only digits and
 /// the first [length] of them. Digits always read left to right, so the
 /// boxes are laid out LTR even in RTL apps: a deliberate exception to the
-/// layout rule (see the C-09 report).
+/// layout rule (D-025).
 class AppOtpField extends StatefulWidget {
   const AppOtpField({
     super.key,

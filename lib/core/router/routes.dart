@@ -200,7 +200,7 @@ class VideoDetailRoute extends GoRouteData with $VideoDetailRoute {
       VideoDetailPage(id: id, customUrl: url);
 }
 
-/// The component gallery (C-35). Only dev and staging builds have it: in prod
+/// The component gallery. Only dev and staging builds have it: in prod
 /// the redirect sends the request to the home route.
 @TypedGoRoute<ShowcaseRoute>(path: ShowcasePage.routeName)
 class ShowcaseRoute extends GoRouteData with $ShowcaseRoute {
