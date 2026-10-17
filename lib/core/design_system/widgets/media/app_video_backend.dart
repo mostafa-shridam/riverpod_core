@@ -1,9 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/widgets.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:riverpod_core/core/design_system/widgets/media/app_video_source.dart';
 import 'package:video_player/video_player.dart';
+
+part 'app_video_backend.g.dart';
 
 /// Raw playback facts reported by an [AppVideoBackend].
 @immutable
@@ -57,6 +60,11 @@ abstract interface class AppVideoBackend implements Listenable {
 
 typedef AppVideoBackendFactory =
     AppVideoBackend Function(AppVideoSource source);
+
+/// The playback engine the video pages use. Override with a fake in tests
+/// and the integration flow; the default is `video_player`.
+@Riverpod(keepAlive: true)
+AppVideoBackendFactory videoBackendFactory(Ref ref) => createVideoPlayerBackend;
 
 /// Default factory: `video_player`.
 AppVideoBackend createVideoPlayerBackend(AppVideoSource source) =>

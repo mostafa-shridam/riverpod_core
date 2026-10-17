@@ -113,6 +113,9 @@ Future<void> bootstrap(
         }
 
         await initFormatting();
+        // Loads the saved and device locale before EasyLocalization builds (its
+        // controller reads them in the constructor; without this it throws).
+        await EasyLocalization.ensureInitialized();
 
         runner(
           UncontrolledProviderScope(

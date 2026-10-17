@@ -31,14 +31,14 @@ class VideoDetailPage extends ConsumerWidget {
     super.key,
     required this.id,
     this.customUrl,
-    this.backendFactory = createVideoPlayerBackend,
+    this.backendFactory,
   });
 
   final String id;
   final String? customUrl;
 
-  /// Playback engine factory; tests pass a fake.
-  final AppVideoBackendFactory backendFactory;
+  /// Playback engine factory. Null uses `videoBackendFactoryProvider`.
+  final AppVideoBackendFactory? backendFactory;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -53,7 +53,8 @@ class VideoDetailPage extends ConsumerWidget {
         builder: (context, data) => _Content(
           video: data,
           isCustom: customUrl != null,
-          backendFactory: backendFactory,
+          backendFactory:
+              backendFactory ?? ref.watch(videoBackendFactoryProvider),
         ),
       ),
     );
