@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:riverpod_core/core/design_system/tokens/brand_config.dart';
+import 'package:riverpod_core/core/firebase/firebase_bootstrap.dart';
 import 'package:riverpod_core/core/notifications/local/flutter_local_notification_backend.dart';
 import 'package:riverpod_core/core/notifications/local/local_notification_backend.dart';
 import 'package:riverpod_core/core/notifications/local/native_timezone_backend.dart';
@@ -39,7 +40,9 @@ LocalNotificationBackend localNotificationBackend(Ref ref) =>
 
 /// Platform seam for push: override in tests.
 @Riverpod(keepAlive: true)
-PushBackend pushBackend(Ref ref) => FirebasePushBackend();
+PushBackend pushBackend(Ref ref) => FirebasePushBackend(
+  ensureFirebase: ref.read(firebaseBootstrapProvider).ensureInitialized,
+);
 
 /// How the app tells its backend about push tokens. The default does nothing;
 /// override it with a real registrar (see `DioPushTokenRegistrar`).

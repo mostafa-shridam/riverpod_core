@@ -260,7 +260,7 @@ final class PushBackendProvider
   }
 }
 
-String _$pushBackendHash() => r'06cf5c607f543c3373b8aa324d72799bfa0d1a38';
+String _$pushBackendHash() => r'639933ffa6ba3f427556649bb7a7230b1751af6e';
 
 /// How the app tells its backend about push tokens. The default does nothing;
 /// override it with a real registrar (see `DioPushTokenRegistrar`).

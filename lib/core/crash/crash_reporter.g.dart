@@ -8,17 +8,20 @@ part of 'crash_reporter.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// The crash reporter chosen by `AppConfig.enableCrashReporting`.
+/// The crash reporter: Crashlytics when `AppConfig.enableCrashReporting` is on
+/// AND Firebase is configured, otherwise Noop (D-042).
 
 @ProviderFor(crashReporter)
 final crashReporterProvider = CrashReporterProvider._();
 
-/// The crash reporter chosen by `AppConfig.enableCrashReporting`.
+/// The crash reporter: Crashlytics when `AppConfig.enableCrashReporting` is on
+/// AND Firebase is configured, otherwise Noop (D-042).
 
 final class CrashReporterProvider
     extends $FunctionalProvider<CrashReporter, CrashReporter, CrashReporter>
     with $Provider<CrashReporter> {
-  /// The crash reporter chosen by `AppConfig.enableCrashReporting`.
+  /// The crash reporter: Crashlytics when `AppConfig.enableCrashReporting` is on
+  /// AND Firebase is configured, otherwise Noop (D-042).
   CrashReporterProvider._()
     : super(
         from: null,
@@ -52,4 +55,4 @@ final class CrashReporterProvider
   }
 }
 
-String _$crashReporterHash() => r'f8afa4bc4f50b778e99a13a2d62c04f112035374';
+String _$crashReporterHash() => r'e072be2d1e2b59ed2b165e11e3c7323cc82f026e';

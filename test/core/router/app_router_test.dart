@@ -1,7 +1,9 @@
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:riverpod_core/core/analytics/analytics_service.dart';
 import 'package:riverpod_core/core/app_info/app_info.dart';
 import 'package:riverpod_core/core/auth/auth_tokens.dart';
 import 'package:riverpod_core/core/auth/session_controller.dart';
@@ -25,6 +27,7 @@ import 'package:riverpod_core/generated/codegen_loader.g.dart';
 import 'package:riverpod_core/shared/models/auth_user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../helpers/fake_analytics.dart';
 import '../../helpers/helpers.dart';
 
 /// The installed app facts without the platform channel.
@@ -43,6 +46,7 @@ class _FixedAppInfo implements AppInfoSource {
 Future<ProviderContainer> _container(
   WidgetTester tester, {
   required bool onboardingSeen,
+  List<Override> overrides = const [],
 }) async {
   SharedPreferences.setMockInitialValues({});
   await EasyLocalization.ensureInitialized();
@@ -68,6 +72,7 @@ Future<ProviderContainer> _container(
       remoteConfigSourceProvider.overrideWithValue(
         const MockRemoteConfigSource(),
       ),
+      ...overrides,
     ],
   );
   // The router waits for the startup sequence (restore, settings read).
@@ -169,6 +174,33 @@ void main() {
   });
 
   group('navigation', () {
+    testWidgets('navigating logs screen views', (tester) async {
+      final analytics = FakeAnalytics();
+      final container = await _container(
+        tester,
+        onboardingSeen: true,
+        overrides: [analyticsServiceProvider.overrideWithValue(analytics)],
+      );
+      addTearDown(container.dispose);
+      await _signIn(container);
+      await _pumpRouter(tester, container);
+      expect(analytics.screens, isNotEmpty);
+      final before = analytics.screens.length;
+
+      container
+          .read(notificationRouterProvider)
+          .handle(
+            const NotificationTap(
+              payload: NotificationPayload(type: 'myEvents', id: '42'),
+              source: NotificationTapSource.localTap,
+            ),
+          );
+      await tester.pumpAndSettle();
+
+      expect(analytics.screens.length, greaterThan(before));
+      expect(analytics.screens.last, isNot(analytics.screens[before - 1]));
+    });
+
     testWidgets('an unknown location shows the error page', (tester) async {
       final container = await _container(tester, onboardingSeen: true);
       addTearDown(container.dispose);

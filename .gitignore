@@ -57,3 +57,7 @@ android/key.properties
 ios/ExportOptions.plist
 *.mobileprovision
 build-symbols/
+
+# Firebase config belongs to each app, never to the template (D-042)
+google-services.json
+GoogleService-Info.plist
