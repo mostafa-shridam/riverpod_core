@@ -16,7 +16,6 @@ import 'package:riverpod_core/core/notifications/notification_service.dart';
 import 'package:riverpod_core/core/notifications/notification_service_provider.dart';
 import 'package:riverpod_core/core/notifications/registration/noop_push_token_registrar.dart';
 import 'package:riverpod_core/core/notifications/routing/notification_router_provider.dart';
-import 'package:riverpod_core/core/notifications/settings/notification_settings_controller.dart';
 import 'package:riverpod_core/core/permissions/app_permission.dart';
 import 'package:riverpod_core/core/permissions/permission_service.dart';
 import 'package:riverpod_core/core/router/routes.dart';
@@ -312,9 +311,7 @@ void main() {
 
       await h.service.setChannelEnabled('general', enabled: false);
 
-      expect(h.prefs.getStringList(notificationDisabledChannelsKey), [
-        'general',
-      ]);
+      expect(h.prefs.disabledNotificationChannels, ['general']);
       expect(await h.service.local.show(title: 'T', body: 'B'), isNull);
       expect(
         await h.service.local.show(

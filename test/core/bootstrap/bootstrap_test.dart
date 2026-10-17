@@ -4,11 +4,15 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod_core/core/bootstrap/bootstrap.dart';
 import 'package:riverpod_core/core/config/app_config.dart';
 import 'package:riverpod_core/core/config/flavor.dart';
 import 'package:riverpod_core/core/crash/crash_reporter.dart';
+import 'package:riverpod_core/core/design_system/widgets/permissions/permission_rationale_dialog.dart';
+import 'package:riverpod_core/core/permissions/app_permission.dart';
+import 'package:riverpod_core/core/permissions/permission_service.dart';
 import 'package:riverpod_core/core/storage/cache/cache_store.dart';
 import 'package:riverpod_core/core/storage/hive_boxes.dart';
 import 'package:riverpod_core/core/storage/prefs_storage.dart';
@@ -25,6 +29,27 @@ API_BASE_URL=https://api.example.com
 CONNECT_TIMEOUT_MS=1000
 RECEIVE_TIMEOUT_MS=1000
 ''';
+
+/// Denied, with a rationale worth showing. Records each system prompt.
+class _RecordingBackend implements PermissionBackend {
+  final requests = <AppPermission>[];
+
+  @override
+  Future<AppPermissionResult> status(AppPermission permission) async =>
+      AppPermissionResult.denied;
+
+  @override
+  Future<AppPermissionResult> request(AppPermission permission) async {
+    requests.add(permission);
+    return AppPermissionResult.granted;
+  }
+
+  @override
+  Future<bool> shouldShowRationale(AppPermission permission) async => true;
+
+  @override
+  Future<bool> openSettings() async => true;
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -48,6 +73,7 @@ void main() {
     FakeCrashReporter? crash,
     void Function(Widget)? onRun,
     List<String>? readPaths,
+    List<Override> extra = const [],
   }) async {
     Widget? app;
     final storage = await openTestStorage();
@@ -65,6 +91,7 @@ void main() {
       },
       overrides: [
         if (crash != null) crashReporterProvider.overrideWithValue(crash),
+        ...extra,
       ],
       initNotifications: () async {},
     );
@@ -196,6 +223,58 @@ void main() {
 
     expect(builds, 1);
     expect(container.read(failing).hasError, isTrue);
+  });
+
+  test('bootstrap wires the design-system rationale presenter', () async {
+    final app = await run(flavor: Flavor.dev);
+    final container = (app! as UncontrolledProviderScope).container;
+
+    expect(
+      container.read(permissionRationalePresenterProvider),
+      same(showPermissionRationale),
+    );
+  });
+
+  testWidgets('the rationale comes before the system prompt', (tester) async {
+    final backend = _RecordingBackend();
+    await pumpApp(
+      tester,
+      Builder(
+        builder: (context) => TextButton(
+          onPressed: () => ProviderScope.containerOf(context)
+              .read(permissionServiceProvider)
+              .ensure(AppPermission.camera, context),
+          child: const Text('ask'),
+        ),
+      ),
+      overrides: [
+        permissionBackendProvider.overrideWithValue(backend),
+        // The same tear-off bootstrap installs.
+        permissionRationalePresenterProvider.overrideWithValue(
+          showPermissionRationale,
+        ),
+      ],
+    );
+
+    await tester.tap(find.text('ask'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(PermissionRationaleDialog), findsOneWidget);
+    expect(
+      backend.requests,
+      isEmpty,
+      reason: 'the system prompt waits for the explanation',
+    );
+
+    await tester.tap(
+      find.descendant(
+        of: find.byType(PermissionRationaleDialog),
+        matching: find.byType(FilledButton),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(backend.requests, [AppPermission.camera]);
   });
 
   testWidgets('Arabic plurals work inside pumpApp', (tester) async {

@@ -183,16 +183,14 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('A new version of the app is available.'), findsNothing);
-      expect(prefs!.getStringList(DismissedUpdates.prefKey), ['1.5.0']);
+      expect(prefs!.dismissedUpdateVersions, ['1.5.0']);
     });
 
     testWidgets('a version the user already dismissed stays hidden', (
       tester,
     ) async {
       final prefs = await tester.runAsync(() => fakePrefsStorage({}));
-      await tester.runAsync(
-        () => prefs!.setStringList(DismissedUpdates.prefKey, ['1.5.0']),
-      );
+      await tester.runAsync(() => prefs!.setDismissedUpdateVersions(['1.5.0']));
       await pumpAuthPage(
         tester,
         const Scaffold(body: SoftUpdateBanner()),

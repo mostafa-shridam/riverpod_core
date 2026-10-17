@@ -12,11 +12,13 @@ import 'package:riverpod_core/core/config/config_exception.dart';
 import 'package:riverpod_core/core/config/env_loader.dart';
 import 'package:riverpod_core/core/config/flavor.dart';
 import 'package:riverpod_core/core/config/log_level.dart';
-import 'package:riverpod_core/core/constants.dart';
 import 'package:riverpod_core/core/crash/crash_reporter.dart';
+import 'package:riverpod_core/core/design_system/widgets/permissions/permission_rationale_dialog.dart';
 import 'package:riverpod_core/core/firebase/observability_init.dart';
+import 'package:riverpod_core/core/localization/app_locales.dart';
 import 'package:riverpod_core/core/logger/app_logger.dart';
 import 'package:riverpod_core/core/notifications/notification_service_provider.dart';
+import 'package:riverpod_core/core/permissions/permission_service.dart';
 import 'package:riverpod_core/core/storage/hive_boxes.dart';
 import 'package:riverpod_core/core/storage/prefs_storage.dart';
 import 'package:riverpod_core/core/utils/formatting/formatting_setup.dart';
@@ -77,6 +79,10 @@ Future<void> bootstrap(
           retry: (retryCount, error) => null,
           overrides: [
             appConfigProvider.overrideWithValue(config),
+            // The rationale is shown before the system prompt (C-46).
+            permissionRationalePresenterProvider.overrideWithValue(
+              showPermissionRationale,
+            ),
             ...storage,
             ...overrides,
           ],

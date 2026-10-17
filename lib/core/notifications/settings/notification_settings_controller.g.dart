@@ -45,7 +45,7 @@ final class NotificationSettingsControllerProvider
 }
 
 String _$notificationSettingsControllerHash() =>
-    r'46945ad0a1362896b85a27111662bc40f8ff4e22';
+    r'd99d78059d6d57d8e40cca698e61da5bd9eee774';
 
 /// Owns [NotificationSettings]: loads them from the settings store and saves
 /// every change. The master flag lives in `PrefsStorage.notificationsEnabled`.

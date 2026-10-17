@@ -16,6 +16,13 @@ Duration splashMinimumDisplay(Ref ref) => const Duration(milliseconds: 800);
 @Riverpod(keepAlive: true)
 Duration splashRemoteConfigTimeout(Ref ref) => const Duration(seconds: 3);
 
+/// The clock the minimum display time is measured on. Tests move it by hand.
+@Riverpod(keepAlive: true)
+DateTime Function() startupClock(Ref ref) => DateTime.now;
+
+/// How often the splash checks the clock while it holds.
+const _holdPoll = Duration(milliseconds: 20);
+
 /// The startup sequence. Config is already validated in bootstrap. Mandatory
 /// steps: the session restore, then the settings read (it carries the
 /// onboarding-seen flag). A failed step leaves the state in error, so the
@@ -25,11 +32,21 @@ Duration splashRemoteConfigTimeout(Ref ref) => const Duration(seconds: 3);
 class StartupController extends _$StartupController {
   @override
   Future<void> build() async {
-    final shown = Future<void>.delayed(ref.read(splashMinimumDisplayProvider));
+    final clock = ref.read(startupClockProvider);
+    final deadline = clock().add(ref.read(splashMinimumDisplayProvider));
     await ref.read(sessionControllerProvider.notifier).restore();
     await ref.read(prefsStorageProvider.future);
     await _loadRemoteConfig();
-    await shown;
+    await _holdUntil(deadline, clock);
+  }
+
+  /// Waits until [clock] reaches [deadline]. A clock already past it returns
+  /// at once, so the wait is decided by the clock, not by a timer.
+  Future<void> _holdUntil(DateTime deadline, DateTime Function() clock) async {
+    for (var left = deadline.difference(clock()); left > Duration.zero;) {
+      await Future<void>.delayed(left < _holdPoll ? left : _holdPoll);
+      left = deadline.difference(clock());
+    }
   }
 
   Future<void> _loadRemoteConfig() async {

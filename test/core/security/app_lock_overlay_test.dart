@@ -6,6 +6,7 @@ import 'package:riverpod_core/core/design_system/widgets/buttons/app_button.dart
 import 'package:riverpod_core/core/security/app_lock_controller.dart';
 import 'package:riverpod_core/core/security/app_lock_overlay.dart';
 import 'package:riverpod_core/core/security/biometric_service.dart';
+import 'package:riverpod_core/core/storage/prefs_storage.dart';
 
 import '../../helpers/helpers.dart';
 import 'security_fakes.dart';
@@ -23,7 +24,7 @@ Future<ProviderContainer> _pump(
     biometric: biometric,
     prefs: locked
         ? {
-            appLockPrefKey: ['1'],
+            PrefKeys.appLock: ['1'],
           }
         : const {},
   );

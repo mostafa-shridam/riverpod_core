@@ -84,4 +84,37 @@ void main() {
       expect(prefs.getStringList('settings.other'), ['x']);
     });
   });
+
+  group('PrefsStorage typed settings', () {
+    test(
+      'app lock, dismissed updates and disabled channels round trip',
+      () async {
+        final prefs = await fakePrefsStorage();
+        expect(prefs.appLockEnabled, isFalse);
+        expect(prefs.dismissedUpdateVersions, isEmpty);
+        expect(prefs.disabledNotificationChannels, isEmpty);
+
+        await prefs.setAppLockEnabled(value: true);
+        await prefs.setDismissedUpdateVersions(['1.5.0']);
+        await prefs.setDisabledNotificationChannels(['general']);
+        expect(prefs.appLockEnabled, isTrue);
+        expect(prefs.dismissedUpdateVersions, ['1.5.0']);
+        expect(prefs.disabledNotificationChannels, ['general']);
+
+        await prefs.setAppLockEnabled(value: false);
+        expect(prefs.appLockEnabled, isFalse);
+      },
+    );
+
+    test('the keys keep the encoding older builds wrote', () async {
+      final prefs = await fakePrefsStorage({
+        PrefKeys.appLock: ['1'],
+        PrefKeys.dismissedUpdateVersions: ['1.5.0'],
+        PrefKeys.disabledNotificationChannels: ['general'],
+      });
+      expect(prefs.appLockEnabled, isTrue);
+      expect(prefs.dismissedUpdateVersions, ['1.5.0']);
+      expect(prefs.disabledNotificationChannels, ['general']);
+    });
+  });
 }

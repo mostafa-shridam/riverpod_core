@@ -14,7 +14,6 @@ part 'app_lock_controller.g.dart';
 /// Prefs slot of the "app lock on" flag. It is a device setting, so it does
 /// not start with `user.` and survives logout. Stored through the generic
 /// string-list slot: `['1']` is on, empty is off.
-const appLockPrefKey = 'settings.appLock';
 
 /// How long the app may stay in the background before it asks again. Apps
 /// override this provider; zero locks on every return.
@@ -59,7 +58,7 @@ class AppLockController extends _$AppLockController {
   @override
   AppLockState build() {
     final prefs = ref.watch(prefsStorageProvider).value;
-    final enabled = prefs?.getStringList(appLockPrefKey).contains('1') ?? false;
+    final enabled = prefs?.appLockEnabled ?? false;
 
     _gate = ref.watch(secureScreenGateProvider);
     final observer = _LifecycleObserver(onLifecycle);
@@ -155,7 +154,7 @@ class AppLockController extends _$AppLockController {
 
   Future<void> _persist({required bool enabled}) async {
     final prefs = await ref.read(prefsStorageProvider.future);
-    await prefs.setStringList(appLockPrefKey, enabled ? const ['1'] : const []);
+    await prefs.setAppLockEnabled(value: enabled);
   }
 
   /// While app lock is on the whole app is protected, which also hides it

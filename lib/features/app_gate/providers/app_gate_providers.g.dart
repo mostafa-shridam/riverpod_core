@@ -51,17 +51,17 @@ final class StoreOpenerProvider
 String _$storeOpenerHash() => r'ce89bf4987dd3bb90e1aee3e86859faaacc2258b';
 
 /// Newest versions the user dismissed the soft update notice for. Device
-/// setting (not per user), kept in the prefs string-list slot.
+/// setting (not per user), read and written through `PrefsStorage`.
 
 @ProviderFor(DismissedUpdates)
 final dismissedUpdatesProvider = DismissedUpdatesProvider._();
 
 /// Newest versions the user dismissed the soft update notice for. Device
-/// setting (not per user), kept in the prefs string-list slot.
+/// setting (not per user), read and written through `PrefsStorage`.
 final class DismissedUpdatesProvider
     extends $AsyncNotifierProvider<DismissedUpdates, List<String>> {
   /// Newest versions the user dismissed the soft update notice for. Device
-  /// setting (not per user), kept in the prefs string-list slot.
+  /// setting (not per user), read and written through `PrefsStorage`.
   DismissedUpdatesProvider._()
     : super(
         from: null,
@@ -81,10 +81,10 @@ final class DismissedUpdatesProvider
   DismissedUpdates create() => DismissedUpdates();
 }
 
-String _$dismissedUpdatesHash() => r'd85332f81ede26e4212d102618f58ca083261eef';
+String _$dismissedUpdatesHash() => r'8db0eada1d86981c4632dd106d2acb042c7f51ee';
 
 /// Newest versions the user dismissed the soft update notice for. Device
-/// setting (not per user), kept in the prefs string-list slot.
+/// setting (not per user), read and written through `PrefsStorage`.
 
 abstract class _$DismissedUpdates extends $AsyncNotifier<List<String>> {
   FutureOr<List<String>> build();

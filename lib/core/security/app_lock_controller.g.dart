@@ -8,18 +8,27 @@ part of 'app_lock_controller.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// Prefs slot of the "app lock on" flag. It is a device setting, so it does
+/// not start with `user.` and survives logout. Stored through the generic
+/// string-list slot: `['1']` is on, empty is off.
 /// How long the app may stay in the background before it asks again. Apps
 /// override this provider; zero locks on every return.
 
 @ProviderFor(appLockTimeout)
 final appLockTimeoutProvider = AppLockTimeoutProvider._();
 
+/// Prefs slot of the "app lock on" flag. It is a device setting, so it does
+/// not start with `user.` and survives logout. Stored through the generic
+/// string-list slot: `['1']` is on, empty is off.
 /// How long the app may stay in the background before it asks again. Apps
 /// override this provider; zero locks on every return.
 
 final class AppLockTimeoutProvider
     extends $FunctionalProvider<Duration, Duration, Duration>
     with $Provider<Duration> {
+  /// Prefs slot of the "app lock on" flag. It is a device setting, so it does
+  /// not start with `user.` and survives logout. Stored through the generic
+  /// string-list slot: `['1']` is on, empty is off.
   /// How long the app may stay in the background before it asks again. Apps
   /// override this provider; zero locks on every return.
   AppLockTimeoutProvider._()
@@ -151,7 +160,7 @@ final class AppLockControllerProvider
   }
 }
 
-String _$appLockControllerHash() => r'b481d4ce5631d353ebdc9da81e6935344b8d5208';
+String _$appLockControllerHash() => r'c29b2d9cf51ce458f9f7dfffa2a3e639b6a6ad96';
 
 /// Optional app lock. Locks when the app comes back after more than
 /// [appLockTimeoutProvider] in the background, and at cold start when on.
