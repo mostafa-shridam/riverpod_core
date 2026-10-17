@@ -81,7 +81,7 @@ Grouped like `ai-docs/CHECKLIST.md` (which carries the DONE/PARTIAL/MISSING stat
 - Splash -> onboarding -> auth -> home with pure redirect rules (`appRedirect`) and a startup sequence.
 - Biometric app lock (`local_auth`), screenshot blocking and app-switcher cover (own `MethodChannel`: Android `FLAG_SECURE`, iOS cover view), a security settings page (D-041).
 - No root/jailbreak detection on purpose: client-side checks give false confidence (D-041).
-- Social sign-in is an extension point only (see the C-17 report); `google_sign_in`, `firebase_auth` and `cloud_firestore` are dependencies but no code uses them yet.
+- Social sign-in is an extension point only (see the C-17 report). `google_sign_in`, `firebase_auth` and `cloud_firestore` are kept on purpose for each app's own login and data (owner rule, D-012); template code does not import them.
 
 ### Navigation
 - ONE `GoRouter` (`appRouterProvider`), typed routes (`go_router_builder`) in `core/router/routes.dart`, a stateful shell with separate stacks (Home, More).
@@ -225,7 +225,7 @@ choice has no recorded alternative (it is the standard package for that job).
 | in_app_review | 2.0.12 | `ReviewService` | D-041 | MIT |
 | package_info_plus | 10.2.2 | `AppInfo`, About page | D-041 | BSD-3 |
 | url_launcher | 6.3.3 | `ExternalLinks` (scheme allow-list) | | BSD-3 |
-| cloud_firestore, firebase_auth, google_sign_in | 7.0.0, 7.0.0, 7.2.0 | **not imported anywhere in `lib/` today**; kept for apps that add sign-in | kept by owner instruction (D-012); the template never writes to Firestore | BSD-3 |
+| cloud_firestore, firebase_auth, google_sign_in | 7.0.0, 7.0.0, 7.2.0 | kept on purpose for the app's login and data; **not imported by any template code** | owner rule (D-012); the template never writes to Firestore | BSD-3 |
 
 > **Status:** C-41 swaps `shared_preferences`, `drift`, `drift_flutter` (and dev `drift_dev`) for `hive_ce` + `hive_ce_flutter` (D-034). C-30 adds
 > `firebase_crashlytics` and `firebase_analytics` (D-042). C-31 may add `flutter_native_splash` (to be decided as D-044 in its report).

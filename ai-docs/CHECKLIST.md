@@ -132,4 +132,4 @@ Open work at this date: C-41 (READY), C-44 (BLOCKED by C-41), C-21 (READY), C-30
 | README | DONE | C-29 | rewritten; its `Status:` notes are removed by the Lead as C-41/C-44/C-46/C-21/C-30/C-31/C-26 become DONE |
 | HOW_TO_START_A_NEW_APP.md | DONE | C-29 | steps that depend on C-30/C-31 are marked pending |
 | ai-docs + CLAUDE.md control plane | DONE | — | |
-| Skill recipes (`.claude/skills`) | PARTIAL | BL | `release-check` still mentions `env/prod.json` and `--dart-define-from-file` (superseded by D-024); update when touched |
+| Skill recipes (`.claude/skills`) | DONE | C-29 | `release-check` updated to the dotenv flavor setup (D-024) |

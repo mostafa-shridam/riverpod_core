@@ -19,7 +19,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 | status | owner | blocked by |
 |---|---|---|
 | DONE | worker-b | — |
-- Goal: typed config from `--dart-define-from-file` with startup validation and a clear error (D-006, D-018). Not wired into startup here (C-08).
+- Goal (historical: the dart-define loading and `env/*.example.json` were superseded by D-024 / C-37; current files are `env/*.env.example`): typed config from `--dart-define-from-file` with startup validation and a clear error (D-006, D-018). Not wired into startup here (C-08).
 - Files: `lib/core/config/app_config.dart`, `lib/core/config/flavor.dart`, `lib/core/config/config_exception.dart`, `env/dev.example.json`, `env/staging.example.json`, `env/prod.example.json`, `.gitignore` (add `env/*.json` and `!env/*.example.json`), `test/core/config/app_config_test.dart`
 - Done when:
   - `Flavor { dev, staging, prod }`; `AppConfig` has `flavor`, `appName`, `apiBaseUrl`, `connectTimeout`, `receiveTimeout`, `logLevel`, `enableCrashReporting`, `enableAnalytics`, optional `String? crashDsn`. No app-specific values.
