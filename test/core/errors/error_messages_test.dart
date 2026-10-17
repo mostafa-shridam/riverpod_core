@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod_core/core/errors/app_exception.dart';
 import 'package:riverpod_core/core/errors/error_messages.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 const _all = <AppException>[
   NetworkException(),
@@ -40,11 +41,11 @@ void main() {
       'errors.unauthorized',
     );
     expect(errorMessageKey(const NotFoundException()), 'errors.notFound');
-    expect(errorRetryKey, 'errors.retry');
+    expect(LocaleKeys.errors_retry, 'errors.retry');
   });
 
   test('every errors.* key is non-empty in ar and en', () {
-    final keys = [..._all.map(errorMessageKey), errorRetryKey];
+    final keys = [..._all.map(errorMessageKey), LocaleKeys.errors_retry];
     for (final lang in ['ar', 'en']) {
       final json =
           jsonDecode(File('assets/translations/$lang.json').readAsStringSync())
