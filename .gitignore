@@ -61,3 +61,7 @@ build-symbols/
 # Firebase config belongs to each app, never to the template (D-042)
 google-services.json
 GoogleService-Info.plist
+
+# Flutter golden-test failure output and Gradle reports are build artifacts
+**/test/**/failures/
+/android/build/
