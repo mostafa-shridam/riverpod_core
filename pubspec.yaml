@@ -78,6 +78,7 @@ dev_dependencies:
   drift_dev: ^2.35.1
   flutter_launcher_icons: ^0.14.4
   flutter_lints: ^6.0.0
+  flutter_native_splash: ^2.4.8
   flutter_test:
     sdk: flutter
   freezed: ^4.0.2
@@ -120,25 +121,30 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
-  # TODO Change app icon run this comannd : dart run flutter_launcher_icons
-  # flutter_launcher_icons:
-  # android: true
-  # ios: true
-  # remove_alpha_ios: true
-  # image_path: "assets/images/appLogo.png"
-  # image_path_ios: "assets/images/appLogo.png"
-  # background_color: "#FFFFFF"
-  # web:
-  #   generate: true
-  #   image_path: "assets/images/appLogo.png"
-  #   background_color: "#FFFFFF"
-  #   theme_color: "#FFFFFF"
-  # windows:
-  #   generate: true
-  #   image_path: "assets/images/appLogo.png"
-  #   icon_size: 48
-  # macos:
-  #   generate: true
-  #   image_path: "assets/images/appLogo.png"
+
+# Launcher icons: `dart run flutter_launcher_icons` (ai-docs/HOW_TO_START_A_NEW_APP.md).
+# The placeholder PNGs come from `dart run tool/generate_placeholder_icon.dart`;
+# an app replaces them with its own artwork. Keep the colors in sync with
+# `brandSeedColor` in lib/core/design_system/tokens/brand_config.dart.
+flutter_launcher_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/images/app_icon.png"
+  adaptive_icon_background: "#4A6FA5"
+  adaptive_icon_foreground: "assets/images/app_icon_foreground.png"
+
+# Native splash: `dart run flutter_native_splash:create`. Same color as the seed.
+flutter_native_splash:
+  color: "#4A6FA5"
+  image: assets/images/app_icon_foreground.png
+  color_dark: "#22344F"
+  image_dark: assets/images/app_icon_foreground.png
+  android_12:
+    color: "#4A6FA5"
+    image: assets/images/app_icon_foreground.png
+    color_dark: "#22344F"
+    image_dark: assets/images/app_icon_foreground.png
+  fullscreen: false
 
 #if need to rename app use this command : dart run rename_app:main all="My App Name"

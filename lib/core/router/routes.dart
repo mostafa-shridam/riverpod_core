@@ -5,6 +5,8 @@ import 'package:riverpod_core/core/config/app_config.dart';
 import 'package:riverpod_core/core/config/flavor.dart';
 import 'package:riverpod_core/core/router/app_shell.dart';
 import 'package:riverpod_core/core/startup/splash_page.dart';
+import 'package:riverpod_core/features/app_gate/presentation/pages/force_update_page.dart';
+import 'package:riverpod_core/features/app_gate/presentation/pages/maintenance_page.dart';
 import 'package:riverpod_core/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:riverpod_core/features/auth/presentation/pages/login_page.dart';
 import 'package:riverpod_core/features/auth/presentation/pages/register_page.dart';
@@ -43,6 +45,24 @@ class LoginRoute extends GoRouteData with $LoginRoute {
 
   @override
   Widget build(BuildContext context, GoRouterState state) => const LoginPage();
+}
+
+@TypedGoRoute<ForceUpdateRoute>(path: ForceUpdatePage.routeName)
+class ForceUpdateRoute extends GoRouteData with $ForceUpdateRoute {
+  const ForceUpdateRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const ForceUpdatePage();
+}
+
+@TypedGoRoute<MaintenanceRoute>(path: MaintenancePage.routeName)
+class MaintenanceRoute extends GoRouteData with $MaintenanceRoute {
+  const MaintenanceRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const MaintenancePage();
 }
 
 @TypedGoRoute<RegisterRoute>(path: RegisterPage.routeName)
@@ -133,6 +153,8 @@ class ItemDetailRoute extends GoRouteData with $ItemDetailRoute {
 GoRouteData? routeForDeepLink({required String type, required String id}) {
   return switch (type) {
     'myEvents' => ItemDetailRoute(id: id),
+    'items' => ItemDetailRoute(id: id),
+    'videos' => VideoDetailRoute(id: id),
     _ => null,
   };
 }

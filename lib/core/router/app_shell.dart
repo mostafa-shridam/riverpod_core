@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:riverpod_core/features/app_gate/presentation/widgets/soft_update_banner.dart';
 import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 /// Bottom navigation with one stack per branch (each tab keeps its own
@@ -13,7 +14,13 @@ class AppShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: navigationShell,
+      // The soft update notice sits above every tab (empty unless due).
+      body: Column(
+        children: [
+          const SoftUpdateBanner(),
+          Expanded(child: navigationShell),
+        ],
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: navigationShell.currentIndex,
         onDestinationSelected: (index) => navigationShell.goBranch(

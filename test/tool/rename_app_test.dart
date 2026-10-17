@@ -107,6 +107,74 @@ void main() {
     });
 
     test(
+      'rewrites the deep-link scheme from the package, keeps the host',
+      () async {
+        await renameApp(root: project, request: _request);
+
+        String read(String path) =>
+            File('${project.path}/$path').readAsStringSync();
+
+        final manifest = read('android/app/src/main/AndroidManifest.xml');
+        expect(manifest, contains('<data android:scheme="my-app"/>'));
+        expect(
+          manifest,
+          contains('<data android:scheme="https" android:host="example.com"/>'),
+        );
+        expect(
+          read('ios/Runner/Info.plist'),
+          contains('<string>my-app</string>'),
+        );
+        expect(
+          read('ios/Runner/Runner.entitlements'),
+          contains('applinks:example.com'),
+        );
+        final config = read('lib/core/router/deep_link.dart');
+        expect(config, contains("const deepLinkScheme = 'my-app';"));
+        expect(config, contains("const deepLinkHost = 'example.com';"));
+      },
+    );
+
+    test('--host rewrites the https host in all three places', () async {
+      await renameApp(
+        root: project,
+        request: const RenameRequest(
+          name: 'My App',
+          id: 'com.company.myapp',
+          package: 'my_app',
+          host: 'links.company.com',
+        ),
+      );
+
+      String read(String path) =>
+          File('${project.path}/$path').readAsStringSync();
+
+      expect(
+        read('android/app/src/main/AndroidManifest.xml'),
+        contains('android:scheme="https" android:host="links.company.com"'),
+      );
+      expect(
+        read('ios/Runner/Runner.entitlements'),
+        contains('applinks:links.company.com'),
+      );
+      expect(
+        read('lib/core/router/deep_link.dart'),
+        contains("const deepLinkHost = 'links.company.com';"),
+      );
+    });
+
+    test('the custom scheme never keeps an underscore', () {
+      expect(_request.scheme, 'my-app');
+      expect(
+        const RenameRequest(
+          name: 'A',
+          id: 'com.a.b',
+          package: 'shop_cart_app',
+        ).scheme,
+        'shop-cart-app',
+      );
+    });
+
+    test(
       'rewrites package imports in lib, test and integration_test',
       () async {
         await renameApp(root: project, request: _request);
@@ -212,7 +280,8 @@ void main() {
           for (final entry in files.entries)
             if (!entry.key.startsWith('build/') &&
                 !entry.key.startsWith('.git/') &&
-                entry.value.contains('riverpod_core'))
+                (entry.value.contains('riverpod_core') ||
+                    entry.value.contains('riverpod-core')))
               entry.key,
         ];
         expect(leftovers, isEmpty);
@@ -317,6 +386,23 @@ void main() {
       }
     });
 
+    test('a bad --host is reported', () {
+      for (final host in [
+        'https://a.com',
+        'a.com/path',
+        'A.com',
+        'localhost',
+      ]) {
+        expect(
+          validateRename(
+            RenameRequest(name: 'App', id: 'com.a.b', package: 'a', host: host),
+          ),
+          anyElement(contains('--host')),
+          reason: host,
+        );
+      }
+    });
+
     test('a valid request has no problems', () {
       expect(validateRename(_request), isEmpty);
     });
@@ -364,6 +450,32 @@ void main() {
 
       expect(options.dryRun, isTrue);
       expect(options.request.package, 'shop');
+    });
+
+    test('--host is parsed in both forms', () {
+      expect(
+        parseRenameArgs(const [
+          '--name',
+          'A',
+          '--id',
+          'com.a.b',
+          '--host',
+          'links.a.com',
+        ]).request.host,
+        'links.a.com',
+      );
+      expect(
+        parseRenameArgs(const [
+          '--name=A',
+          '--id=com.a.b',
+          '--host=links.a.com',
+        ]).request.host,
+        'links.a.com',
+      );
+      expect(
+        parseRenameArgs(const ['--name', 'A', '--id', 'com.a.b']).request.host,
+        isNull,
+      );
     });
 
     test('missing --id, unknown options and a bare flag are rejected', () {
