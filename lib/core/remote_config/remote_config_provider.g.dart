@@ -135,7 +135,7 @@ final class RemoteConfigProvider
     : super(
         from: null,
         argument: null,
-        retry: null,
+        retry: _noRetry,
         name: r'remoteConfigProvider',
         isAutoDispose: false,
         dependencies: null,
@@ -157,7 +157,7 @@ final class RemoteConfigProvider
   }
 }
 
-String _$remoteConfigHash() => r'f98ffd5c42d54d282aa9838f0bcf6cfdfd4223c8';
+String _$remoteConfigHash() => r'ee66f9bfa02cbb27d5b3626eef5c03b324778b8d';
 
 /// The config in use: [RemoteConfig.defaults] until one is known.
 
@@ -206,6 +206,55 @@ final class CurrentRemoteConfigProvider
 String _$currentRemoteConfigHash() =>
     r'a004404f0511800eb7b3a908223adc9d1eae3fde';
 
+/// The version the gate compares: the `APP_VERSION` override when set, else the
+/// installed version. Null while that is still loading.
+
+@ProviderFor(currentAppVersion)
+final currentAppVersionProvider = CurrentAppVersionProvider._();
+
+/// The version the gate compares: the `APP_VERSION` override when set, else the
+/// installed version. Null while that is still loading.
+
+final class CurrentAppVersionProvider
+    extends $FunctionalProvider<String?, String?, String?>
+    with $Provider<String?> {
+  /// The version the gate compares: the `APP_VERSION` override when set, else the
+  /// installed version. Null while that is still loading.
+  CurrentAppVersionProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'currentAppVersionProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$currentAppVersionHash();
+
+  @$internal
+  @override
+  $ProviderElement<String?> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  String? create(Ref ref) {
+    return currentAppVersion(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(String? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<String?>(value),
+    );
+  }
+}
+
+String _$currentAppVersionHash() => r'9f80e4db7f43681401a5d18cc5ff0e001c391275';
+
 /// What the app shows for this build and the config in use.
 
 @ProviderFor(appGateStatus)
@@ -250,7 +299,7 @@ final class AppGateStatusProvider
   }
 }
 
-String _$appGateStatusHash() => r'7b82f68c092bfedc7616fdd0626572d754dc543d';
+String _$appGateStatusHash() => r'a11ee5c47ef8dfe02ec9458c65284d85419c29e4';
 
 /// A feature flag, typed. False unless the server turns it on.
 

@@ -74,6 +74,19 @@ void main() {
       );
     });
 
+    test('an unknown current version never forces an update', () {
+      final config = _config(minVersion: '9.0.0');
+      expect(
+        gateStatusFor(currentVersion: null, config: config),
+        AppGateStatus.ok,
+      );
+      expect(
+        gateStatusFor(currentVersion: null, config: _config(maintenance: true)),
+        AppGateStatus.maintenance,
+        reason: 'maintenance does not need the version',
+      );
+    });
+
     test('never for ok, forced or maintenance states', () {
       for (final status in [
         AppGateStatus.ok,

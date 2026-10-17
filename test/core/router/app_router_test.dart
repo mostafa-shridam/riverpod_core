@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:riverpod_core/core/app_info/app_info.dart';
 import 'package:riverpod_core/core/auth/auth_tokens.dart';
 import 'package:riverpod_core/core/auth/session_controller.dart';
 import 'package:riverpod_core/core/config/app_config.dart';
@@ -25,6 +26,19 @@ import 'package:riverpod_core/shared/models/auth_user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../helpers/helpers.dart';
+
+/// The installed app facts without the platform channel.
+class _FixedAppInfo implements AppInfoSource {
+  const _FixedAppInfo();
+
+  @override
+  Future<AppInfo> load() async => const AppInfo(
+    name: 'Test App',
+    version: '1.0.0',
+    buildNumber: '1',
+    packageName: 'test.app',
+  );
+}
 
 Future<ProviderContainer> _container(
   WidgetTester tester, {
@@ -50,6 +64,7 @@ Future<ProviderContainer> _container(
       secureStorageProvider.overrideWithValue(FakeSecureStorage()),
       splashMinimumDisplayProvider.overrideWithValue(Duration.zero),
       appDatabaseProvider.overrideWithValue(AppDatabase.inMemory()),
+      appInfoSourceProvider.overrideWithValue(const _FixedAppInfo()),
       remoteConfigSourceProvider.overrideWithValue(
         const MockRemoteConfigSource(),
       ),

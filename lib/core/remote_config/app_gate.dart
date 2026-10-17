@@ -7,14 +7,17 @@ enum AppGateStatus { ok, updateAvailable, updateRequired, maintenance }
 /// The gate decision. Pure: no UI, no I/O.
 ///
 /// - maintenance on: [AppGateStatus.maintenance] (wins over updates);
+/// - [currentVersion] unknown (still loading) or unreadable: no version check,
+///   so [AppGateStatus.ok] (an unknown version never forces an update);
 /// - older than `minVersion`: [AppGateStatus.updateRequired];
 /// - older than `latestVersion`: [AppGateStatus.updateAvailable];
-/// - otherwise [AppGateStatus.ok]. An unreadable version never blocks: `ok`.
+/// - otherwise [AppGateStatus.ok].
 AppGateStatus gateStatusFor({
-  required String currentVersion,
+  required String? currentVersion,
   required RemoteConfig config,
 }) {
   if (config.maintenance.enabled) return AppGateStatus.maintenance;
+  if (currentVersion == null) return AppGateStatus.ok;
   try {
     if (compareVersions(currentVersion, config.minVersion) < 0) {
       return AppGateStatus.updateRequired;

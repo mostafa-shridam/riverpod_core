@@ -17,7 +17,7 @@ class AppConfig {
     required this.enableCrashReporting,
     required this.enableAnalytics,
     this.crashDsn,
-    this.appVersion = '0.0.0',
+    this.appVersion,
     this.remoteConfigPath = '/app/config',
     this.remoteConfigMock = false,
   });
@@ -66,9 +66,9 @@ class AppConfig {
         _parseBool('ENABLE_ANALYTICS', value('ENABLE_ANALYTICS'), problems) ??
         false;
 
-    // Optional: 0.0.0 keeps the update gate open until the app states its version.
-    final appVersion = value('APP_VERSION') ?? '0.0.0';
-    if (!_versionPattern.hasMatch(appVersion)) {
+    // Optional override of the installed version; empty means "use it".
+    final appVersion = value('APP_VERSION');
+    if (appVersion != null && !_versionPattern.hasMatch(appVersion)) {
       problems.add('APP_VERSION must look like 1.2.3');
     }
     final remoteConfigPath = value('REMOTE_CONFIG_PATH') ?? '/app/config';
@@ -116,9 +116,9 @@ class AppConfig {
   /// Optional crash-reporter DSN. Null when the crash vendor is not configured.
   final String? crashDsn;
 
-  /// Version of this build, `major.minor.patch` (`APP_VERSION`). Compared with
-  /// the remote config for the update gate.
-  final String appVersion;
+  /// Version override (`APP_VERSION`, `major.minor.patch`). Null means the
+  /// installed version from `appInfoProvider` is used.
+  final String? appVersion;
 
   /// Path of the remote config endpoint, relative to [apiBaseUrl].
   final String remoteConfigPath;

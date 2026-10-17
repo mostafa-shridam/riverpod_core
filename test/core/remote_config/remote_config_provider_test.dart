@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:riverpod_core/core/app_info/app_info.dart';
 import 'package:riverpod_core/core/config/app_config.dart';
 import 'package:riverpod_core/core/config/flavor.dart';
 import 'package:riverpod_core/core/config/log_level.dart';
@@ -13,20 +14,36 @@ import 'package:riverpod_core/core/storage/database/app_database.dart';
 
 import '../../helpers/helpers.dart';
 
+class _InstalledInfo implements AppInfoSource {
+  _InstalledInfo(this.version);
+
+  final String version;
+
+  @override
+  Future<AppInfo> load() async => AppInfo(
+    name: 'Test',
+    version: version,
+    buildNumber: '1',
+    packageName: 'test.app',
+  );
+}
+
 class _Source implements RemoteConfigSource {
   _Source({this.value, this.error});
 
   final RemoteConfig? value;
   final Object? error;
+  int fetches = 0;
 
   @override
   Future<CacheFetch<RemoteConfig>> fetch() async {
+    fetches++;
     if (error != null) throw error!;
     return (value: value!, etag: null);
   }
 }
 
-AppConfig _config({String appVersion = '1.0.0'}) => AppConfig(
+AppConfig _config({String? appVersion = '1.0.0'}) => AppConfig(
   flavor: Flavor.dev,
   appName: 'Test',
   apiBaseUrl: 'https://api.example.test',
@@ -40,7 +57,8 @@ AppConfig _config({String appVersion = '1.0.0'}) => AppConfig(
 
 ProviderContainer _container({
   required RemoteConfigSource source,
-  String appVersion = '1.0.0',
+  String? appVersion = '1.0.0',
+  String installedVersion = '1.0.0',
 }) {
   final database = AppDatabase.inMemory();
   final container = createContainer(
@@ -48,6 +66,7 @@ ProviderContainer _container({
       appConfigProvider.overrideWithValue(_config(appVersion: appVersion)),
       appDatabaseProvider.overrideWithValue(database),
       remoteConfigSourceProvider.overrideWithValue(source),
+      appInfoSourceProvider.overrideWithValue(_InstalledInfo(installedVersion)),
     ],
   );
   container.listen(remoteConfigProvider, (_, _) {}, onError: (_, _) {});
@@ -73,16 +92,38 @@ void main() {
   });
 
   test('without a config the defaults apply: no gate, no flags', () async {
-    final container = _container(
-      source: _Source(error: const NetworkException()),
-    );
+    final source = _Source(error: const NetworkException());
+    final container = _container(source: source);
     await container
         .read(remoteConfigProvider.future)
         .then<void>((_) {}, onError: (_) {});
 
+    expect(
+      source.fetches,
+      1,
+      reason: 'a failed read is not retried: the config is optional',
+    );
     expect(container.read(currentRemoteConfigProvider), RemoteConfig.defaults);
     expect(container.read(appGateStatusProvider), AppGateStatus.ok);
     expect(container.read(flagProvider('anything')), isFalse);
+  });
+
+  test('without an override the installed version is compared', () async {
+    final container = _container(
+      appVersion: null,
+      installedVersion: '1.2.0',
+      source: _Source(
+        value: const RemoteConfig(minVersion: '1.0.0', latestVersion: '1.5.0'),
+      ),
+    );
+    await container.read(remoteConfigProvider.future);
+    await container.read(appInfoProvider.future);
+
+    expect(container.read(currentAppVersionProvider), '1.2.0');
+    expect(
+      container.read(appGateStatusProvider),
+      AppGateStatus.updateAvailable,
+    );
   });
 
   test('the gate reads the version of this build', () async {
