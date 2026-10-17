@@ -428,7 +428,7 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 ## C-46 — Storage and wiring leftovers after C-41
 | status | owner | blocked by |
 |---|---|---|
-| REVIEW | Worker A | — |
+| DONE | Worker A | — |
 - Goal: close the small gaps left by C-41/C-36/C-45.
 - Files: `lib/core/bootstrap/bootstrap.dart` (ProviderScope override `permissionRationalePresenterProvider` with `showPermissionRationale` from design_system; tiny diff, C-44 edits `bootstrap.dart` too for prune scheduling), `lib/core/remote_config/**` + `lib/core/storage/**` (wire the typed `DismissedUpdates` accessor instead of the generic slot, same key; app_gate/soft update must use it), `lib/core/constants.dart` (delete once nothing imports it: bootstrap, `test/helpers/pump_app.dart` and two tests import it today: move what they need to its natural owner), `test/**` touched by those, `test/core/startup/**` (splash minimum-display test: inject a clock into `StartupController` instead of a real 120 ms timer), `ai-docs/reports/C-46.md`
 - Done when: the rationale dialog shows before the system prompt in a widget test using the real app wiring; no generic-slot string-list access remains for appLock/disabledChannels/dismissed updates (grep); `constants.dart` gone; splash test deterministic; gate green.
