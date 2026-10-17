@@ -84,7 +84,7 @@ CI (`.github/workflows/ci.yml`) runs the same plus a stale-generated-code check 
 ## 11. Release
 - Android: `cp android/key.properties.example android/key.properties`, fill it, keep the keystore outside the repo. iOS: pick your team in Xcode, `cp ios/ExportOptions.plist.example ios/ExportOptions.plist`.
 - Build: `tool/release/build_android.sh [--flavor staging|prod]` and `tool/release/build_ios.sh [--flavor staging|prod]` (they run the gate first, then obfuscated release builds). Details: `tool/release/README.md`.
-- Before shipping run the checklist in `.claude/skills/release-check/SKILL.md` (note: that file still mentions `env/prod.json` / `--dart-define-from-file`; with D-024 the equivalent is `env/prod.env` and a plain release build).
+- Before shipping run the checklist in `.claude/skills/release-check/SKILL.md`.
 - Signing files (`key.properties`, `*.jks`, `*.keystore`, `ExportOptions.plist`, `*.mobileprovision`) and `build-symbols/` stay untracked.
 
 ## 12. Integration tests
