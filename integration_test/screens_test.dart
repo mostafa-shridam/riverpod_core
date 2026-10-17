@@ -22,7 +22,11 @@ void main() {
     // screen on iOS.
     final capture = ScreenCapture(binding, tester);
     Future<void> shot(String name) async {
-      if (captureScreens) await capture.shot(name);
+      if (!captureScreens) return;
+      // Let the route transition finish: a page is found while the old one
+      // is still fully visible above it.
+      await tester.pump(const Duration(milliseconds: 800));
+      await capture.shot(name);
     }
 
     await startApp(tester);
