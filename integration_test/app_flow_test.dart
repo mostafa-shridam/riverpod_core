@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -5,6 +7,7 @@ import 'package:integration_test/integration_test.dart';
 import 'package:riverpod_core/core/design_system/widgets/buttons/app_button.dart';
 import 'package:riverpod_core/core/errors/app_exception.dart';
 import 'package:riverpod_core/core/errors/error_messages.dart';
+import 'package:riverpod_core/core/router/routes.dart';
 import 'package:riverpod_core/features/videos/data/sources/sample_videos.dart';
 import 'package:riverpod_core/generated/locale_keys.g.dart';
 
@@ -21,28 +24,7 @@ void main() {
     'onboarding, sign-in, then a video is favorited and the app is home',
     (tester) async {
       await _startSignedIn(tester);
-
-      // Videos: list, open the first, play, favorite it.
-      await tapWhenFound(
-        tester,
-        find.byKey(const ValueKey('home-videos-tile')),
-      );
-      final first = sampleVideos.first;
-      await tapWhenFound(tester, find.text(first.title));
-      await pumpUntilFound(tester, find.byKey(const ValueKey('flow-video')));
-      await tapWhenFound(
-        tester,
-        find.widgetWithText(AppButton, LocaleKeys.videos_favorite_add.tr()),
-      );
-      await pumpUntilFound(
-        tester,
-        find.text(LocaleKeys.videos_favorite_remove.tr()),
-      );
-
-      // Back to videos, then home.
-      await popRoute(tester);
-      await popRoute(tester);
-      await pumpUntilFound(tester, find.byKey(const ValueKey('home-page')));
+      await _favoriteFirstVideoAndLeave(tester);
     },
   );
 
@@ -50,6 +32,7 @@ void main() {
     'KNOWN DEFECT C-26, skipped: More, About, then logout returns to login',
     (tester) async {
       await _startSignedIn(tester);
+      await _favoriteFirstVideoAndLeave(tester);
 
       await tapWhenFound(tester, find.byIcon(Icons.more_horiz));
       await pumpUntilFound(tester, find.byKey(const ValueKey('more-page')));
@@ -63,11 +46,46 @@ void main() {
       );
       await pumpUntilFound(tester, find.byKey(const ValueKey('login-page')));
     },
-    // Known defect (C-26 report): after a video pop the bottom tab bar is
-    // under an absorbing layer, so the More tab cannot be tapped. Un-skip when
-    // fixed.
     skip: true,
   );
+
+  testWidgets(
+    'KNOWN DEFECT C-26, skipped: More opens after an items detail is popped',
+    (tester) async {
+      await _startSignedIn(tester);
+      final home = tester.element(find.byKey(const ValueKey('home-page')));
+      unawaited(const ItemDetailRoute(id: '42').push<void>(home));
+      await pumpUntilFound(
+        tester,
+        find.byKey(const ValueKey('item-detail-page')),
+      );
+      await popRoute(tester);
+
+      await tapWhenFound(tester, find.byIcon(Icons.more_horiz));
+      await pumpUntilFound(tester, find.byKey(const ValueKey('more-page')));
+    },
+    skip: true,
+  );
+}
+
+/// Opens the first video, favorites it (the toast stays up), and pops back to
+/// home. The pops happen while the toast is still on screen.
+Future<void> _favoriteFirstVideoAndLeave(WidgetTester tester) async {
+  await tapWhenFound(tester, find.byKey(const ValueKey('home-videos-tile')));
+  final first = sampleVideos.first;
+  await tapWhenFound(tester, find.text(first.title));
+  await pumpUntilFound(tester, find.byKey(const ValueKey('flow-video')));
+  await tapWhenFound(
+    tester,
+    find.widgetWithText(AppButton, LocaleKeys.videos_favorite_add.tr()),
+  );
+  await pumpUntilFound(
+    tester,
+    find.text(LocaleKeys.videos_favorite_remove.tr()),
+  );
+  await popRoute(tester);
+  await popRoute(tester);
+  await pumpUntilFound(tester, find.byKey(const ValueKey('home-page')));
 }
 
 /// Cold start through onboarding and a valid sign-in, to home.
