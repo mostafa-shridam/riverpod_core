@@ -408,6 +408,15 @@ Architecture and paths: ARCHITECTURE.md (target tree). Old paths in existing cod
 - Done when: `dart run flutter_launcher_icons` and the splash command are documented, committed output builds on both platforms (`flutter build apk --debug`, `flutter build ios --no-codesign --debug`); deep link `https://example.com/videos/abc` and `riverpod_core://videos/abc` map to the video detail route in tests; plain `flutter run` still needs no `--flavor`.
 - Tests: deep-link mapping table, rename script covers the new placeholders.
 
+## C-47 — Notification channels localized after translations are loaded (bug from the owner's first device run)
+| status | owner | blocked by |
+|---|---|---|
+| READY | — | — |
+- Bug: on `flutter run` the log shows `Localization key [notifications.groupUpdates] not found` (and every `notifications.channel*` key). Cause: `bootstrap.dart` calls `notificationServiceProvider.initialize()` BEFORE `EasyLocalization` has loaded the translations, so `.tr()` returns the raw key; Android channels/groups would be created with key strings as their visible names.
+- Files: `lib/core/notifications/**` (channel/group registration), `lib/core/app/app.dart` or `lib/core/startup/**` (one hook that runs after the first frame, when `context.locale`/translations are ready, and again on locale change), `lib/core/bootstrap/bootstrap.dart` ONLY to remove/defer the early localized call if needed (tiny diff; C-41 and C-30 also edit it), `test/core/notifications/**`
+- Done when: no `Localization key ... not found` warning at startup (verify with a widget test that pumps the app with real translations and a log/`EasyLocalization.logger` check, or a fake translator that fails on empty), channels and groups are created/updated once translations are loaded and re-registered with the new names when the user switches language (same channel ids; Android allows renaming by re-creating), initialization stays non-blocking, tap/permission behaviour unchanged.
+- Tests: channel registration runs after translations (fake translator records order), locale switch re-registers with the translated names, startup without translations loaded does not register with raw keys.
+
 ---
 
 ## Backlog (full tasks written when dependencies near DONE)
