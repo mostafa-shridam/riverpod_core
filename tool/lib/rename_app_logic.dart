@@ -95,6 +95,12 @@ List<String> validateRename(RenameRequest request) {
       'got "${request.package}".',
     );
   }
+  if (_wellKnownSchemes.contains(request.scheme)) {
+    problems.add(
+      'The deep-link scheme "${request.scheme}" (from --package) is a '
+      'well-known scheme the app must not claim; choose another --package.',
+    );
+  }
   final host = request.host;
   if (host != null && !_hostPattern.hasMatch(host)) {
     problems.add(
@@ -217,20 +223,40 @@ String rewriteManifest(String content, String name) => content.replaceAllMapped(
 // Deep links (ai-docs/DEEP_LINKS.md). The https host is only rewritten when a
 // request names one; the custom scheme always follows the package.
 
-/// `<data android:scheme="https" android:host="...">` and the custom scheme.
+/// Schemes the app never claims as its own and the rename never rewrites.
+const _wellKnownSchemes = {'http', 'https', 'mailto', 'tel', 'sms'};
+
+/// The deep-link `<intent-filter>`s of the manifest: a VIEW action with the
+/// BROWSABLE category. `<queries>` holds `<intent>` elements, never these.
+final _deepLinkFilter = RegExp(
+  r'<intent-filter\b[^>]*>[\s\S]*?</intent-filter>',
+);
+
+/// `<data android:scheme="https" android:host="...">` and the custom scheme,
+/// only inside the VIEW/BROWSABLE intent-filters. Everything else (`<queries>`,
+/// other filters) and the well-known schemes stay as they are.
 String rewriteManifestDeepLink(String content, RenameRequest request) {
-  var result = content.replaceAllMapped(
-    RegExp(r'(android:scheme=")(?!https"|http")[^"]*(")'),
-    (m) => '${m[1]!}${request.scheme}${m[2]!}',
-  );
   final host = request.host;
-  if (host != null) {
-    result = result.replaceAllMapped(
-      RegExp(r'(android:host=")[^"]*(")'),
-      (m) => '${m[1]!}$host${m[2]!}',
+  return content.replaceAllMapped(_deepLinkFilter, (filter) {
+    final block = filter[0]!;
+    if (!block.contains('android.intent.action.VIEW') ||
+        !block.contains('android.intent.category.BROWSABLE')) {
+      return block;
+    }
+    var result = block.replaceAllMapped(
+      RegExp(r'(android:scheme=")([^"]*)(")'),
+      (m) => _wellKnownSchemes.contains(m[2])
+          ? m[0]!
+          : '${m[1]!}${request.scheme}${m[3]!}',
     );
-  }
-  return result;
+    if (host != null) {
+      result = result.replaceAllMapped(
+        RegExp(r'(android:host=")[^"]*(")'),
+        (m) => '${m[1]!}$host${m[2]!}',
+      );
+    }
+    return result;
+  });
 }
 
 /// The `CFBundleURLSchemes` entry of Info.plist.

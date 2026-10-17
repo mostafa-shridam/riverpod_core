@@ -162,6 +162,122 @@ void main() {
       );
     });
 
+    test(
+      'only the app scheme changes; <queries> and Info.plist queries stay',
+      () async {
+        // The real manifest and plist of the template, not the fixtures.
+        File(
+          '${project.path}/android/app/src/main/AndroidManifest.xml',
+        ).writeAsStringSync(
+          File('android/app/src/main/AndroidManifest.xml').readAsStringSync(),
+        );
+        File(
+          '${project.path}/ios/Runner/Info.plist',
+        ).writeAsStringSync(File('ios/Runner/Info.plist').readAsStringSync());
+        await renameApp(root: project, request: _request);
+
+        final manifest = File(
+          '${project.path}/android/app/src/main/AndroidManifest.xml',
+        ).readAsStringSync();
+        final queries = RegExp(
+          r'<queries>[\s\S]*?</queries>',
+        ).firstMatch(manifest)!.group(0)!;
+        List<String?> schemes(String xml) => RegExp(
+          r'android:scheme="([^"]*)"',
+        ).allMatches(xml).map((m) => m[1]).toList();
+        expect(schemes(queries), ['https', 'http', 'mailto', 'tel']);
+        expect(schemes(manifest.replaceFirst(queries, '')), [
+          'https',
+          'my-app',
+        ]);
+        expect(manifest, isNot(contains('riverpod-core')));
+
+        final plist = File(
+          '${project.path}/ios/Runner/Info.plist',
+        ).readAsStringSync();
+        final urlSchemes = RegExp(
+          r'<key>CFBundleURLSchemes</key>\s*<array>([\s\S]*?)</array>',
+        ).firstMatch(plist)!.group(1)!;
+        final plistQueries = RegExp(
+          r'<key>LSApplicationQueriesSchemes</key>\s*<array>([\s\S]*?)</array>',
+        ).firstMatch(plist)!.group(1)!;
+        List<String?> strings(String xml) => RegExp(
+          r'<string>([^<]*)</string>',
+        ).allMatches(xml).map((m) => m[1]).toList();
+        expect(strings(urlSchemes), ['my-app']);
+        expect(strings(plistQueries), ['https', 'http', 'mailto', 'tel']);
+      },
+    );
+
+    test(
+      'rewriteManifestDeepLink leaves <queries> and other filters alone',
+      () {
+        const manifest = '''
+<activity>
+  <intent-filter>
+    <action android:name="android.intent.action.VIEW"/>
+    <category android:name="android.intent.category.BROWSABLE"/>
+    <data android:scheme="old-app"/>
+  </intent-filter>
+  <intent-filter>
+    <action android:name="com.other.ACTION"/>
+    <data android:scheme="other"/>
+  </intent-filter>
+</activity>
+<queries>
+  <intent><data android:scheme="mailto"/></intent>
+  <intent><data android:scheme="tel"/></intent>
+  <intent><data android:scheme="sms"/></intent>
+</queries>
+''';
+        final result = rewriteManifestDeepLink(manifest, _request);
+        expect(result, contains('android:scheme="my-app"'));
+        expect(result, isNot(contains('old-app')));
+        expect(result, contains('android:scheme="other"'));
+        for (final scheme in ['mailto', 'tel', 'sms']) {
+          expect(result, contains('android:scheme="$scheme"'));
+        }
+        expect(rewriteManifestDeepLink(result, _request), result);
+      },
+    );
+
+    test('a second rename with other values keeps queries intact', () async {
+      File(
+        '${project.path}/android/app/src/main/AndroidManifest.xml',
+      ).writeAsStringSync(
+        File('android/app/src/main/AndroidManifest.xml').readAsStringSync(),
+      );
+      await renameApp(root: project, request: _request);
+      await renameApp(root: project, request: _acmeRequest);
+      final manifest = File(
+        '${project.path}/android/app/src/main/AndroidManifest.xml',
+      ).readAsStringSync();
+      expect(manifest, contains('<data android:scheme="acme-app"/>'));
+      expect(manifest, contains('<data android:scheme="mailto"/>'));
+      expect(manifest, contains('<data android:scheme="tel"/>'));
+      expect(manifest, isNot(contains('my-app')));
+      // The identical request again changes nothing and is refused.
+      await expectLater(
+        renameApp(root: project, request: _acmeRequest),
+        throwsA(isA<RenameException>()),
+      );
+    });
+
+    test('a package whose scheme is a well-known one is refused', () async {
+      for (final package in ['mailto', 'tel', 'sms', 'http', 'https']) {
+        final request = RenameRequest(
+          name: 'My App',
+          id: 'com.company.myapp',
+          package: package,
+        );
+        expect(validateRename(request), isNotEmpty, reason: package);
+        await expectLater(
+          renameApp(root: project, request: request),
+          throwsA(isA<RenameException>()),
+        );
+      }
+    });
+
     test('the custom scheme never keeps an underscore', () {
       expect(_request.scheme, 'my-app');
       expect(
