@@ -12,3 +12,7 @@ bool isExpired({
 /// one user's entries can be removed without touching another's.
 String cacheKey(String key, {String? userId}) =>
     userId == null ? 'shared/$key' : 'user/$userId/$key';
+
+/// Eviction age used when a caller does not choose one (D-038). Presets per
+/// data type come with the cache policy task (C-44).
+const defaultMaxAge = Duration(days: 30);

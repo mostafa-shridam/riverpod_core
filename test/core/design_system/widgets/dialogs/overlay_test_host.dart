@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod_core/core/design_system/theme/app_theme.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Reads `assets/translations/<lang>.json` synchronously so it works inside
 /// the fake-async zone of `testWidgets`.
@@ -24,7 +23,6 @@ class _FileAssetLoader extends AssetLoader {
 
 /// Call once in `setUpAll` of every test file that uses [pumpOverlayHost].
 Future<void> setUpOverlayTests() async {
-  SharedPreferences.setMockInitialValues({});
   TestWidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   EasyLocalization.logger.enableLevels = [];

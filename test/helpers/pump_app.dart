@@ -7,7 +7,6 @@ import 'package:riverpod_core/core/constants.dart';
 import 'package:riverpod_core/core/design_system/responsive/text_scale.dart';
 import 'package:riverpod_core/core/design_system/theme/app_theme.dart';
 import 'package:riverpod_core/generated/codegen_loader.g.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Default phone window used when a test does not pass [size].
 const Size defaultTestSize = Size(400, 800);
@@ -30,9 +29,7 @@ Future<void> pumpApp(
     ..physicalSize = size;
   addTearDown(tester.view.reset);
 
-  // No platform channels in tests: mock prefs and do real async work outside
-  // the fake clock of testWidgets.
-  SharedPreferences.setMockInitialValues({});
+  // Do real async work outside the fake clock of testWidgets.
   await tester.runAsync(EasyLocalization.ensureInitialized);
 
   // EasyLocalization reads startLocale only in initState: unmount first so

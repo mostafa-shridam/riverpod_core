@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
+import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:riverpod_core/core/app/app.dart';
 import 'package:riverpod_core/core/config/app_config.dart';
 import 'package:riverpod_core/core/config/config_exception.dart';
@@ -15,6 +16,7 @@ import 'package:riverpod_core/core/constants.dart';
 import 'package:riverpod_core/core/crash/crash_reporter.dart';
 import 'package:riverpod_core/core/logger/app_logger.dart';
 import 'package:riverpod_core/core/notifications/notification_service_provider.dart';
+import 'package:riverpod_core/core/storage/hive_boxes.dart';
 import 'package:riverpod_core/core/storage/prefs_storage.dart';
 import 'package:riverpod_core/core/utils/formatting/formatting_setup.dart';
 import 'package:riverpod_core/generated/codegen_loader.g.dart';
@@ -22,16 +24,30 @@ import 'package:riverpod_core/generated/codegen_loader.g.dart';
 /// Shows the app. `runApp` in production; a capture in tests.
 typedef AppRunner = void Function(Widget app);
 
-/// Starts the app for [flavor] (D-024): load and validate config, install the
-/// global error handlers, warm storage, then run the app.
+/// Opens the local stores (D-034): Hive in the app documents directory, then
+/// the settings and cache boxes. Returns the provider overrides that expose them.
+Future<List<Override>> openAppStorage() async {
+  await Hive.initFlutter();
+  return storageOverrides(
+    settings: await Hive.openBox<dynamic>(HiveBoxNames.settings),
+    cache: await Hive.openBox<Map<dynamic, dynamic>>(HiveBoxNames.cache),
+  );
+}
+
+/// Starts the app for [flavor] (D-024): load and validate config, open the
+/// local stores, install the global error handlers, warm storage, then run the
+/// app.
 ///
 /// A config failure shows [ConfigErrorApp]; optional services never block.
-/// [envReader], [runner], [overrides] and [initNotifications] exist for tests.
+/// A storage failure is fatal and goes to the zone error handler.
+/// [envReader], [runner], [overrides], [openStorage] and [initNotifications]
+/// exist for tests.
 Future<void> bootstrap(
   Flavor flavor, {
   AssetReader? envReader,
   AppRunner runner = runApp,
   List<Override> overrides = const [],
+  Future<List<Override>> Function()? openStorage,
   Future<void> Function()? initNotifications,
 }) {
   final done = Completer<void>();
@@ -54,11 +70,13 @@ Future<void> bootstrap(
           return;
         }
 
+        final storage = await (openStorage ?? openAppStorage)();
         // D-032: no silent provider retries; Dio retries network calls only.
         final container = ProviderContainer(
           retry: (retryCount, error) => null,
           overrides: [
             appConfigProvider.overrideWithValue(config),
+            ...storage,
             ...overrides,
           ],
         );

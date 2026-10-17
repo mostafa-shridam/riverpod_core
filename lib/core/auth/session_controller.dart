@@ -11,8 +11,8 @@ import 'package:riverpod_core/core/network/dio_client.dart';
 import 'package:riverpod_core/core/network/session_events.dart';
 import 'package:riverpod_core/core/network/token_refresher.dart';
 import 'package:riverpod_core/core/notifications/notification_service_provider.dart';
+import 'package:riverpod_core/core/storage/cache/cache_store.dart';
 import 'package:riverpod_core/core/storage/clear_user_data.dart';
-import 'package:riverpod_core/core/storage/database/app_database.dart';
 import 'package:riverpod_core/core/storage/prefs_storage.dart';
 import 'package:riverpod_core/core/storage/secure_storage.dart';
 import 'package:riverpod_core/shared/models/auth_user.dart';
@@ -119,7 +119,7 @@ class SessionController extends _$SessionController
     await clearUserData(
       secure: _secure,
       prefs: await ref.read(prefsStorageProvider.future),
-      database: ref.read(appDatabaseProvider),
+      cache: ref.read(cacheStoreProvider),
     );
     final analytics = ref.read(analyticsServiceProvider);
     await analytics.setUserId(null);

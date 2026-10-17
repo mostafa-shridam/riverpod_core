@@ -12,13 +12,11 @@ import 'package:riverpod_core/core/design_system/theme/app_theme.dart';
 import 'package:riverpod_core/features/more/presentation/pages/about_page.dart';
 import 'package:riverpod_core/features/more/presentation/pages/more_page.dart';
 import 'package:riverpod_core/generated/codegen_loader.g.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../helpers/fake_native_backends.dart';
 
 void main() {
   testWidgets('the About tile opens the About page', (tester) async {
-    SharedPreferences.setMockInitialValues({});
     await tester.runAsync(EasyLocalization.ensureInitialized);
     tester.view
       ..devicePixelRatio = 1

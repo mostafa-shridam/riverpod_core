@@ -8,12 +8,12 @@ part of 'cached_repository_helper.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// The helper for the whole app, backed by the one [AppDatabase].
+/// The helper for the whole app, backed by the one [CacheStore].
 
 @ProviderFor(cachedRepositoryHelper)
 final cachedRepositoryHelperProvider = CachedRepositoryHelperProvider._();
 
-/// The helper for the whole app, backed by the one [AppDatabase].
+/// The helper for the whole app, backed by the one [CacheStore].
 
 final class CachedRepositoryHelperProvider
     extends
@@ -23,7 +23,7 @@ final class CachedRepositoryHelperProvider
           CachedRepositoryHelper
         >
     with $Provider<CachedRepositoryHelper> {
-  /// The helper for the whole app, backed by the one [AppDatabase].
+  /// The helper for the whole app, backed by the one [CacheStore].
   CachedRepositoryHelperProvider._()
     : super(
         from: null,
@@ -59,4 +59,4 @@ final class CachedRepositoryHelperProvider
 }
 
 String _$cachedRepositoryHelperHash() =>
-    r'4a24ed2a2045efcca0a3265fc03b34ffd446582e';
+    r'7653190152952bb2fe73cd0ced48baa58bb024c2';

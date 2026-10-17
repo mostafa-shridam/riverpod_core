@@ -15,7 +15,7 @@ import 'package:riverpod_core/core/network/dio_client.dart';
 import 'package:riverpod_core/core/network/session_events.dart';
 import 'package:riverpod_core/core/network/token_refresher.dart';
 import 'package:riverpod_core/core/notifications/notification_service_provider.dart';
-import 'package:riverpod_core/core/storage/database/app_database.dart';
+import 'package:riverpod_core/core/storage/cache/cache_store.dart';
 import 'package:riverpod_core/core/storage/prefs_storage.dart';
 import 'package:riverpod_core/core/storage/secure_storage.dart';
 import 'package:riverpod_core/shared/models/auth_user.dart';
@@ -57,14 +57,14 @@ class _Harness {
     required this.secure,
     required this.analytics,
     required this.adapter,
-    required this.database,
+    required this.cache,
   });
 
   final ProviderContainer container;
   final FakeSecureStorage secure;
   final _RecordingAnalytics analytics;
   final FakeHttpAdapter adapter;
-  final AppDatabase database;
+  final CacheStore cache;
 
   SessionController get session =>
       container.read(sessionControllerProvider.notifier);
@@ -76,8 +76,10 @@ Future<_Harness> _harness({
   Map<String, String> secure = const {},
   Future<void> Function()? notificationLogout,
 }) async {
-  final prefs = await fakePrefsStorage({PrefKeys.themeMode: 'dark'});
-  final database = AppDatabase.inMemory();
+  final storage = await openTestStorage();
+  await storage.settings.putAll({PrefKeys.themeMode: 'dark'});
+  final prefs = PrefsStorage(storage.settings);
+  final cache = CacheStore(storage.cache);
   final analytics = _RecordingAnalytics();
   final fakeSecure = FakeSecureStorage(secure);
   final adapter = FakeHttpAdapter();
@@ -86,7 +88,7 @@ Future<_Harness> _harness({
       appConfigProvider.overrideWithValue(_config()),
       secureStorageProvider.overrideWithValue(fakeSecure),
       prefsStorageProvider.overrideWith((ref) => Future.value(prefs)),
-      appDatabaseProvider.overrideWithValue(database),
+      cacheStoreProvider.overrideWithValue(cache),
       analyticsServiceProvider.overrideWithValue(analytics),
       httpClientAdapterProvider.overrideWithValue(adapter),
       // Real notification plugins are never touched in these tests.
@@ -100,7 +102,7 @@ Future<_Harness> _harness({
     secure: fakeSecure,
     analytics: analytics,
     adapter: adapter,
-    database: database,
+    cache: cache,
   );
 }
 
@@ -108,7 +110,6 @@ void main() {
   group('restore', () {
     test('no stored token means signed out', () async {
       final h = await _harness();
-      addTearDown(h.database.close);
 
       await h.session.restore();
 
@@ -124,7 +125,6 @@ void main() {
           'auth.user': jsonEncode(_user.toJson()),
         },
       );
-      addTearDown(h.database.close);
 
       await h.session.restore();
 
@@ -138,7 +138,6 @@ void main() {
         final h = await _harness(
           secure: {SecureKeys.accessToken: 'access-1', 'auth.user': 'not json'},
         );
-        addTearDown(h.database.close);
 
         await h.session.restore();
 
@@ -151,7 +150,6 @@ void main() {
   group('signIn', () {
     test('stores tokens and user, then reports signed in', () async {
       final h = await _harness();
-      addTearDown(h.database.close);
 
       await h.session.signIn(tokens: _tokens, user: _user);
 
@@ -166,7 +164,6 @@ void main() {
   group('refreshAccessToken', () {
     test('renews the tokens through the refresh client', () async {
       final h = await _harness(secure: {SecureKeys.refreshToken: 'refresh-1'});
-      addTearDown(h.database.close);
       h.adapter.enqueueJson(200, {
         'accessToken': 'access-2',
         'refreshToken': 'refresh-2',
@@ -182,7 +179,6 @@ void main() {
 
     test('without a refresh token it fails as unauthorized', () async {
       final h = await _harness();
-      addTearDown(h.database.close);
 
       await expectLater(
         h.session.refreshAccessToken(),
@@ -192,7 +188,6 @@ void main() {
 
     test('is the refresher the Dio client uses', () async {
       final h = await _harness();
-      addTearDown(h.database.close);
 
       final refresher = h.container.read(accessTokenRefresherProvider);
 
@@ -208,7 +203,6 @@ void main() {
           'auth.user': jsonEncode(_user.toJson()),
         },
       );
-      addTearDown(h.database.close);
       await h.session.restore();
       final epochBefore = h.container.read(sessionEpochProvider);
 
@@ -228,7 +222,7 @@ void main() {
     }) async {
       final h = await _harness(notificationLogout: notificationLogout);
       await h.session.signIn(tokens: _tokens, user: _user);
-      await h.database.writeCache(
+      await h.cache.write(
         key: 'user-1/orders',
         payload: '[]',
         savedAt: DateTime.utc(2026),
@@ -241,14 +235,13 @@ void main() {
 
     test('wipes secrets, cache and user settings and signs out', () async {
       final h = await signedIn();
-      addTearDown(h.database.close);
 
       await h.session.logout();
 
       expect(h.state, SessionStatus.signedOut);
       expect(h.user, isNull);
       expect(h.secure.values, isEmpty);
-      expect(await h.database.readCache('user-1/orders'), isNull);
+      expect(h.cache.read('user-1/orders'), isNull);
       final prefs = await h.container.read(prefsStorageProvider.future);
       expect(prefs.notificationsEnabled, isTrue, reason: 'user setting reset');
       expect(prefs.themeMode, 'dark', reason: 'device setting kept');
@@ -256,7 +249,6 @@ void main() {
 
     test('clears analytics and bumps the session epoch', () async {
       final h = await signedIn();
-      addTearDown(h.database.close);
       final epochBefore = h.container.read(sessionEpochProvider);
 
       await h.session.logout();
@@ -267,7 +259,6 @@ void main() {
 
     test('calls the remote logout before the local wipe', () async {
       final h = await signedIn();
-      addTearDown(h.database.close);
       var remoteSawTokens = false;
 
       await h.session.logout(
@@ -293,7 +284,6 @@ void main() {
             );
           },
         );
-        addTearDown(h.database.close);
 
         await h.session.logout(
           remoteLogout: () async {
@@ -318,7 +308,6 @@ void main() {
           throw const NetworkException();
         },
       );
-      addTearDown(h.database.close);
 
       await h.session.logout();
 
@@ -328,7 +317,6 @@ void main() {
 
     test('a failing remote logout does not block the local wipe', () async {
       final h = await signedIn();
-      addTearDown(h.database.close);
 
       await h.session.logout(
         remoteLogout: () async {

@@ -19,7 +19,6 @@ import 'package:riverpod_core/core/storage/prefs_storage.dart';
 import 'package:riverpod_core/core/storage/secure_storage.dart';
 import 'package:riverpod_core/generated/codegen_loader.g.dart';
 import 'package:riverpod_core/shared/models/auth_user.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../helpers/helpers.dart';
 
@@ -27,7 +26,6 @@ Future<ProviderContainer> _container(
   WidgetTester tester, {
   required bool onboardingSeen,
 }) async {
-  SharedPreferences.setMockInitialValues({});
   await EasyLocalization.ensureInitialized();
   final prefs = await tester.runAsync(
     () => fakePrefsStorage({if (onboardingSeen) PrefKeys.onboardingSeen: true}),
