@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod_core/core/design_system/theme/theme_context.dart';
 import 'package:riverpod_core/core/design_system/tokens/app_tokens.dart';
+import 'package:riverpod_core/generated/locale_keys.g.dart';
 
 import 'helpers.dart';
 
@@ -98,16 +99,16 @@ void main() {
       late String label;
       Widget probe() => Builder(
         builder: (context) {
-          label = 'english'.tr();
+          label = LocaleKeys.errors_retry.tr();
           return const SizedBox();
         },
       );
 
       await pumpApp(tester, probe());
-      expect(label, 'English');
+      expect(label, 'Try again');
 
       await pumpApp(tester, locale: const Locale('ar'), probe());
-      expect(label, isNot('English'));
+      expect(label, isNot('Try again'));
       expect(label, isNotEmpty);
     });
 

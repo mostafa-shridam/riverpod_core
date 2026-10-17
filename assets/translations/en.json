@@ -1,15 +1,4 @@
 {
-  "hello": "Hello",
-  "arabic": "Arabic",
-  "english": "English",
-  "light": "Light",
-  "dark": "Dark",
-  "system": "System",
-  "confirmButton": "Confirm",
-  "cancelButton": "Cancel",
-  "selectLanguage": "Select Language",
-  "goodEvening": "Good Evening",
-  "goodMorning": "Good Morning",
   "ds_display": {
     "imageError": "Image could not be loaded",
     "expand": "Expand",
@@ -223,8 +212,7 @@
     "actionReply": "Reply",
     "actionReplySend": "Send",
     "actionReplyHint": "Write a reply",
-    "actionMarkRead": "Mark as read",
-    "groupSummary": "{} new notifications"
+    "actionMarkRead": "Mark as read"
   },
   "showcase": {
     "title": "Component gallery",
@@ -445,7 +433,6 @@
     },
     "detail": {
       "title": "Video",
-      "description": "About this video",
       "related": "Related videos",
       "relatedError": "Related videos could not be loaded.",
       "customTitle": "Custom link",
@@ -506,8 +493,7 @@
       "share": "Share the app",
       "shareMessage": "Check out {}",
       "rate": "Rate the app",
-      "actionFailed": "Could not complete that. Please try again.",
-      "loadFailed": "Could not load the app details."
+      "actionFailed": "Could not complete that. Please try again."
     }
   },
   "security": {

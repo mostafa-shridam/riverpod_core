@@ -1,15 +1,4 @@
 {
-  "hello": "مرحبا",
-  "arabic": "العربية",
-  "english": "الإنجليزية",
-  "light": "فاتح",
-  "dark": "غامق",
-  "system": "النظام",
-  "confirmButton": "تأكيد",
-  "cancelButton": "إلغاء",
-  "selectLanguage": "اختر اللغة",
-  "goodEvening": "مساء الخير",
-  "goodMorning": "صباح الخير",
   "ds_display": {
     "imageError": "تعذر تحميل الصورة",
     "expand": "توسيع",
@@ -223,8 +212,7 @@
     "actionReply": "رد",
     "actionReplySend": "إرسال",
     "actionReplyHint": "اكتب رداً",
-    "actionMarkRead": "تعليم كمقروء",
-    "groupSummary": "{} إشعارات جديدة"
+    "actionMarkRead": "تعليم كمقروء"
   },
   "showcase": {
     "title": "معرض المكوّنات",
@@ -445,7 +433,6 @@
     },
     "detail": {
       "title": "فيديو",
-      "description": "عن هذا الفيديو",
       "related": "فيديوهات ذات صلة",
       "relatedError": "تعذّر تحميل الفيديوهات ذات الصلة.",
       "customTitle": "رابط مخصص",
@@ -506,8 +493,7 @@
       "share": "شارك التطبيق",
       "shareMessage": "جرّب {}",
       "rate": "قيّم التطبيق",
-      "actionFailed": "تعذر إتمام ذلك. حاول مرة أخرى.",
-      "loadFailed": "تعذر تحميل تفاصيل التطبيق."
+      "actionFailed": "تعذر إتمام ذلك. حاول مرة أخرى."
     }
   },
   "security": {

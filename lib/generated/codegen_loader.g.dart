@@ -15,17 +15,6 @@ class CodegenLoader extends AssetLoader {
   }
 
   static const Map<String, dynamic> _en = {
-    "hello": "Hello",
-    "arabic": "Arabic",
-    "english": "English",
-    "light": "Light",
-    "dark": "Dark",
-    "system": "System",
-    "confirmButton": "Confirm",
-    "cancelButton": "Cancel",
-    "selectLanguage": "Select Language",
-    "goodEvening": "Good Evening",
-    "goodMorning": "Good Morning",
     "ds_display": {
       "imageError": "Image could not be loaded",
       "expand": "Expand",
@@ -235,7 +224,6 @@ class CodegenLoader extends AssetLoader {
       "actionReplySend": "Send",
       "actionReplyHint": "Write a reply",
       "actionMarkRead": "Mark as read",
-      "groupSummary": "{} new notifications",
     },
     "showcase": {
       "title": "Component gallery",
@@ -458,7 +446,6 @@ class CodegenLoader extends AssetLoader {
       },
       "detail": {
         "title": "Video",
-        "description": "About this video",
         "related": "Related videos",
         "relatedError": "Related videos could not be loaded.",
         "customTitle": "Custom link",
@@ -521,7 +508,6 @@ class CodegenLoader extends AssetLoader {
         "shareMessage": "Check out {}",
         "rate": "Rate the app",
         "actionFailed": "Could not complete that. Please try again.",
-        "loadFailed": "Could not load the app details.",
       },
     },
     "security": {
@@ -546,17 +532,6 @@ class CodegenLoader extends AssetLoader {
     },
   };
   static const Map<String, dynamic> _ar = {
-    "hello": "مرحبا",
-    "arabic": "العربية",
-    "english": "الإنجليزية",
-    "light": "فاتح",
-    "dark": "غامق",
-    "system": "النظام",
-    "confirmButton": "تأكيد",
-    "cancelButton": "إلغاء",
-    "selectLanguage": "اختر اللغة",
-    "goodEvening": "مساء الخير",
-    "goodMorning": "صباح الخير",
     "ds_display": {
       "imageError": "تعذر تحميل الصورة",
       "expand": "توسيع",
@@ -767,7 +742,6 @@ class CodegenLoader extends AssetLoader {
       "actionReplySend": "إرسال",
       "actionReplyHint": "اكتب رداً",
       "actionMarkRead": "تعليم كمقروء",
-      "groupSummary": "{} إشعارات جديدة",
     },
     "showcase": {
       "title": "معرض المكوّنات",
@@ -988,7 +962,6 @@ class CodegenLoader extends AssetLoader {
       },
       "detail": {
         "title": "فيديو",
-        "description": "عن هذا الفيديو",
         "related": "فيديوهات ذات صلة",
         "relatedError": "تعذّر تحميل الفيديوهات ذات الصلة.",
         "customTitle": "رابط مخصص",
@@ -1045,7 +1018,6 @@ class CodegenLoader extends AssetLoader {
         "shareMessage": "جرّب {}",
         "rate": "قيّم التطبيق",
         "actionFailed": "تعذر إتمام ذلك. حاول مرة أخرى.",
-        "loadFailed": "تعذر تحميل تفاصيل التطبيق.",
       },
     },
     "security": {
