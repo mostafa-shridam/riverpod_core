@@ -15,6 +15,7 @@ The knowledge base every AI session must follow. `CLAUDE.md` (repo root) is the 
 | CHECKLIST.md | The Lead: what the template still lacks (status per item). |
 | DECISIONS.md | Why things are the way they are. Append-only. Check before proposing alternatives. |
 | DEEP_LINKS.md | App links and custom scheme: host/scheme places, assetlinks.json, apple-app-site-association, enabling Universal Links. |
+| FIREBASE.md | Optional Crashlytics + Firebase Analytics: what is optional, adding Firebase files, consent, switching vendor, test crash. |
 | HOW_TO_START_A_NEW_APP.md | Someone creating an app from this template. |
 | reports/C-xx.md | Per-task report written by the worker; the Lead appends "REVIEW (Lead)". |
 

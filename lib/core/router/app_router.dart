@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:riverpod_core/core/analytics/analytics_route_observer.dart';
 import 'package:riverpod_core/core/auth/session_controller.dart';
 import 'package:riverpod_core/core/notifications/models/notification_payload.dart';
 import 'package:riverpod_core/core/notifications/models/notification_tap.dart';
@@ -38,6 +39,7 @@ GoRouter appRouter(Ref ref) {
   final router = GoRouter(
     initialLocation: SplashPage.routeName,
     refreshListenable: refresh,
+    observers: [ref.read(analyticsRouteObserverProvider)],
     redirect: (context, state) {
       final uri = state.uri;
       // A custom-scheme link is first rewritten to its route location.
