@@ -43,10 +43,9 @@ class ScreenCapture {
     final view = binding.renderViews.first;
     final layer = view.debugLayer! as OffsetLayer;
     final pixelRatio = view.configuration.devicePixelRatio;
-    final image = await layer.toImage(
-      Offset.zero & view.size,
-      pixelRatio: pixelRatio,
-    );
+    // The root layer is in physical pixels, so ask for the whole physical
+    // area at ratio 1 (a logical rect with the device ratio crops the corner).
+    final image = await layer.toImage(Offset.zero & (view.size * pixelRatio));
     try {
       final data = await image.toByteData(format: ui.ImageByteFormat.png);
       return data!.buffer.asUint8List().toList();
